@@ -1,0 +1,44 @@
+
+	I. Install and configure Prometheus
+	
+Prometheus est un outil informatique open-source de surveillance (monitoring) et d'alerte. 
+Il a été conçu pour suivre la santé, les performances et le bon fonctionnement des serveurs, des applications et des infrastructures informatiques.
+
+
+Installer Prometheus:
+
+
+	wget https://github.com/prometheus/prometheus/releases/download/v2.13.1/prometheus-2.13.1.linux-amd64.tar.gz
+tar xzf prometheus-2.13.1.linux-amd64.tar.gz
+sudo mv prometheus-2.13.1.linux-amd64/ /usr/share/prometheus
+	sudo useradd -u 3434 -d /usr/share/prometheus -s /bin/false prometheus
+sudo mkdir -p /var/lib/prometheus/data
+sudo chown prometheus:prometheus /var/lib/prometheus/data
+sudo chown -R prometheus:prometheus /usr/share/prometheus
+
+
+Tester si il prend bien la config crée:
+
+	/usr/share/prometheus/prometheus --config.file=/usr/share/prometheus/prometheus.yml
+	Ctrl +c
+
+
+Automatiser le démarrage de Prometheus au démarrage du serveur:
+
+	sudo vi /etc/systemd/system/prometheus.service
+
+		[Unit]
+Description=Prometheus Server
+Documentation=https://prometheus.io/docs/introduction/overview/
+After=network-online.target
+		[Service]
+User=prometheus
+Restart=on-failure
+WorkingDirectory=/usr/share/prometheus
+ExecStart=/usr/share/prometheus/prometheus --config.file=/usr/share/prometheus/prometheus.yml
+		[Install]
+WantedBy=multi-user.target
+		sudo systemctl daemon-reload
+sudo systemctl enable prometheus
+sudo systemctl start prometheus
+sudo systemctl status prometheus

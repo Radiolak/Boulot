@@ -1,0 +1,70 @@
+	III. Installation de Node Exporter:
+	
+Node exporter est un outil qui mesure la santé et les performances d'un serveur Linux. C'est un composant essentiel de l'écosystème de surveillance Prometheus.
+
+Pourquoi node exporter ?
+ 
+Car pour collecter les données depuis les autres machines on a besoin d'un agent collecteur (exporter) puis prometeus vas scrapper ces données.
+
+Node exporter seul ne fais rien, c'est prometeus depuis le serveur qui vas pull la donnée depuis le serveur sur les clients.
+
+Source: https://github.com/prometheus/node_exporter/blob/master/examples/systemd/README.md
+
+Télécharger l'archive et la transférer sur la machine:
+
+Extraire l'archive: 
+	
+tar -xvf node_exporter-1.8.2.linux-amd64.tar.gz 
+
+lancer en arrière-plan le client: 
+
+	./node_exporter-1.8.2.linux-amd64/node_exporter &
+
+Automatiser son démarrage avec systemd: 
+
+	touch /etc/systemd/system/node_exporter.service
+	vi /etc/systemd/system/node_exporter.service
+		
+		[Unit]
+		Description=Node Exporter
+		Requires=node_exporter.socket
+		
+		[Service]
+		User=node_exporter
+		# Fallback when environment file does not exist
+		Environment=OPTIONS=
+		EnvironmentFile=-/etc/sysconfig/node_exporter
+		ExecStart=/usr/sbin/node_exporter --web.systemd-socket $OPTIONS
+		Restart=on-failure
+		
+		[Install]
+		WantedBy=multi-user.target
+		
+	touch /etc/sysconfig/node_exporter
+	vi /etc/sysconfig/node_exporter
+	
+		OPTIONS="--collector.textfile.directory /var/lib/node_exporter/textfile_collector"
+		
+	systemctl restart systemd
+	systemctl start node_exporter.service
+	systemctl status node_exporter.service
+	
+	systemctl enable --now node_exporter.service
+	
+Configuration des clients sur Prometheus:
+
+Coté Prometheus on vas avoir besoin de rajouter le client, dans la section "scrape_configs" on rajoute un bloc tel que: 
+	
+ # Nouvelle vm 
+	- job_name: 'autre_vm_linux' 
+		static_configs: 
+			- targets: ['IP_DE_L_AUTRE_VM:9100']
+
+
+Redémarrer Prometheus:
+
+	sudo systemctl restart prometheus
+
+Vérifier si on a trouvé la Target:
+ 
+http://IP_PROMETHEUS:9090 > Status > Targets > La nouvelle vm sera là avec le status "up"

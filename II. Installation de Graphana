@@ -1,0 +1,84 @@
+II. Installation de Graphana: 
+
+ Graphana est une plateforme open-source populaire de visualisation et d'analyse de données. Elle permet de transformer des données brutes en superbes tableaux de bord interactifs (graphiques, courbes, jauges) pour surveiller des serveurs, des applications ou des indicateurs métiers en temps réel. [1]
+
+	wget https://dl.grafana.com/oss/release/grafana-6.4.4.linux-amd64.tar.gz
+tar -xzf grafana-6.4.4.linux-amd64.tar.gz
+	sudo useradd -d /usr/share/grafana -s /bin/false grafana
+sudo mkdir -p /var/lib/grafana/plugins /etc/grafana /var/log/grafana
+sudo chown -R grafana:grafana /var/lib/grafana
+	sudo mv grafana-6.4.4/ /usr/share/grafana
+sudo cp /usr/share/grafana/bin/grafana-server /usr/sbin/
+sudo cp /usr/share/grafana/conf/sample.ini /etc/grafana/grafana.ini
+
+Config de systemD Pour automatiser le démarrage: 
+
+	sudo vi /etc/default/grafana-server
+
+		GRAFANA_USER=grafana
+GRAFANA_GROUP=grafana
+GRAFANA_HOME=/usr/share/grafana
+LOG_DIR=/var/log/grafana
+DATA_DIR=/var/lib/grafana
+MAX_OPEN_FILES=10000
+CONF_DIR=/etc/grafana
+CONF_FILE=/etc/grafana/grafana.ini
+RESTART_ON_UPGRADE=true
+PLUGINS_DIR=/var/lib/grafana/plugins
+PROVISIONING_CFG_DIR=/etc/grafana/provisioning
+PID_FILE_DIR=/var/run/grafana
+
+
+
+	sudo vi /etc/systemd/system/multi-user.target.wants/grafana-server.service
+		[Unit]
+Description=Grafana instance
+Documentation=http://docs.grafana.org
+Wants=network-online.target
+After=network-online.target
+After=postgresql.service mariadb.service mysql.service
+		[Service]
+EnvironmentFile=/etc/default/grafana-server
+User=grafana
+Group=grafana
+Type=simple
+Restart=on-failure
+WorkingDirectory=/usr/share/grafana
+RuntimeDirectory=grafana
+RuntimeDirectoryMode=0750
+ExecStart=/usr/sbin/grafana-server                                                  \
+                            --config=${CONF_FILE}                                   \
+                            --pidfile=${PID_FILE_DIR}/grafana-server.pid            \
+                            cfg:default.paths.logs=${LOG_DIR}                       \
+                            cfg:default.paths.data=${DATA_DIR}                      \
+                            cfg:default.paths.plugins=${PLUGINS_DIR}                \
+                            cfg:default.paths.provisioning=${PROVISIONING_CFG_DIR}
+		LimitNOFILE=10000
+TimeoutStopSec=20
+UMask=0027
+		[Install]
+WantedBy=multi-user.target
+
+Démarrer le service: 
+
+	systemctl start grafana-server
+systemctl enable grafana-server
+systemctl status grafana-server
+
+
+Connecter Graphana à Prometheus:
+
+Naviguer sur cette addresse:
+	
+	http://127.0.0.1:3000
+	
+Se connecter avec ces identifiants:
+	
+	admin / admin
+
+Naviguer: 
+
+Configuration > Data Source > Prometheus > http://127.0.0.1:9090
+
+
+
