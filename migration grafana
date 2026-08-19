@@ -1,0 +1,18 @@
+# Arrête le service
+sudo systemctl stop grafana-server
+
+# Supprime complètement les anciens public/ et bin/ (l'ancienne version 6.4.4)
+sudo rm -rf /usr/share/grafana/public
+sudo rm -rf /usr/share/grafana/bin
+sudo rm -rf /usr/share/grafana/conf
+
+# Recopie proprement depuis la nouvelle version extraite
+sudo cp -r ~/grafana-13.2.0/public /usr/share/grafana/
+sudo cp -r ~/grafana-13.2.0/bin /usr/share/grafana/
+sudo cp -r ~/grafana-13.2.0/conf /usr/share/grafana/
+
+# Refixe les droits et le lien /usr/sbin/grafana-server
+sudo chown -R grafana:grafana /usr/share/grafana
+sudo cp /usr/share/grafana/bin/grafana-server /usr/sbin/grafana-server
+sudo chown grafana:grafana /usr/sbin/grafana-server
+sudo chmod 755 /usr/sbin/grafana-server
