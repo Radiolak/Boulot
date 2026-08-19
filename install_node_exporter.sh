@@ -7,8 +7,8 @@ fail() {
 
 sudo -v || fail "authentification sudo"
 
-TARBALL=$(ls ~/node_exporter-*.linux-amd64.tar.gz 2>/dev/null) || fail "tar.gz introuvable dans ~"
-cd ~ || fail "cd vers home"
+TARBALL=$(ls ./node_exporter-*.linux-amd64.tar.gz 2>/dev/null) || fail "tar.gz introuvable dans le répertoire courant ($(pwd))"
+
 tar -xzf "$TARBALL" || fail "extraction tar.gz"
 EXTRACTDIR=$(tar -tzf "$TARBALL" | head -1 | cut -f1 -d"/") || fail "lecture nom dossier extrait"
 
