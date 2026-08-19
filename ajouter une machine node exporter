@@ -1,17 +1,31 @@
-# Extraction (détecte automatiquement le nom du tar.gz présent dans ~)
 cd ~
-tar -xzf node_exporter-*.linux-amd64.tar.gz
+ls -la node_exporter-*.tar.gz
 
-# Création de l'utilisateur dédié (ignore l'erreur si déjà existant)
-sudo useradd -d /usr/share/node_exporter -s /bin/false node_exporter 2>/dev/null
+# Extraction
+TARBALL=$(ls node_exporter-*.linux-amd64.tar.gz)
+tar -xzf "$TARBALL"
 
-# Déploiement du binaire
+# Récupère le nom exact du dossier extrait (fiable, pas de wildcard hasardeux)
+EXTRACTDIR=$(tar -tzf "$TARBALL" | head -1 | cut -f1 -d"/")
+echo ">>> Dossier extrait : $EXTRACTDIR"
+ls -l "$EXTRACTDIR"
+
+# Création utilisateur (affiche l'erreur si ce n'est pas juste "déjà existant")
+sudo id node_exporter || sudo useradd -d /usr/share/node_exporter -s /bin/false node_exporter
+
+# Déploiement du binaire avec vérification immédiate
 sudo mkdir -p /usr/share/node_exporter
-sudo mv node_exporter-*.linux-amd64/node_exporter /usr/share/node_exporter/
+sudo mv -v "$EXTRACTDIR"/node_exporter /usr/share/node_exporter/
+echo ">>> Vérification du binaire déployé :"
+ls -l /usr/share/node_exporter/
+
 sudo chown -R node_exporter:node_exporter /usr/share/node_exporter
 sudo chmod 755 /usr/share/node_exporter/node_exporter
 
-# Création du service systemd
+# Correction SELinux (au cas où, ne casse rien si désactivé)
+sudo restorecon -Rv /usr/share/node_exporter/
+
+# Service systemd
 sudo tee /etc/systemd/system/node_exporter.service > /dev/null <<'EOF'
 [Unit]
 Description=Node Exporter
@@ -28,14 +42,15 @@ Restart=on-failure
 WantedBy=multi-user.target
 EOF
 
-# Activation et démarrage
 sudo systemctl daemon-reload
 sudo systemctl enable --now node_exporter
+sleep 2
+echo ">>> Statut du service :"
+systemctl status node_exporter --no-pager
 
-# Ouverture du firewall
+# Firewall
 sudo firewall-cmd --permanent --add-port=9100/tcp
 sudo firewall-cmd --reload
 
-# Vérification finale
-systemctl status node_exporter --no-pager
+# Test final
 curl -s http://localhost:9100/metrics | head -5
