@@ -16,3 +16,17 @@ sudo chown -R grafana:grafana /usr/share/grafana
 sudo cp /usr/share/grafana/bin/grafana-server /usr/sbin/grafana-server
 sudo chown grafana:grafana /usr/sbin/grafana-server
 sudo chmod 755 /usr/sbin/grafana-server
+
+
+
+
+
+ExecStart=/usr/share/grafana/bin/grafana server \
+    --config=${CONF_FILE} \
+    --pidfile=${PID_FILE_DIR}/grafana-server.pid \
+    --homepath=/usr/share/grafana \
+    cfg:default.paths.logs=${LOG_DIR} \
+    cfg:default.paths.data=${DATA_DIR} \
+    cfg:default.paths.plugins=${PLUGINS_DIR} \
+    cfg:default.paths.provisioning=${PROVISIONING_CFG_DIR}
+
