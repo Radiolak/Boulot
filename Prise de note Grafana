@@ -1,0 +1,68 @@
+Rajouter des targets: sur prometheus: 
+
+sudo vi /etc/prometheus/prometheus.yml
+sudo systemctl reload prometheus
+sudo systemctl status prometheus
+
+
+Ensuite aller voir sur 
+
+http://10.94.192.177:9090/targets
+
+Puis dans
+
+ http://10.94.192.178:3000/d/multi_server_monitoring/multi-server-monitoring-dashboard?orgId=1&from=now-6h&to=now&timezone=browser&var-DS_PROMETHEUS=dfvnqurhin56oa&refresh=30s
+
+Rajotuer des targets, sur la target: 
+
+Importer le script et le zip de node exporter
+sudo -v
+chmod +x install_node_exporter.sh
+sudo systemctl status node_exporter.service
+
+
+
+
+
+
+
+La suite c'est quoi ? 
+
+Voir le daskboard sans connection:
+Multi-Server Monitoring Dashboard - Dashboards - Grafana
+
+Sans l'ip:
+Multi-Server Monitoring Dashboard - Dashboards - Grafana
+
+Mettre https
+
+
+
+Pourquoi le compte node exporter et comptes de roles en général pour cette application: 
+
+Si vous lanciez Node Exporter avec votre compte ou en root (administrateur), le programme aurait accès à tout votre serveur. En cas de faille de sécurité dans Node Exporter, un pirate pourrait prendre le contrôle total de votre machine.
+
+Cet utilisateur est activé automatiquement par systemd (le gestionnaire de services de Linux).
+Dans le fichier de configuration du service (situé dans /etc/systemd/system/node_exporter.service), il y a des lignes spécifiques :
+User=node_exporter Group=node_exporter ExecStart=/usr/share/node_exporter/node_exporter
+
+
+Les utilisateurs: 
+
+admin
+Ecad2025!
+
+CAO_dashboard
+ECAD2025!
+
+
+
+openssl req -new -newkey rsa:2048 -nodes \
+-keyout grafana.key \
+-out grafana.csr \
+-config grafana.cnf
+
+openssl req -in grafana.csr -noout -text | grep -A 5 "Subject Alternative Name"
+
+chmod +x install_node_exporter.sh
+./install_node_exporter.sh
