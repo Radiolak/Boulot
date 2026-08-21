@@ -2,33 +2,35 @@ Administrateur Système en alternance chez Airbus Defence & Space et étudiant e
 
 AIRBUS DEFENCE & SPACE
 
-Au sein du service Cross-Program, Digitization & Improvement, j'interviens sur des projets d'infrastructure et d'ingénierie variés :
+Au sein de mon service, j'interviens sur des projets d'infrastructure et d'ingénierie variés :
 - Développement d'API en Python pour outiller, moderniser et industrialiser des processus
 - Virtualisation et administration d'environnements VMware
-- Mise en place de Windows Server RDS (serveur de rebond / accès distant)
-- Migration d'une plateforme ALM
+- Mise en place de solutions de bastion (serveur de rebond / accès distant)
+- Migration de plateforme ALM
 - Mise en place de mirroring de dépôts (NetApp / Artifactory)
-- Scripting d'import de données (XML vers SQL)
-- Mise en place d'une solution de supervision pour les processus internes
+- Scripting et optimisation de traitement de données en python
+- Mise en place de solutions end user 
 
 ESGI
 
-Formation d'Expert en Architecture Systèmes, Réseaux & Sécurité (M2). J'y consolide des compétences en administration système Linux/Windows, réseaux, cloud (AWS, Azure, GCP), conteneurisation (Docker), CI/CD (GitLab) et sécurité, avec une approche systématiquement tournée vers la pratique.
+Diplomé d'un bachelor spécialisé en Systèmes réseaux et cloud, je porsuit actuellement mon cursus dans cette même voie, actuellement en dernière année de master, 
+j'y consolide des compétences en administration système Linux/Windows, réseaux, cloud (AWS, Azure, GCP, on premise), conteneurisation et orchestration (Docker / Podman / k8s), CI/CD (GitLab) et sécurité,
+avec une approche systématiquement tournée vers la pratique.
 
 HOMELAB
 
 Je fais tourner un cluster Proxmox pour prototyper avant de proposer des solutions en production :
-- Virtualisation & conteneurs : Proxmox (KVM/LXC), Docker, Kubernetes (en apprentissage)
+- Virtualisation & conteneurs : Proxmox (KVM/LXC), Docker, Kubernetes
 - Infrastructure as Code & automatisation : Ansible, Terraform
 - Expérimentation d'agents/API et d'intégration d'outils d'infrastructure
 
 MES COMPÉTENCES CLÉS
 
-Virtualisation (VMware, Proxmox) • Linux & Windows • Cloud (AWS, Azure, GCP) • IaC (Terraform, Ansible) • Docker • CI/CD (GitLab) • Python • Réseaux (niveau CCNA) • Sécurité des systèmes (IDS/IPS, pfSense)
+Virtualisation (VMware, Proxmox) / Admonistration système Linux & Windows / Cloud (AWS, Azure, GCP) / IaC (Terraform, Ansible) / Docker / CI/CD (GitLab) / Python / Réseaux (niveau CCNA)
 
 CE QUI ME CARACTÉRISE
 
-Rigueur, méthodologie, curiosité et goût pour l'automatisation et la résolution de problèmes concrets. J'aime comprendre en profondeur avant de travailler sur un sujet.
+Rigueur, méthodologie, curiosité et goût pour l'automatisation et la résolution de problèmes concrets. J'aime comprendre en profondeur quand je me lance dans un projet.
 
 Paris, France
 alexis.francesco95@gmail.com
