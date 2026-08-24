@@ -3,7 +3,10 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": { "type": "datasource", "uid": "grafana" },
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -16,80 +19,155 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": null,
+  "id": 0,
   "links": [],
   "panels": [
     {
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "custom": {
             "align": "auto",
-            "cellOptions": { "type": "auto" },
+            "cellOptions": {
+              "type": "auto"
+            },
             "filterable": true,
-            "footer": { "reducers": [] },
+            "footer": {
+              "reducers": []
+            },
             "inspect": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": 0 },
-              { "color": "yellow", "value": 70 },
-              { "color": "red", "value": 90 }
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
             ]
           }
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "Etat" },
+            "matcher": {
+              "id": "byName",
+              "options": "Etat"
+            },
             "properties": [
-              { "id": "unit", "value": "percent" },
-              { "id": "custom.cellOptions", "value": { "type": "color-background" } },
-              { "id": "custom.align", "value": "center" },
-              { "id": "max", "value": 100 }
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "max",
+                "value": 100
+              }
             ]
           },
           {
-            "matcher": { "id": "byName", "options": "Server" },
+            "matcher": {
+              "id": "byName",
+              "options": "Server"
+            },
             "properties": [
               {
                 "id": "links",
                 "value": [
                   {
+                    "targetBlank": false,
                     "title": "Voir le detail",
-                    "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.Server}",
-                    "targetBlank": false
+                    "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.Server}"
                   }
                 ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "name"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 238
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "os_complet"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 276
               }
             ]
           }
         ]
       },
-      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 0 },
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
       "id": 2,
       "options": {
         "cellHeight": "sm",
         "enablePagination": false,
         "showHeader": true,
-        "sortBy": [{ "desc": true, "displayName": "Etat" }]
+        "sortBy": []
       },
       "pluginVersion": "12.3.11",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
           "expr": "max by(instance) (\n  100 - (avg by(instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)\nor\n  100 * (1 - ((node_memory_MemAvailable_bytes or node_memory_Buffers_bytes + node_memory_Cached_bytes + node_memory_MemFree_bytes) / node_memory_MemTotal_bytes))\nor\n  (time() - node_boot_time_seconds < 300) * 100\n)",
           "format": "table",
           "instant": true,
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "__auto",
           "refId": "A"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
-          "expr": "node_uname_info",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "group by(instance, OS) (\r\n  label_join(node_uname_info * on(instance) group_left(name, version) node_os_info, \"OS\", \" \", \"name\", \"version\")\r\n)",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -97,7 +175,11 @@
           "refId": "B"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
           "expr": "(time() - node_boot_time_seconds) / 3600",
           "format": "table",
           "instant": true,
@@ -106,7 +188,11 @@
           "refId": "C"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
           "expr": "count by(instance) (node_cpu_seconds_total{mode=\"idle\"})",
           "format": "table",
           "instant": true,
@@ -128,27 +214,27 @@
               "Time": true,
               "Value #B": true,
               "__name__": true,
-              "job": true,
               "domainname": true,
-              "release": true,
-              "machine": true
+              "job": true,
+              "machine": true,
+              "release": true
             },
             "includeByName": {},
             "indexByName": {
-              "instance": 0,
               "Value #A": 1,
-              "sysname": 2,
-              "nodename": 3,
               "Value #C": 4,
-              "Value #D": 5
+              "Value #D": 5,
+              "instance": 0,
+              "nodename": 3,
+              "sysname": 2
             },
             "renameByName": {
-              "instance": "Server",
               "Value #A": "Etat",
-              "sysname": "OS",
-              "nodename": "Hostname",
               "Value #C": "Uptime (h)",
-              "Value #D": "Nb CPU"
+              "Value #D": "Nb CPU",
+              "instance": "Server",
+              "nodename": "Hostname",
+              "sysname": "OS"
             }
           }
         }
@@ -159,11 +245,18 @@
   "preload": false,
   "refresh": "30s",
   "schemaVersion": 42,
-  "tags": ["supervision", "airbus", "node-exporter"],
+  "tags": [
+    "supervision",
+    "airbus",
+    "node-exporter"
+  ],
   "templating": {
     "list": [
       {
-        "current": {},
+        "current": {
+          "text": "prometheus",
+          "value": "dfvnqurhin56oa"
+        },
         "includeAll": false,
         "name": "DS_PROMETHEUS",
         "options": [],
@@ -174,10 +267,13 @@
       }
     ]
   },
-  "time": { "from": "now-6h", "to": "now" },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
   "timepicker": {},
   "timezone": "",
   "title": "Supervision - Vue globale des serveurs",
   "uid": "global-overview-dash",
-  "version": 1
+  "version": 3
 }
