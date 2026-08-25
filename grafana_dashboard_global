@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 0,
+  "id": 6,
   "links": [],
   "panels": [
     {
@@ -275,5 +275,5 @@
   "timezone": "",
   "title": "Supervision - Vue globale des serveurs",
   "uid": "global-overview-dash",
-  "version": 3
+  "version": 5
 }
