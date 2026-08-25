@@ -248,12 +248,25 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "label_replace(label_replace(up{job=\"node_exporter\"}, \"alias\", \"$1\", \"instance\", \"([^.:]+).*\"), \"fqdn\", \"$1\", \"instance\", \"([^:]+).*\")",
+          "expr": "label_replace(up{job=\"node_exporter\"}, \"alias\", \"$1\", \"instance\", \"([^.:]+).*\")",
           "format": "table",
           "instant": true,
           "interval": "",
           "legendFormat": "",
           "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "label_replace(up{job=\"node_exporter\"}, \"fqdn\", \"$1\", \"instance\", \"([^:]+).*\")",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "F"
         }
       ],
       "title": "Etat des serveurs",
@@ -276,7 +289,8 @@
               "job": true,
               "machine": true,
               "release": true,
-              "Value #E": true
+              "Value #E": true,
+              "Value #F": true
             },
             "includeByName": {},
             "indexByName": {
