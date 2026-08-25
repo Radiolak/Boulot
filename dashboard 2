@@ -166,7 +166,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "max(\n  100 - (avg by(instance) (rate(node_cpu_seconds_total{instance=\"$server\", mode=\"idle\"}[5m])) * 100)\nor\n  100 * (1 - ((node_memory_MemAvailable_bytes{instance=\"$server\"} or node_memory_Buffers_bytes{instance=\"$server\"} + node_memory_Cached_bytes{instance=\"$server\"} + node_memory_MemFree_bytes{instance=\"$server\"}) / node_memory_MemTotal_bytes{instance=\"$server\"}))\n)",
+          "expr": "max(\n  100 - (avg by(instance) (rate(node_cpu_seconds_total{instance=\"$server\", mode=\"idle\", job=\"node_exporter\"}[5m])) * 100)\nor\n  100 * (1 - ((node_memory_MemAvailable_bytes{instance=\"$server\", job=\"node_exporter\"} or node_memory_Buffers_bytes{instance=\"$server\", job=\"node_exporter\"} + node_memory_Cached_bytes{instance=\"$server\", job=\"node_exporter\"} + node_memory_MemFree_bytes{instance=\"$server\", job=\"node_exporter\"}) / node_memory_MemTotal_bytes{instance=\"$server\", job=\"node_exporter\"}))\n)",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -177,7 +177,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "node_uname_info{instance=\"$server\"}",
+          "expr": "node_uname_info{instance=\"$server\", job=\"node_exporter\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -188,7 +188,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "(time() - node_boot_time_seconds{instance=\"$server\"}) / 3600",
+          "expr": "(time() - node_boot_time_seconds{instance=\"$server\", job=\"node_exporter\"}) / 3600",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -199,7 +199,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "count by(instance) (node_cpu_seconds_total{instance=\"$server\", mode=\"idle\"})",
+          "expr": "count by(instance) (node_cpu_seconds_total{instance=\"$server\", mode=\"idle\", job=\"node_exporter\"})",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -307,7 +307,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "100 - (avg by(instance) (rate(node_cpu_seconds_total{instance=\"$server\", mode=\"idle\"}[5m])) * 100)",
+          "expr": "100 - (avg by(instance) (rate(node_cpu_seconds_total{instance=\"$server\", mode=\"idle\", job=\"node_exporter\"}[5m])) * 100)",
           "legendFormat": "CPU global",
           "range": true,
           "refId": "A"
@@ -363,7 +363,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "100 - (avg by(cpu) (rate(node_cpu_seconds_total{instance=\"$server\", mode=\"idle\"}[5m])) * 100)",
+          "expr": "100 - (avg by(cpu) (rate(node_cpu_seconds_total{instance=\"$server\", mode=\"idle\", job=\"node_exporter\"}[5m])) * 100)",
           "legendFormat": "CPU {{cpu}}",
           "range": true,
           "refId": "A"
@@ -437,7 +437,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "100 * (1 - (node_memory_MemAvailable_bytes{instance=\"$server\"} / node_memory_MemTotal_bytes{instance=\"$server\"}))",
+          "expr": "100 * (1 - (node_memory_MemAvailable_bytes{instance=\"$server\", job=\"node_exporter\"} / node_memory_MemTotal_bytes{instance=\"$server\", job=\"node_exporter\"}))",
           "legendFormat": "RAM utilisee",
           "range": true,
           "refId": "A"
@@ -508,7 +508,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "node_filesystem_avail_bytes{instance=\"$server\", fstype!~\"tmpfs|overlay|squashfs|devtmpfs\"}",
+          "expr": "node_filesystem_avail_bytes{instance=\"$server\", fstype!~\"tmpfs|overlay|squashfs|devtmpfs\", job=\"node_exporter\"}",
           "legendFormat": "{{mountpoint}}",
           "range": true,
           "refId": "A"
@@ -576,7 +576,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "rate(node_network_receive_bytes_total{instance=\"$server\", device!=\"lo\"}[5m]) * 8",
+          "expr": "rate(node_network_receive_bytes_total{instance=\"$server\", device!=\"lo\", job=\"node_exporter\"}[5m]) * 8",
           "legendFormat": "{{device}} entrant",
           "range": true,
           "refId": "A"
@@ -587,7 +587,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "rate(node_network_transmit_bytes_total{instance=\"$server\", device!=\"lo\"}[5m]) * 8",
+          "expr": "rate(node_network_transmit_bytes_total{instance=\"$server\", device!=\"lo\", job=\"node_exporter\"}[5m]) * 8",
           "legendFormat": "{{device}} sortant",
           "range": true,
           "refId": "B"
@@ -653,7 +653,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "rate(node_network_receive_errs_total{instance=\"$server\"}[5m])",
+          "expr": "rate(node_network_receive_errs_total{instance=\"$server\", job=\"node_exporter\"}[5m])",
           "legendFormat": "{{device}} erreurs entrantes",
           "range": true,
           "refId": "A"
@@ -664,7 +664,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "rate(node_network_transmit_errs_total{instance=\"$server\"}[5m])",
+          "expr": "rate(node_network_transmit_errs_total{instance=\"$server\", job=\"node_exporter\"}[5m])",
           "legendFormat": "{{device}} erreurs sortantes",
           "range": true,
           "refId": "B"
@@ -675,7 +675,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "rate(node_network_receive_drop_total{instance=\"$server\"}[5m])",
+          "expr": "rate(node_network_receive_drop_total{instance=\"$server\", job=\"node_exporter\"}[5m])",
           "legendFormat": "{{device}} paquets perdus (in)",
           "range": true,
           "refId": "C"
@@ -686,7 +686,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "rate(node_network_transmit_drop_total{instance=\"$server\"}[5m])",
+          "expr": "rate(node_network_transmit_drop_total{instance=\"$server\", job=\"node_exporter\"}[5m])",
           "legendFormat": "{{device}} paquets perdus (out)",
           "range": true,
           "refId": "D"
@@ -750,7 +750,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "node_procs_running{instance=\"$server\"}",
+          "expr": "node_procs_running{instance=\"$server\", job=\"node_exporter\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -761,7 +761,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "node_procs_blocked{instance=\"$server\"}",
+          "expr": "node_procs_blocked{instance=\"$server\", job=\"node_exporter\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -772,7 +772,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "node_processes_pids{instance=\"$server\"}",
+          "expr": "node_processes_pids{instance=\"$server\", job=\"node_exporter\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -783,7 +783,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "node_processes_threads{instance=\"$server\"}",
+          "expr": "node_processes_threads{instance=\"$server\", job=\"node_exporter\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -794,7 +794,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "node_processes_state{instance=\"$server\", state=~\"Z|zombie\"}",
+          "expr": "node_processes_state{instance=\"$server\", state=~\"Z|zombie\", job=\"node_exporter\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "",
