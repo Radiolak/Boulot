@@ -1,4 +1,9 @@
-for host in chara coxa burga arz zembra vanavana calx buran cursa bolon binic york taiwan burle baguio; do
-  echo "=== $host ==="
-  ssh root@${host}.fr.airbusds.corp "sed -i '/^ExecStart=/{/--collector.processes/!s/\$/ --collector.processes/}; /^ExecStart=/{/--collector.netdev.address-info/!s/\$/ --collector.netdev.address-info/}' /etc/systemd/system/node_exporter.service && systemctl daemon-reload && systemctl restart node_exporter && systemctl status node_exporter --no-pager"
-done
+sudo sed -i '/^ExecStart=/{/--collector.processes/!s/$/ --collector.processes/}; /^ExecStart=/{/--collector.netdev.address-info/!s/$/ --collector.netdev.address-info/}' /etc/systemd/system/node_exporter.service
+
+sudo systemctl daemon-reload
+sudo systemctl restart node_exporter
+sudo systemctl status node_exporter --no-pager
+
+echo "--- Verification ---"
+curl -s http://localhost:9100/metrics | grep -c node_processes_pids
+curl -s http://localhost:9100/metrics | grep -c node_network_address_info
