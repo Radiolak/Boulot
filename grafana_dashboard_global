@@ -3,10 +3,7 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": {
-          "type": "datasource",
-          "uid": "grafana"
-        },
+        "datasource": { "type": "datasource", "uid": "grafana" },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -15,85 +12,53 @@
       }
     ]
   },
-  "description": "Vue globale des serveurs - Etat CPU/RAM/Uptime colore",
+  "description": "Vue globale des serveurs - Etat OK/HIGH/CRITICAL",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 6,
+  "id": null,
   "links": [],
   "panels": [
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
+          "color": { "mode": "thresholds" },
           "custom": {
             "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
+            "cellOptions": { "type": "auto" },
             "filterable": true,
-            "footer": {
-              "reducers": []
-            },
+            "footer": { "reducers": [] },
             "inspect": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "yellow",
-                "value": 70
-              },
-              {
-                "color": "red",
-                "value": 90
-              }
+              { "color": "green", "value": 0 },
+              { "color": "yellow", "value": 60 },
+              { "color": "red", "value": 95 }
             ]
           }
         },
         "overrides": [
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Etat"
-            },
+            "matcher": { "id": "byName", "options": "Etat" },
             "properties": [
+              { "id": "custom.cellOptions", "value": { "type": "color-background" } },
+              { "id": "custom.align", "value": "center" },
               {
-                "id": "unit",
-                "value": "percent"
-              },
-              {
-                "id": "custom.cellOptions",
-                "value": {
-                  "type": "color-background"
-                }
-              },
-              {
-                "id": "custom.align",
-                "value": "center"
-              },
-              {
-                "id": "max",
-                "value": 100
+                "id": "mappings",
+                "value": [
+                  { "type": "range", "options": { "from": 0, "to": 60, "result": { "text": "OK", "color": "green" } } },
+                  { "type": "range", "options": { "from": 60.01, "to": 95, "result": { "text": "HIGH", "color": "yellow" } } },
+                  { "type": "range", "options": { "from": 95.01, "to": 100, "result": { "text": "CRITICAL", "color": "red" } } }
+                ]
               }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Server"
-            },
+            "matcher": { "id": "byName", "options": "Server" },
             "properties": [
               {
                 "id": "links",
@@ -108,37 +73,16 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "name"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 238
-              }
-            ]
+            "matcher": { "id": "byName", "options": "name" },
+            "properties": [{ "id": "custom.width", "value": 238 }]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "os_complet"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 276
-              }
-            ]
+            "matcher": { "id": "byName", "options": "os_complet" },
+            "properties": [{ "id": "custom.width", "value": 276 }]
           }
         ]
       },
-      "gridPos": {
-        "h": 12,
-        "w": 24,
-        "x": 0,
-        "y": 0
-      },
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 0 },
       "id": 2,
       "options": {
         "cellHeight": "sm",
@@ -149,10 +93,7 @@
       "pluginVersion": "12.3.11",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
           "editorMode": "code",
           "expr": "max by(instance) (\n  100 - (avg by(instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)\nor\n  100 * (1 - ((node_memory_MemAvailable_bytes or node_memory_Buffers_bytes + node_memory_Cached_bytes + node_memory_MemFree_bytes) / node_memory_MemTotal_bytes))\nor\n  (time() - node_boot_time_seconds < 300) * 100\n)",
           "format": "table",
@@ -162,12 +103,9 @@
           "refId": "A"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
           "editorMode": "code",
-          "expr": "group by(instance, OS) (\r\n  label_join(node_uname_info * on(instance) group_left(name, version) node_os_info, \"OS\", \" \", \"name\", \"version\")\r\n)",
+          "expr": "group by(instance, OS) (\n  label_join(node_uname_info * on(instance) group_left(name, version) node_os_info, \"OS\", \" \", \"name\", \"version\")\n)",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -175,10 +113,7 @@
           "refId": "B"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
           "editorMode": "code",
           "expr": "(time() - node_boot_time_seconds) / 3600",
           "format": "table",
@@ -188,10 +123,7 @@
           "refId": "C"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
           "editorMode": "code",
           "expr": "count by(instance) (node_cpu_seconds_total{mode=\"idle\"})",
           "format": "table",
@@ -204,8 +136,8 @@
       "title": "Etat des serveurs",
       "transformations": [
         {
-          "id": "merge",
-          "options": {}
+          "id": "joinByField",
+          "options": { "byField": "instance", "mode": "outer" }
         },
         {
           "id": "organize",
@@ -226,15 +158,14 @@
               "Value #D": 5,
               "instance": 0,
               "nodename": 3,
-              "sysname": 2
+              "OS": 2
             },
             "renameByName": {
               "Value #A": "Etat",
               "Value #C": "Uptime (h)",
               "Value #D": "Nb CPU",
               "instance": "Server",
-              "nodename": "Hostname",
-              "sysname": "OS"
+              "nodename": "Hostname"
             }
           }
         }
@@ -245,18 +176,11 @@
   "preload": false,
   "refresh": "30s",
   "schemaVersion": 42,
-  "tags": [
-    "supervision",
-    "airbus",
-    "node-exporter"
-  ],
+  "tags": ["supervision", "airbus", "node-exporter"],
   "templating": {
     "list": [
       {
-        "current": {
-          "text": "prometheus",
-          "value": "dfvnqurhin56oa"
-        },
+        "current": {},
         "includeAll": false,
         "name": "DS_PROMETHEUS",
         "options": [],
@@ -267,13 +191,10 @@
       }
     ]
   },
-  "time": {
-    "from": "now-6h",
-    "to": "now"
-  },
+  "time": { "from": "now-6h", "to": "now" },
   "timepicker": {},
   "timezone": "",
   "title": "Supervision - Vue globale des serveurs",
   "uid": "global-overview-dash",
-  "version": 5
+  "version": 1
 }
