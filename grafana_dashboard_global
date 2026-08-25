@@ -3,7 +3,10 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": { "type": "datasource", "uid": "grafana" },
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -12,78 +15,132 @@
       }
     ]
   },
-  "description": "Vue globale des serveurs - Etat OK/HIGH/CRITICAL",
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "graphTooltip": 0,
+  "graphTooltip": 1,
   "id": null,
-  "links": [],
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": false,
+      "title": "Retour a la vue globale",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/global-overview-dash/supervision-vue-globale-des-serveurs"
+    }
+  ],
+  "liveNow": false,
   "panels": [
     {
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "custom": {
             "align": "auto",
-            "cellOptions": { "type": "auto" },
-            "filterable": true,
-            "footer": { "reducers": [] },
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "footer": {
+              "reducers": []
+            },
             "inspect": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": 0 },
-              { "color": "yellow", "value": 60 },
-              { "color": "red", "value": 95 }
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 60
+              },
+              {
+                "color": "red",
+                "value": 95
+              }
             ]
           }
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "Etat" },
+            "matcher": {
+              "id": "byName",
+              "options": "Etat"
+            },
             "properties": [
-              { "id": "custom.cellOptions", "value": { "type": "color-background" } },
-              { "id": "custom.align", "value": "center" },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
               {
                 "id": "mappings",
                 "value": [
-                  { "type": "range", "options": { "from": 0, "to": 60, "result": { "text": "OK", "color": "green" } } },
-                  { "type": "range", "options": { "from": 60.01, "to": 95, "result": { "text": "HIGH", "color": "yellow" } } },
-                  { "type": "range", "options": { "from": 95.01, "to": 100, "result": { "text": "CRITICAL", "color": "red" } } }
-                ]
-              }
-            ]
-          },
-          {
-            "matcher": { "id": "byName", "options": "Server" },
-            "properties": [
-              {
-                "id": "links",
-                "value": [
                   {
-                    "targetBlank": false,
-                    "title": "Voir le detail",
-                    "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.Server}"
+                    "type": "range",
+                    "options": {
+                      "from": 0,
+                      "to": 60,
+                      "result": {
+                        "text": "OK",
+                        "color": "green"
+                      }
+                    }
+                  },
+                  {
+                    "type": "range",
+                    "options": {
+                      "from": 60.01,
+                      "to": 95,
+                      "result": {
+                        "text": "HIGH",
+                        "color": "yellow"
+                      }
+                    }
+                  },
+                  {
+                    "type": "range",
+                    "options": {
+                      "from": 95.01,
+                      "to": 100,
+                      "result": {
+                        "text": "CRITICAL",
+                        "color": "red"
+                      }
+                    }
                   }
                 ]
               }
             ]
-          },
-          {
-            "matcher": { "id": "byName", "options": "name" },
-            "properties": [{ "id": "custom.width", "value": 238 }]
-          },
-          {
-            "matcher": { "id": "byName", "options": "os_complet" },
-            "properties": [{ "id": "custom.width", "value": 276 }]
           }
         ]
       },
-      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 0 },
-      "id": 2,
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 8,
       "options": {
         "cellHeight": "sm",
         "enablePagination": false,
@@ -93,51 +150,69 @@
       "pluginVersion": "12.3.11",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
-          "editorMode": "code",
-          "expr": "max by(instance) (\n  100 - (avg by(instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)\nor\n  100 * (1 - ((node_memory_MemAvailable_bytes or node_memory_Buffers_bytes + node_memory_Cached_bytes + node_memory_MemFree_bytes) / node_memory_MemTotal_bytes))\nor\n  (time() - node_boot_time_seconds < 300) * 100\n)",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "max(\n  100 - (avg by(instance) (rate(node_cpu_seconds_total{instance=\"$server\", job=\"node_exporter\", mode=\"idle\"}[5m])) * 100)\nor\n  100 * (1 - ((node_memory_MemAvailable_bytes{instance=\"$server\", job=\"node_exporter\"} or node_memory_Buffers_bytes{instance=\"$server\", job=\"node_exporter\"} + node_memory_Cached_bytes{instance=\"$server\", job=\"node_exporter\"} + node_memory_MemFree_bytes{instance=\"$server\", job=\"node_exporter\"}) / node_memory_MemTotal_bytes{instance=\"$server\", job=\"node_exporter\"}))\nor\n  (time() - node_boot_time_seconds{instance=\"$server\", job=\"node_exporter\"} < 300) * 100\n)",
           "format": "table",
           "instant": true,
-          "interval": "",
-          "legendFormat": "__auto",
+          "legendFormat": "",
           "refId": "A"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
-          "editorMode": "code",
-          "expr": "group by(instance, OS) (\n  label_join(node_uname_info * on(instance) group_left(name, version) node_os_info, \"OS\", \" \", \"name\", \"version\")\n)",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "group by(instance, OS) (\n  label_join(node_uname_info{instance=\"$server\", job=\"node_exporter\"} * on(instance) group_left(name, version) node_os_info{instance=\"$server\", job=\"node_exporter\"}, \"OS\", \" \", \"name\", \"version\")\n)",
           "format": "table",
           "instant": true,
-          "interval": "",
           "legendFormat": "",
           "refId": "B"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
-          "editorMode": "code",
-          "expr": "(time() - node_boot_time_seconds) / 3600",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "(time() - node_boot_time_seconds{instance=\"$server\", job=\"node_exporter\"}) / 3600",
           "format": "table",
           "instant": true,
-          "interval": "",
           "legendFormat": "",
           "refId": "C"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
-          "editorMode": "code",
-          "expr": "count by(instance) (node_cpu_seconds_total{mode=\"idle\"})",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "count by(instance) (node_cpu_seconds_total{instance=\"$server\", job=\"node_exporter\", mode=\"idle\"})",
           "format": "table",
           "instant": true,
-          "interval": "",
           "legendFormat": "",
           "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "up{instance=\"$server\", job=\"node_exporter\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "E"
         }
       ],
-      "title": "Etat des serveurs",
+      "title": "Infos serveur",
       "transformations": [
         {
           "id": "joinByField",
-          "options": { "byField": "instance", "mode": "outer" }
+          "options": {
+            "byField": "instance",
+            "mode": "outer"
+          }
         },
         {
           "id": "organize",
@@ -145,27 +220,607 @@
             "excludeByName": {
               "Time": true,
               "Value #B": true,
+              "Value #E": true,
               "__name__": true,
-              "domainname": true,
               "job": true,
+              "domainname": true,
+              "release": true,
               "machine": true,
-              "release": true
+              "version": true,
+              "name": true,
+              "sysname": true
             },
             "includeByName": {},
             "indexByName": {
-              "Value #A": 1,
-              "Value #C": 4,
-              "Value #D": 5,
               "instance": 0,
+              "Value #A": 1,
+              "OS": 2,
               "nodename": 3,
-              "OS": 2
+              "ip": 4,
+              "Value #C": 5,
+              "Value #D": 6
             },
             "renameByName": {
-              "Value #A": "Etat",
-              "Value #C": "Uptime (h)",
-              "Value #D": "Nb CPU",
               "instance": "Server",
-              "nodename": "Hostname"
+              "Value #A": "Etat",
+              "nodename": "Hostname",
+              "ip": "Adresse IP",
+              "Value #C": "Uptime (h)",
+              "Value #D": "Nb CPU"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisLabel": "%",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 1,
+            "showPoints": "never"
+          },
+          "max": 100,
+          "min": 0,
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 4
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "100 - (avg by(instance) (rate(node_cpu_seconds_total{instance=\"$server\", mode=\"idle\", job=\"node_exporter\"}[5m])) * 100)",
+          "legendFormat": "CPU global",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "CPU - Utilisation globale",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisLabel": "%",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 1,
+            "showPoints": "never"
+          },
+          "max": 100,
+          "min": 0,
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 4
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "100 - (avg by(cpu) (rate(node_cpu_seconds_total{instance=\"$server\", mode=\"idle\", job=\"node_exporter\"}[5m])) * 100)",
+          "legendFormat": "CPU {{cpu}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "CPU - Utilisation par CPU logique",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisLabel": "%",
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 12
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max",
+            "last"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "100 * (1 - (node_memory_MemAvailable_bytes{instance=\"$server\", job=\"node_exporter\"} / node_memory_MemTotal_bytes{instance=\"$server\", job=\"node_exporter\"}))",
+          "legendFormat": "RAM utilisee",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "RAM - Usage / Evolution",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisLabel": "",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 1,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 21474836480
+              },
+              {
+                "color": "green",
+                "value": 53687091200
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 12
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "node_filesystem_avail_bytes{instance=\"$server\", fstype!~\"tmpfs|overlay|squashfs|devtmpfs\", job=\"node_exporter\"}",
+          "legendFormat": "{{mountpoint}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Disques - Espace restant",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisLabel": "bits/s",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 1,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "bps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/sortant/"
+            },
+            "properties": [
+              {
+                "id": "custom.transform",
+                "value": "negative-Y"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 20
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_receive_bytes_total{instance=\"$server\", device!=\"lo\", job=\"node_exporter\"}[5m]) * 8",
+          "legendFormat": "{{device}} entrant",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_transmit_bytes_total{instance=\"$server\", device!=\"lo\", job=\"node_exporter\"}[5m]) * 8",
+          "legendFormat": "{{device}} sortant",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Reseau - Debit entrant / sortant",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisLabel": "paquets/s",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 1,
+            "showPoints": "never"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "pps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 20
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_receive_errs_total{instance=\"$server\", job=\"node_exporter\"}[5m])",
+          "legendFormat": "{{device}} erreurs entrantes",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_transmit_errs_total{instance=\"$server\", job=\"node_exporter\"}[5m])",
+          "legendFormat": "{{device}} erreurs sortantes",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_receive_drop_total{instance=\"$server\", job=\"node_exporter\"}[5m])",
+          "legendFormat": "{{device}} paquets perdus (in)",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_transmit_drop_total{instance=\"$server\", job=\"node_exporter\"}[5m])",
+          "legendFormat": "{{device}} paquets perdus (out)",
+          "range": true,
+          "refId": "D"
+        }
+      ],
+      "title": "Reseau - Erreurs et pertes de paquets",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 28
+      },
+      "id": 9,
+      "options": {
+        "cellHeight": "sm",
+        "enablePagination": false,
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "12.3.11",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "node_procs_running{instance=\"$server\", job=\"node_exporter\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "node_procs_blocked{instance=\"$server\", job=\"node_exporter\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "node_processes_pids{instance=\"$server\", job=\"node_exporter\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "node_processes_threads{instance=\"$server\", job=\"node_exporter\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "node_processes_state{instance=\"$server\", state=~\"Z|zombie\", job=\"node_exporter\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "E"
+        }
+      ],
+      "title": "Processus (vue limitee - node_exporter seul)",
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "instance",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "instance": true,
+              "__name__": true,
+              "job": true,
+              "state": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "Value #A": "Processus actifs",
+              "Value #B": "Processus bloques",
+              "Value #C": "Total PIDs",
+              "Value #D": "Threads",
+              "Value #E": "Zombies"
             }
           }
         }
@@ -173,10 +828,12 @@
       "type": "table"
     }
   ],
-  "preload": false,
   "refresh": "30s",
   "schemaVersion": 42,
-  "tags": ["supervision", "airbus", "node-exporter"],
+  "tags": [
+    "supervision",
+    "airbus"
+  ],
   "templating": {
     "list": [
       {
@@ -188,13 +845,55 @@
         "refresh": 1,
         "regex": "",
         "type": "datasource"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(node_uname_info, instance)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Serveur",
+        "multi": false,
+        "name": "server",
+        "options": [],
+        "query": {
+          "query": "label_values(node_uname_info, instance)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
       }
     ]
   },
-  "time": { "from": "now-6h", "to": "now" },
-  "timepicker": {},
-  "timezone": "",
-  "title": "Supervision - Vue globale des serveurs",
-  "uid": "global-overview-dash",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h"
+    ],
+    "time_options": [
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Detail serveur",
+  "uid": "server-detail-dash",
   "version": 1
 }
