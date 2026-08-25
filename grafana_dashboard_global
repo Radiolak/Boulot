@@ -122,24 +122,6 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Server"
-            },
-            "properties": [
-              {
-                "id": "links",
-                "value": [
-                  {
-                    "targetBlank": false,
-                    "title": "Voir le detail",
-                    "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.Server}"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
               "options": "name"
             },
             "properties": [
@@ -158,6 +140,36 @@
               {
                 "id": "custom.width",
                 "value": 276
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Server"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Alias"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": false,
+                    "title": "Voir le detail",
+                    "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.Server}"
+                  }
+                ]
               }
             ]
           }
@@ -236,7 +248,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "label_replace(up{job=\"node_exporter\"}, \"alias\", \"$1\", \"instance\", \"([^.:]+).*\")",
+          "expr": "label_replace(label_replace(up{job=\"node_exporter\"}, \"alias\", \"$1\", \"instance\", \"([^.:]+).*\"), \"fqdn\", \"$1\", \"instance\", \"([^:]+).*\")",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -268,13 +280,14 @@
             },
             "includeByName": {},
             "indexByName": {
+              "alias": 0,
               "Value #A": 1,
+              "OS": 2,
+              "nodename": 3,
               "Value #C": 4,
               "Value #D": 5,
-              "instance": 0,
-              "nodename": 3,
-              "OS": 2,
-              "alias": 6
+              "fqdn": 6,
+              "instance": 7
             },
             "renameByName": {
               "Value #A": "Etat",
@@ -282,7 +295,8 @@
               "Value #D": "Nb CPU",
               "instance": "Server",
               "nodename": "Hostname",
-              "alias": "Alias"
+              "alias": "Alias",
+              "fqdn": "FQDN"
             }
           }
         }
