@@ -186,6 +186,17 @@
       "title": "Licences du vendeur",
       "transformations": [
         {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "name",
+                "destinationType": "string"
+              }
+            ]
+          }
+        },
+        {
           "id": "joinByField",
           "options": {
             "byField": "name",
