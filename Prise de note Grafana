@@ -66,3 +66,7 @@ openssl req -in grafana.csr -noout -text | grep -A 5 "Subject Alternative Name"
 
 chmod +x install_node_exporter.sh
 ./install_node_exporter.sh
+
+
+
+curl -s http://localhost:9319/metrics | grep -E "^flexlm_(feature_issued|feature_used|feature_used_users|server_status|vendor_status)\{" | sort -u -t'{' -k1,1 | awk '!seen[$1]++'
