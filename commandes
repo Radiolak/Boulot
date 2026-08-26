@@ -1,9 +1,3 @@
-sudo sed -i '/^ExecStart=/{/--collector.processes/!s/$/ --collector.processes/}; /^ExecStart=/{/--collector.netdev.address-info/!s/$/ --collector.netdev.address-info/}' /etc/systemd/system/node_exporter.service
-
-sudo systemctl daemon-reload
-sudo systemctl restart node_exporter
-sudo systemctl status node_exporter --no-pager
-
-echo "--- Verification ---"
-curl -s http://localhost:9100/metrics | grep -c node_processes_pids
-curl -s http://localhost:9100/metrics | grep -c node_network_address_info
+curl -s http://localhost:9319/metrics | grep 'flexlm_feature_issued{app="ptc"'
+curl -s http://localhost:9319/metrics | grep 'flexlm_feature_used{app="ptc"'
+curl -s http://localhost:9319/metrics | grep 'flexlm_feature_expiration_seconds{app="ptc"'
