@@ -205,7 +205,14 @@
               "index": true,
               "vendor": true,
               "version": true,
-              "licenses": true
+              "licenses": true,
+              "instance": true,
+              "instance 1": true,
+              "instance 2": true,
+              "job": true,
+              "job 1": true,
+              "job 2": true,
+              "app": true
             },
             "indexByName": {
               "app": 0,
@@ -267,11 +274,7 @@
             "properties": [
               {
                 "id": "unit",
-                "value": "dtdurations"
-              },
-              {
-                "id": "decimals",
-                "value": 0
+                "value": "dateTimeFromNow"
               }
             ]
           }
@@ -297,7 +300,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "time() - flexlm_feature_used_users{app=\"$vendor\"}",
+          "expr": "flexlm_feature_used_users{app=\"$vendor\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -312,19 +315,33 @@
             "excludeByName": {
               "Time": true,
               "__name__": true,
+              "Value": true,
               "app": true,
-              "since": true
+              "instance": true,
+              "job": true
             },
             "indexByName": {
               "name": 0,
               "user": 1,
-              "Value": 2
+              "since": 2
             },
             "renameByName": {
               "name": "Licence",
               "user": "Utilisateur",
-              "Value": "Connecte depuis"
+              "since": "Connecte depuis"
             }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "Connecte depuis",
+                "destinationType": "time",
+                "dateFormat": "X"
+              }
+            ]
           }
         }
       ],
