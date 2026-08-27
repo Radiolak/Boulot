@@ -1,0 +1,22 @@
+# A ajouter dans prometheus.yml, section scrape_configs
+# Reutilise la meme liste de targets que le job node_exporter, juste un port different (9256)
+- job_name: 'process_exporter'
+  scrape_interval: 30s
+  static_configs:
+    - targets:
+      - 'chara.ux.main.fr.ds.corp:9256'
+      - 'coxa.ux.main.fr.ds.corp:9256'
+      - 'arz.ux.main.fr.ds.corp:9256'
+      - 'zembra.ux.main.fr.ds.corp:9256'
+      - 'vanavana.ux.main.fr.ds.corp:9256'
+      - 'calx.ux.main.fr.ds.corp:9256'
+      - 'buran.ux.main.fr.ds.corp:9256'
+      - 'cursa.ux.main.fr.ds.corp:9256'
+      - 'bolon.ux.main.fr.ds.corp:9256'
+      - 'binic.ux.main.fr.ds.corp:9256'
+      - 'york.ux.main.fr.ds.corp:9256'
+      - 'taiwan.ux.main.fr.ds.corp:9256'
+      - 'burga.ux.main.fr.ds.corp:9256'
+      - 'burle.ux.main.fr.ds.corp:9256'
+      - 'baguio.ux.main.fr.ds.corp:9256'
+      # + les smfidf51xx a completer selon la liste exacte deja utilisee dans le job node_exporter
