@@ -28,6 +28,32 @@ sudo systemctl status node_exporter
 getenforce
 sudo journalctl -u node_exporter -n 20 --no-pager
 
+
+sudo mkdir -p /var/lib/node_exporter/textfile_collector
+sudo chown node_exporter:node_exporter /var/lib/node_exporter/textfile_collector
+sudo chmod 755 /var/lib/node_exporter/textfile_collector
+
+curl -s localhost:9256/metrics | head -5
+
+# 1. Dossier + permissions (root)
+sudo mkdir -p /var/lib/node_exporter/textfile_collector
+sudo chown node_exporter:node_exporter /var/lib/node_exporter/textfile_collector
+sudo chmod 755 /var/lib/node_exporter/textfile_collector
+
+# 2. Verifier process-exporter tourne bien ici
+curl -s localhost:9256/metrics | head -5
+
+# 3. Relancer le script SOUS node_exporter (pas root, pour eviter de recreer un fichier root:root)
+sudo -u node_exporter /usr/local/bin/generate_uid_map.sh
+ls -l /var/lib/node_exporter/textfile_collector/
+
+# 4. Redemarrer node_exporter et verifier les logs
+sudo systemctl restart node_exporter
+sudo journalctl -u node_exporter -n 10 --no-pager
+
+# 5. Test final
+curl -s localhost:9100/metrics | grep node_uid_username
+
 ------------------------------------------------------------------------------------------------------------------------------
 
 [admin_BRG@smfidf5125 ~]$ sudo tee /etc/cron.d/uid_username_map > /dev/null << 'EOF'
