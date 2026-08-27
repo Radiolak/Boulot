@@ -1,7 +1,9 @@
 #!/bin/bash
 # Genere la correspondance UID -> nom d'utilisateur au format Prometheus textfile.
-# getent passe par NSS/SSSD correctement (contrairement au binaire Go statique de process-exporter),
-# donc resout aussi bien les comptes locaux que les comptes AD.
+# IMPORTANT: on NE fait PAS de "getent passwd" global (SSSD n'enumere pas l'AD par defaut,
+# donc ca ne renverrait que les comptes locaux/deja en cache).
+# On fait un lookup CIBLE par UID pour chaque UID numerique non resolu vu dans process-exporter -
+# un lookup individuel declenche toujours une vraie requete SSSD et fonctionne.
 
 set -euo pipefail
 
@@ -11,16 +13,24 @@ TMP_FILE="${OUTPUT_FILE}.tmp"
 
 mkdir -p "$OUTPUT_DIR"
 
+# Recupere la liste des UID numeriques actuellement non resolus par process-exporter
+# (partie apres le dernier ":" dans groupname, quand c'est purement numerique)
+UIDS=$(curl -s localhost:9256/metrics 2>/dev/null \
+  | grep -oP 'groupname="[^"]*:\K[0-9]+(?=")' \
+  | sort -u)
+
 {
-  echo "# HELP node_uid_username Correspondance UID vers nom d'utilisateur (source: getent passwd)"
+  echo "# HELP node_uid_username Correspondance UID vers nom d'utilisateur (lookup cible via getent/SSSD)"
   echo "# TYPE node_uid_username gauge"
-  getent passwd | awk -F: '{
-    uid=$3; user=$1;
-    gsub(/"/, "\\\"", user);
-    print "node_uid_username{uid=\"" uid "\",username=\"" user "\"} 1"
-  }'
+  for uid in $UIDS; do
+    entry=$(getent passwd "$uid" 2>/dev/null || true)
+    if [ -n "$entry" ]; then
+      user=$(echo "$entry" | cut -d: -f1)
+      user_escaped=$(printf '%s' "$user" | sed 's/"/\\"/g')
+      echo "node_uid_username{uid=\"$uid\",username=\"$user_escaped\"} 1"
+    fi
+  done
 } > "$TMP_FILE"
 
-# Ecriture atomique - evite que node_exporter lise un fichier a moitie ecrit
 mv "$TMP_FILE" "$OUTPUT_FILE"
-chmod 644 "$OUTPUT_FILE" 
+chmod 644 "$OUTPUT_FILE"
