@@ -285,7 +285,7 @@
             "properties": [
               {
                 "id": "unit",
-                "value": "dateTimeFromNow"
+                "value": "dateTimeAsSystem"
               }
             ]
           }
@@ -339,7 +339,7 @@
             "renameByName": {
               "name": "Licence",
               "user": "Utilisateur",
-              "since": "Connecte depuis"
+              "since": "since_raw"
             }
           }
         },
@@ -348,11 +348,49 @@
           "options": {
             "conversions": [
               {
-                "targetField": "Connecte depuis",
-                "destinationType": "time",
-                "dateFormat": "X"
+                "targetField": "since_raw",
+                "destinationType": "number"
               }
             ]
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "since_ms",
+            "mode": "binary",
+            "binary": {
+              "left": "since_raw",
+              "operator": "*",
+              "right": "1000"
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "since_ms",
+                "destinationType": "time"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "since_raw": true
+            },
+            "indexByName": {
+              "Licence": 0,
+              "Utilisateur": 1,
+              "since_ms": 2
+            },
+            "renameByName": {
+              "since_ms": "Connecte depuis"
+            }
           }
         }
       ],
