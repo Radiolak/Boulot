@@ -72,16 +72,31 @@ sudo -u node_exporter /usr/local/bin/generate_uid_map.sh
 
 ------------------------------------------------------------------------------------------------------------------------------
 
-[admin_BRG@smfidf5125 ~]$ curl -s localhost:9100/metrics | grep node_uid_username
-[admin_BRG@smfidf5125 ~]$ ls -ld /var/lib/node_exporter
-drwxr-x---. 3 root root 32 Aug 27 15:37 /var/lib/node_exporter
-[admin_BRG@smfidf5125 ~]$ sudo chmod 755 /var/lib/node_exporter
 [admin_BRG@smfidf5125 ~]$ sudo -u node_exporter /usr/local/bin/generate_uid_map.sh
 mv: replace '/var/lib/node_exporter/textfile_collector/uid_username_map.prom', overriding mode 0644 (rw-r--r--)? y
 [admin_BRG@smfidf5125 ~]$ ls -l /var/lib/node_exporter/textfile_collector/
 total 4
 -rw-r--r--. 1 node_exporter node_exporter 283 Aug 27 16:16 uid_username_map.prom
 [admin_BRG@smfidf5125 ~]$ sudo systemctl restart node_exporter
+[admin_BRG@smfidf5125 ~]$ curl -s localhost:9100/metrics | grep node_uid_username
+# HELP node_uid_username Correspondance UID vers nom d'utilisateur (lookup cible via getent/SSSD)
+# TYPE node_uid_username gauge
+node_uid_username{uid="2339",username="pete182"} 1
+node_uid_username{uid="2345",username="kata157"} 1
+node_uid_username{uid="31037",username="melo158"} 1
+[admin_BRG@smfidf5125 ~]$ sudo cp generate_uid_map.sh /usr/local/bin/generate_uid_map.sh
+[admin_BRG@smfidf5125 ~]$ sudo chmod 755 /usr/local/bin/generate_uid_map.sh
+[admin_BRG@smfidf5125 ~]$ sudo -u node_exporter /usr/local/bin/generate_uid_map.sh
+[admin_BRG@smfidf5125 ~]$ ls -l /var/lib/node_exporter/textfile_collector/
+total 4
+-rw-r--r--. 1 node_exporter node_exporter 283 Aug 27 16:19 uid_username_map.prom
+[admin_BRG@smfidf5125 ~]$ sudo systemctl restart node_exporter
+[admin_BRG@smfidf5125 ~]$ curl -s localhost:9100/metrics | grep node_uid_username
+# HELP node_uid_username Correspondance UID vers nom d'utilisateur (lookup cible via getent/SSSD)
+# TYPE node_uid_username gauge
+node_uid_username{uid="2339",username="pete182"} 1
+node_uid_username{uid="2345",username="kata157"} 1
+node_uid_username{uid="31037",username="melo158"} 1
 [admin_BRG@smfidf5125 ~]$ curl -s localhost:9100/metrics | grep node_uid_username
 # HELP node_uid_username Correspondance UID vers nom d'utilisateur (lookup cible via getent/SSSD)
 # TYPE node_uid_username gauge
