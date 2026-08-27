@@ -932,7 +932,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by (utilisateur) (label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m]) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"))",
+          "expr": "sum by (utilisateur) (\n(\n  label_replace(\n    label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m]) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n    * on(utilisateur) group_left(username)\n    label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\"),\n    \"utilisateur\", \"$1\", \"username\", \"(.*)\"\n  )\n)\nor\n(\n  label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m]) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n  unless on(utilisateur)\n  label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")\n)\n)",
           "legendFormat": "{{utilisateur}}",
           "range": true,
           "refId": "B"
@@ -1056,7 +1056,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m]) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")",
+          "expr": "(\n  label_replace(\n    label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m]) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n    * on(utilisateur) group_left(username)\n    label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\"),\n    \"utilisateur\", \"$1\", \"username\", \"(.*)\"\n  )\n)\nor\n(\n  label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m]) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n  unless on(utilisateur)\n  label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")\n)",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -1111,7 +1111,9 @@
               "job 1": true,
               "job 2": true,
               "memtype": true,
-              "groupname": true
+              "groupname": true,
+              "username": true,
+              "username 1": true
             },
             "indexByName": {
               "utilisateur": 0,
