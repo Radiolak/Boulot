@@ -54,6 +54,18 @@ sudo journalctl -u node_exporter -n 10 --no-pager
 # 5. Test final
 curl -s localhost:9100/metrics | grep node_uid_username
 
+
+
+ls -ld /var/lib/node_exporter
+sudo chmod 755 /var/lib/node_exporter
+
+sudo -u node_exporter /usr/local/bin/generate_uid_map.sh
+ls -l /var/lib/node_exporter/textfile_collector/
+sudo systemctl restart node_exporter
+curl -s localhost:9100/metrics | grep node_uid_username
+
+
+
 ------------------------------------------------------------------------------------------------------------------------------
 [admin_BRG@smfidf5125 ~]$ sudo mkdir -p /var/lib/node_exporter/textfile_collector
 [admin_BRG@smfidf5125 ~]$ sudo chown node_exporter:node_exporter /var/lib/node_exporter/textfile_collector
