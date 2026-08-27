@@ -23,4 +23,4 @@ mkdir -p "$OUTPUT_DIR"
 
 # Ecriture atomique - evite que node_exporter lise un fichier a moitie ecrit
 mv "$TMP_FILE" "$OUTPUT_FILE"
-chmod 644 "$OUTPUT_FILE"
+chmod 644 "$OUTPUT_FILE" 
