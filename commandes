@@ -12,3 +12,19 @@ sudo systemctl status node_exporter
 sudo /usr/local/bin/generate_uid_map.sh
 curl -s localhost:9100/metrics | grep node_uid_username
 
+
+
+sudo tee /etc/cron.d/uid_username_map > /dev/null << 'EOF'
+*/10 * * * * node_exporter /usr/local/bin/generate_uid_map.sh
+EOF
+
+
+sudo -u node_exporter /usr/local/bin/generate_uid_map.sh
+ls -l /var/lib/node_exporter/textfile_collector/
+sudo systemctl restart node_exporter
+sudo systemctl status node_exporter
+
+
+getenforce
+sudo journalctl -u node_exporter -n 20 --no-pager
+
