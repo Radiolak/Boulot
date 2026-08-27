@@ -28,3 +28,66 @@ sudo systemctl status node_exporter
 getenforce
 sudo journalctl -u node_exporter -n 20 --no-pager
 
+------------------------------------------------------------------------------------------------------------------------------
+
+[admin_BRG@smfidf5125 ~]$ sudo tee /etc/cron.d/uid_username_map > /dev/null << 'EOF'
+> */10 * * * * node_exporter /usr/local/bin/generate_uid_map.sh
+> EOF
+[admin_BRG@smfidf5125 ~]$ sudo -u node_exporter /usr/local/bin/generate_uid_map.sh
+mkdir: cannot create directory ‘/var/lib/node_exporter’: Permission denied
+[admin_BRG@smfidf5125 ~]$ ls -la /usr/local/bin/generate_uid_map.sh
+-rwxr-x---. 1 node_exporter node_exporter 819 Aug 27 16:00 /usr/local/bin/generate_uid_map.sh
+[admin_BRG@smfidf5125 ~]$ sudo -u node_exporter /usr/local/bin/generate_uid_map.sh
+mkdir: cannot create directory ‘/var/lib/node_exporter’: Permission denied
+[admin_BRG@smfidf5125 ~]$ ls -l /var/lib/node_exporter/textfile_collector/
+ls: cannot access '/var/lib/node_exporter/textfile_collector/': Permission denied
+[admin_BRG@smfidf5125 ~]$ sudo systemctl restart node_exporter
+[admin_BRG@smfidf5125 ~]$ sudo systemctl status node_exporter
+● node_exporter.service - Node Exporter
+   Loaded: loaded (/etc/systemd/system/node_exporter.service; enabled; vendor preset: disabled)
+   Active: active (running) since Thu 2026-08-27 16:10:13 CEST; 3s ago
+ Main PID: 378661 (node_exporter)
+    Tasks: 5 (limit: 822823)
+   Memory: 9.2M
+   CGroup: /system.slice/node_exporter.service
+           └─378661 /usr/share/node_exporter/node_exporter --collector.processes --collector.netdev.address-info --collector.textfile.directory=/var/lib/node_exporter/textfile_collector
+
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=time
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=timex
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=udp_queues
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=uname
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=vmstat
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=watchdog
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=xfs
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=zfs
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.760+02:00 level=INFO source=tls_config.go:372 msg="Listening on" address=0.0.0.0:9100
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.760+02:00 level=INFO source=tls_config.go:375 msg="TLS is disabled." http2=false address=0.0.0.0:9100
+[admin_BRG@smfidf5125 ~]$ getenforce
+Permissive
+[admin_BRG@smfidf5125 ~]$ sudo journalctl -u node_exporter -n 20 --no-pager
+-- Logs begin at Sat 2026-08-15 06:37:40 CEST, end at Thu 2026-08-27 16:10:27 CEST. --
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=rapl
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=schedstat
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=selinux
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=sockstat
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=softnet
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=stat
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=tapestats
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=textfile
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=thermal_zone
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=time
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=timex
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=udp_queues
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=uname
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=vmstat
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=watchdog
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=xfs
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.758+02:00 level=INFO source=node_exporter.go:142 msg=zfs
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.760+02:00 level=INFO source=tls_config.go:372 msg="Listening on" address=0.0.0.0:9100
+Aug 27 16:10:13 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:13.760+02:00 level=INFO source=tls_config.go:375 msg="TLS is disabled." http2=false address=0.0.0.0:9100
+Aug 27 16:10:18 smfidf5125.main.fr.ds.corp node_exporter[378661]: time=2026-08-27T16:10:18.377+02:00 level=ERROR source=textfile.go:207 msg="failed to read textfile collector directory" collector=textfile path=/var/lib/node_exporter/textfile_collector err="open /var/lib/node_exporter/textfile_collector: permission denied"
+[admin_BRG@smfidf5125 ~]$ sudo /usr/local/bin/generate_uid_map.sh
+curl -s localhost:9100/metrics | grep node_uid_username
+
+[admin_BRG@smfidf5125 ~]$
+[admin_BRG@smfidf5125 ~]$
