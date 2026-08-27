@@ -544,7 +544,7 @@
       "1y"
     ]
   },
-  "timezone": "browser",
+  "timezone": "Europe/Paris",
   "title": "Detail vendeur FlexLM",
   "uid": "flexlm-vendor-detail",
   "version": 1
