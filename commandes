@@ -1,3 +1,35 @@
-curl -s http://localhost:9319/metrics | grep 'flexlm_feature_issued{app="ptc"'
-curl -s http://localhost:9319/metrics | grep 'flexlm_feature_used{app="ptc"'
-curl -s http://localhost:9319/metrics | grep 'flexlm_feature_expiration_seconds{app="ptc"'
+[Unit]
+Description=FlexLM Exporter
+After=network.target
+
+[Service]
+User=flexlm_exporter
+Group=flexlm_exporter
+Type=simple
+ExecStart=/usr/share/flexlm_exporter/flexlm_exporter \
+  --path.lmutil=/usr/share/flexlm_exporter/lmutil \
+  --path.config=/etc/flexlm_exporter/licenses.yml
+Restart=on-failure
+Environment=TZ=Europe/Paris
+
+[Install]
+WantedBy=multi-user.target
+
+"/etc/systemd/system/flexlm_exporter.service" 16L, 364B
+Et node exporter: 
+
+[Unit]
+Description=Node Exporter
+After=network.target
+
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/share/node_exporter/node_exporter --collector.processes --collector.netdev.address-info
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+~
+"/etc/systemd/system/node_exporter.service" 13L, 277C
