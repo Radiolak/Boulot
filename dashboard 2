@@ -1067,7 +1067,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "label_replace(label_replace(namedprocess_namegroup_memory_bytes{instance=~\"$server_host:9256\", job=\"process_exporter\", memtype=\"resident\"}, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")",
+          "expr": "namedprocess_namegroup_memory_bytes{instance=~\"$server_host:9256\", job=\"process_exporter\", memtype=\"resident\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -1078,7 +1078,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "label_replace(label_replace(namedprocess_namegroup_num_procs{instance=~\"$server_host:9256\", job=\"process_exporter\"}, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")",
+          "expr": "namedprocess_namegroup_num_procs{instance=~\"$server_host:9256\", job=\"process_exporter\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -1111,11 +1111,7 @@
               "job 1": true,
               "job 2": true,
               "memtype": true,
-              "groupname": true,
-              "utilisateur 1": true,
-              "utilisateur 2": true,
-              "processus 1": true,
-              "processus 2": true
+              "groupname": true
             },
             "indexByName": {
               "utilisateur": 0,
