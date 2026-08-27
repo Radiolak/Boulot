@@ -409,7 +409,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "flexlm_feature_used{app=\"$vendor\"} / flexlm_feature_issued{app=\"$vendor\"} * 100",
+          "expr": "flexlm_feature_used{app=\"$vendor\", name=~\"$license\"} / flexlm_feature_issued{app=\"$vendor\", name=~\"$license\"} * 100",
           "legendFormat": "{{name}}",
           "range": true,
           "refId": "A"
@@ -453,6 +453,29 @@
         "options": [],
         "query": {
           "query": "label_values(flexlm_vendor_status, app)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(flexlm_feature_used{app=\"$vendor\"}, name)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Licences a afficher",
+        "multi": true,
+        "name": "license",
+        "options": [],
+        "query": {
+          "query": "label_values(flexlm_feature_used{app=\"$vendor\"}, name)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 2,
