@@ -32,5 +32,5 @@ UIDS=$(curl -s localhost:9256/metrics 2>/dev/null \
   done
 } > "$TMP_FILE"
 
-mv "$TMP_FILE" "$OUTPUT_FILE"
+mv -f "$TMP_FILE" "$OUTPUT_FILE"
 chmod 644 "$OUTPUT_FILE"
