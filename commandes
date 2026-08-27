@@ -65,6 +65,10 @@ sudo systemctl restart node_exporter
 curl -s localhost:9100/metrics | grep node_uid_username
 
 
+sudo cp generate_uid_map.sh /usr/local/bin/generate_uid_map.sh
+sudo chmod 755 /usr/local/bin/generate_uid_map.sh
+sudo -u node_exporter /usr/local/bin/generate_uid_map.sh
+
 
 ------------------------------------------------------------------------------------------------------------------------------
 
