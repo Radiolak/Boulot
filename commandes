@@ -67,31 +67,22 @@ curl -s localhost:9100/metrics | grep node_uid_username
 
 
 ------------------------------------------------------------------------------------------------------------------------------
-[admin_BRG@smfidf5125 ~]$ sudo mkdir -p /var/lib/node_exporter/textfile_collector
-[admin_BRG@smfidf5125 ~]$ sudo chown node_exporter:node_exporter /var/lib/node_exporter/textfile_collector
-[admin_BRG@smfidf5125 ~]$ sudo chmod 755 /var/lib/node_exporter/textfile_collector
-[admin_BRG@smfidf5125 ~]$ curl -s localhost:9256/metrics | head -5
-# HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.
-# TYPE go_gc_duration_seconds summary
-go_gc_duration_seconds{quantile="0"} 1.2918e-05
-go_gc_duration_seconds{quantile="0.25"} 1.8733e-05
-go_gc_duration_seconds{quantile="0.5"} 2.3031e-05
-[admin_BRG@smfidf5125 ~]$ sudo -u node_exporter /usr/local/bin/generate_uid_map.sh
-mkdir: cannot create directory ‘/var/lib/node_exporter’: Permission denied
-[admin_BRG@smfidf5125 ~]$ ls -l /var/lib/node_exporter/textfile_collector/
-ls: cannot access '/var/lib/node_exporter/textfile_collector/': Permission denied
-[admin_BRG@smfidf5125 ~]$ sudo systemctl restart node_exporter
-[admin_BRG@smfidf5125 ~]$ sudo journalctl -u node_exporter -n 10 --no-pager
--- Logs begin at Sat 2026-08-15 06:37:40 CEST, end at Thu 2026-08-27 16:13:41 CEST. --
-Aug 27 16:13:39 smfidf5125.main.fr.ds.corp node_exporter[380474]: time=2026-08-27T16:13:39.304+02:00 level=INFO source=node_exporter.go:142 msg=time
-Aug 27 16:13:39 smfidf5125.main.fr.ds.corp node_exporter[380474]: time=2026-08-27T16:13:39.304+02:00 level=INFO source=node_exporter.go:142 msg=timex
-Aug 27 16:13:39 smfidf5125.main.fr.ds.corp node_exporter[380474]: time=2026-08-27T16:13:39.304+02:00 level=INFO source=node_exporter.go:142 msg=udp_queues
-Aug 27 16:13:39 smfidf5125.main.fr.ds.corp node_exporter[380474]: time=2026-08-27T16:13:39.304+02:00 level=INFO source=node_exporter.go:142 msg=uname
-Aug 27 16:13:39 smfidf5125.main.fr.ds.corp node_exporter[380474]: time=2026-08-27T16:13:39.304+02:00 level=INFO source=node_exporter.go:142 msg=vmstat
-Aug 27 16:13:39 smfidf5125.main.fr.ds.corp node_exporter[380474]: time=2026-08-27T16:13:39.304+02:00 level=INFO source=node_exporter.go:142 msg=watchdog
-Aug 27 16:13:39 smfidf5125.main.fr.ds.corp node_exporter[380474]: time=2026-08-27T16:13:39.304+02:00 level=INFO source=node_exporter.go:142 msg=xfs
-Aug 27 16:13:39 smfidf5125.main.fr.ds.corp node_exporter[380474]: time=2026-08-27T16:13:39.304+02:00 level=INFO source=node_exporter.go:142 msg=zfs
-Aug 27 16:13:39 smfidf5125.main.fr.ds.corp node_exporter[380474]: time=2026-08-27T16:13:39.306+02:00 level=INFO source=tls_config.go:372 msg="Listening on" address=0.0.0.0:9100
-Aug 27 16:13:39 smfidf5125.main.fr.ds.corp node_exporter[380474]: time=2026-08-27T16:13:39.306+02:00 level=INFO source=tls_config.go:375 msg="TLS is disabled." http2=false address=0.0.0.0:9100
+
 [admin_BRG@smfidf5125 ~]$ curl -s localhost:9100/metrics | grep node_uid_username
+[admin_BRG@smfidf5125 ~]$ ls -ld /var/lib/node_exporter
+drwxr-x---. 3 root root 32 Aug 27 15:37 /var/lib/node_exporter
+[admin_BRG@smfidf5125 ~]$ sudo chmod 755 /var/lib/node_exporter
+[admin_BRG@smfidf5125 ~]$ sudo -u node_exporter /usr/local/bin/generate_uid_map.sh
+mv: replace '/var/lib/node_exporter/textfile_collector/uid_username_map.prom', overriding mode 0644 (rw-r--r--)? y
+[admin_BRG@smfidf5125 ~]$ ls -l /var/lib/node_exporter/textfile_collector/
+total 4
+-rw-r--r--. 1 node_exporter node_exporter 283 Aug 27 16:16 uid_username_map.prom
+[admin_BRG@smfidf5125 ~]$ sudo systemctl restart node_exporter
+[admin_BRG@smfidf5125 ~]$ curl -s localhost:9100/metrics | grep node_uid_username
+# HELP node_uid_username Correspondance UID vers nom d'utilisateur (lookup cible via getent/SSSD)
+# TYPE node_uid_username gauge
+node_uid_username{uid="2339",username="pete182"} 1
+node_uid_username{uid="2345",username="kata157"} 1
+node_uid_username{uid="31037",username="melo158"} 1
 [admin_BRG@smfidf5125 ~]$
+
