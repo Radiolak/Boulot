@@ -85,12 +85,12 @@ EOF
 # ------------------------------------------------------------------------------
 step "4/8 - Firewall (port 9256, scrape Prometheus)"
 # ------------------------------------------------------------------------------
-if command -v firewall-cmd >/dev/null 2>&1; then
+if command -v firewall-cmd >/dev/null 2>&1 && systemctl is-active --quiet firewalld; then
   firewall-cmd --permanent --add-port=9256/tcp
   firewall-cmd --reload
   echo "OK - port 9256/tcp ouvert"
 else
-  echo "firewall-cmd absent, a verifier manuellement si un firewall est actif"
+  echo "firewalld inactif ou absent sur cette machine - etape ignoree (pas de port a ouvrir)"
 fi
 
 # ------------------------------------------------------------------------------
