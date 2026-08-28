@@ -1,27 +1,32 @@
-label_replace(
-  sum by (utilisateur) (
-    (
-      label_replace(
-        label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~"$server_host:9256", job="process_exporter"}[5m]) * 100, "utilisateur", "$2", "groupname", "(.+):([^:]+)"), "processus", "$1", "groupname", "(.+):([^:]+)")
-        * on(utilisateur) group_left(username)
-        label_replace(node_uid_username{instance=~"$server_host:9100", job="node_exporter"}, "utilisateur", "$1", "uid", "(.*)"),
-        "utilisateur", "$1", "username", "(.*)"
-      )
-    )
-    or
-    (
+sum by (utilisateur) (
+  (
+    label_replace(
       label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~"$server_host:9256", job="process_exporter"}[5m]) * 100, "utilisateur", "$2", "groupname", "(.+):([^:]+)"), "processus", "$1", "groupname", "(.+):([^:]+)")
-      unless on(utilisateur)
-      label_replace(node_uid_username{instance=~"$server_host:9100", job="node_exporter"}, "utilisateur", "$1", "uid", "(.*)")
+      * on(utilisateur) group_left(username)
+      label_replace(node_uid_username{instance=~"$server_host:9100", job="node_exporter"}, "utilisateur", "$1", "uid", "(.*)"),
+      "utilisateur", "$1", "username", "(.*)"
     )
-  ) / scalar(count(node_cpu_seconds_total{instance=~"$server_host:9100", job="node_exporter", mode="idle"})),
-  "categorie", "CPU", "", ""
+  )
+  or
+  (
+    label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~"$server_host:9256", job="process_exporter"}[5m]) * 100, "utilisateur", "$2", "groupname", "(.+):([^:]+)"), "processus", "$1", "groupname", "(.+):([^:]+)")
+    unless on(utilisateur)
+    label_replace(node_uid_username{instance=~"$server_host:9100", job="node_exporter"}, "utilisateur", "$1", "uid", "(.*)")
+  )
+) / scalar(count(node_cpu_seconds_total{instance=~"$server_host:9100", job="node_exporter", mode="idle"}))
+
+
+label_replace(
+  avg(rate(node_cpu_seconds_total{instance=~"$server_host:9100", job="node_exporter", mode="idle"}[5m])) * 100,
+  "utilisateur", "Libre", "", ""
 )
 
 
 
 
+
 label_replace(label_replace(
-  avg(rate(node_cpu_seconds_total{instance=~"$server_host:9100", job="node_exporter", mode="idle"}[5m])) * 100,
-  "utilisateur", "Libre", "", ""
-), "categorie", "CPU", "", "")
+  time() - namedprocess_namegroup_oldest_start_time_seconds{instance=~"$server_host:9256", job="process_exporter", groupname!~".*:(node_exporter|root)"},
+  "utilisateur", "$2", "groupname", "(.+):([^:]+)"
+), "processus", "$1", "groupname", "(.+):([^:]+)")
+
