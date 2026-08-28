@@ -32,7 +32,16 @@ UID_SCRIPT="/usr/local/bin/generate_uid_map.sh"
 step "1/8 - Extraction et installation du binaire process-exporter"
 # ------------------------------------------------------------------------------
 TMPDIR=$(mktemp -d)
-tar -xzf "$ARCHIVE" -C "$TMPDIR" || fail "Extraction de l'archive echouee"
+
+if command -v tar >/dev/null 2>&1; then
+  tar -xzf "$ARCHIVE" -C "$TMPDIR" || fail "Extraction de l'archive echouee (tar)"
+elif command -v python3 >/dev/null 2>&1; then
+  echo "tar absent sur cette machine - extraction via python3 (module tarfile)"
+  python3 -c "import tarfile,sys; tarfile.open(sys.argv[1]).extractall(sys.argv[2])" "$ARCHIVE" "$TMPDIR" \
+    || fail "Extraction de l'archive echouee (python3 tarfile)"
+else
+  fail "Ni 'tar' ni 'python3' disponibles sur cette machine - impossible d'extraire l'archive."
+fi
 
 # Recherche robuste du binaire (independant de la structure interne de l'archive,
 # contrairement a la premiere version du script qui devinait le dossier racine)
