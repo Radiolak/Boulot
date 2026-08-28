@@ -728,154 +728,18 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "filterable": false,
-            "footer": {
-              "reducers": []
-            },
-            "inspect": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 24,
-        "x": 0,
-        "y": 28
-      },
-      "id": 9,
-      "options": {
-        "cellHeight": "sm",
-        "enablePagination": false,
-        "showHeader": true,
-        "sortBy": []
-      },
-      "pluginVersion": "12.3.11",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "node_procs_running{instance=\"$server\", job=\"node_exporter\"}",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "node_procs_blocked{instance=\"$server\", job=\"node_exporter\"}",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "node_processes_pids{instance=\"$server\", job=\"node_exporter\"}",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "node_processes_threads{instance=\"$server\", job=\"node_exporter\"}",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "D"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "node_processes_state{instance=\"$server\", state=~\"Z|zombie\", job=\"node_exporter\"}",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "E"
-        }
-      ],
-      "title": "Processus (vue limitee - node_exporter seul)",
-      "transformations": [
-        {
-          "id": "joinByField",
-          "options": {
-            "byField": "instance",
-            "mode": "outer"
-          }
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true,
-              "instance": true,
-              "__name__": true,
-              "job": true,
-              "state": true
-            },
-            "includeByName": {},
-            "indexByName": {},
-            "renameByName": {
-              "Value #A": "Processus actifs",
-              "Value #B": "Processus bloques",
-              "Value #C": "Total PIDs",
-              "Value #D": "Threads",
-              "Value #E": "Zombies"
-            }
-          }
-        }
-      ],
-      "type": "table"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
             "mode": "palette-classic"
           },
           "custom": {
             "axisLabel": "",
             "axisPlacement": "auto",
-            "fillOpacity": 70,
+            "fillOpacity": 80,
             "gradientMode": "none",
             "lineWidth": 1,
-            "orientation": "horizontal"
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
           },
           "mappings": [],
           "max": 100,
@@ -885,8 +749,8 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byRegexp",
-              "options": "Libre.*"
+              "id": "byName",
+              "options": "Libre"
             },
             "properties": [
               {
@@ -901,17 +765,20 @@
         ]
       },
       "gridPos": {
-        "h": 8,
+        "h": 6,
         "w": 24,
         "x": 0,
         "y": 32
       },
       "id": 10,
       "options": {
-        "displayMode": "gradient",
         "orientation": "horizontal",
-        "showUnfilled": true,
-        "valueMode": "color"
+        "showValue": "always",
+        "stacking": "normal",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
       },
       "pluginVersion": "12.3.11",
       "targets": [
@@ -920,10 +787,10 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "editorMode": "code",
-          "expr": "avg(rate(node_cpu_seconds_total{instance=\"$server\", mode=\"idle\", job=\"node_exporter\"}[5m])) * 100",
-          "legendFormat": "Libre (idle)",
-          "range": true,
+          "expr": "label_replace(label_replace(\n  sum by (utilisateur) ((\n  label_replace(\n    label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m]) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n    * on(utilisateur) group_left(username)\n    label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\"),\n    \"utilisateur\", \"$1\", \"username\", \"(.*)\"\n  )\n)\nor\n(\n  label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m]) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n  unless on(utilisateur)\n  label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")\n)) / scalar(count(node_cpu_seconds_total{instance=~\"$server_host:9100\", job=\"node_exporter\", mode=\"idle\"})),\n  \"categorie\", \"CPU\", \"\", \"\"\n), \"\", \"\", \"\", \"\")",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
           "refId": "A"
         },
         {
@@ -931,15 +798,36 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "editorMode": "code",
-          "expr": "sum by (utilisateur) (\n(\n  label_replace(\n    label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m]) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n    * on(utilisateur) group_left(username)\n    label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\"),\n    \"utilisateur\", \"$1\", \"username\", \"(.*)\"\n  )\n)\nor\n(\n  label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m]) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n  unless on(utilisateur)\n  label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")\n)\n)",
-          "legendFormat": "{{utilisateur}}",
-          "range": true,
+          "expr": "label_replace(label_replace(\n  avg(rate(node_cpu_seconds_total{instance=~\"$server_host:9100\", job=\"node_exporter\", mode=\"idle\"}[5m])) * 100,\n  \"utilisateur\", \"Libre\", \"\", \"\"\n), \"categorie\", \"CPU\", \"\", \"\")",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
           "refId": "B"
         }
       ],
       "title": "CPU par utilisateur",
-      "type": "bargauge"
+      "type": "barchart",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "rowsToFields",
+          "options": {
+            "mappings": [
+              {
+                "fieldName": "utilisateur",
+                "handlerKey": "field.name"
+              },
+              {
+                "fieldName": "Value",
+                "handlerKey": "field.value"
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "datasource": {
@@ -1029,15 +917,15 @@
         ]
       },
       "gridPos": {
-        "h": 10,
+        "h": 12,
         "w": 24,
         "x": 0,
-        "y": 40
+        "y": 50
       },
       "id": 11,
       "options": {
         "cellHeight": "sm",
-        "enablePagination": true,
+        "enablePagination": false,
         "footer": {
           "reducers": []
         },
@@ -1128,6 +1016,109 @@
               "Value #A": "CPU %",
               "Value #B": "RAM",
               "Value #C": "Nb instances"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Depuis"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dtdurations"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 44
+      },
+      "id": 13,
+      "options": {
+        "cellHeight": "sm",
+        "enablePagination": false,
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Depuis"
+          }
+        ]
+      },
+      "pluginVersion": "12.3.11",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "label_replace(label_replace(\n  time() - namedprocess_namegroup_oldest_start_time_seconds{instance=~\"$server_host:9256\", job=\"process_exporter\"},\n  \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"\n), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Processus les plus anciens (encore actifs)",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true,
+              "instance": true,
+              "job": true,
+              "groupname": true
+            },
+            "indexByName": {
+              "utilisateur": 0,
+              "processus": 1,
+              "Value": 2
+            },
+            "renameByName": {
+              "utilisateur": "Utilisateur",
+              "processus": "Processus",
+              "Value": "Depuis"
             }
           }
         }
