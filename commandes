@@ -1,107 +1,27 @@
-sudo systemctl stop node_exporter
-sudo sed -i 's|--collector.netdev.address-info|--collector.netdev.address-info --collector.textfile.directory=/var/lib/node_exporter/textfile_collector|' /etc/systemd/system/node_exporter.service
-sudo grep ExecStart /etc/systemd/system/node_exporter.service
-
-sudo mkdir -p /var/lib/node_exporter/textfile_collector
-sudo chown node_exporter:node_exporter /var/lib/node_exporter/textfile_collector
-sudo chmod 755 /var/lib/node_exporter/textfile_collector
-sudo systemctl daemon-reload
-sudo systemctl start node_exporter
-sudo systemctl status node_exporter
-
-sudo /usr/local/bin/generate_uid_map.sh
-curl -s localhost:9100/metrics | grep node_uid_username
-
-
-
-sudo tee /etc/cron.d/uid_username_map > /dev/null << 'EOF'
-*/10 * * * * node_exporter /usr/local/bin/generate_uid_map.sh
-EOF
-
-
-sudo -u node_exporter /usr/local/bin/generate_uid_map.sh
-ls -l /var/lib/node_exporter/textfile_collector/
-sudo systemctl restart node_exporter
-sudo systemctl status node_exporter
-
-
-getenforce
-sudo journalctl -u node_exporter -n 20 --no-pager
-
-
-sudo mkdir -p /var/lib/node_exporter/textfile_collector
-sudo chown node_exporter:node_exporter /var/lib/node_exporter/textfile_collector
-sudo chmod 755 /var/lib/node_exporter/textfile_collector
-
-curl -s localhost:9256/metrics | head -5
-
-# 1. Dossier + permissions (root)
-sudo mkdir -p /var/lib/node_exporter/textfile_collector
-sudo chown node_exporter:node_exporter /var/lib/node_exporter/textfile_collector
-sudo chmod 755 /var/lib/node_exporter/textfile_collector
-
-# 2. Verifier process-exporter tourne bien ici
-curl -s localhost:9256/metrics | head -5
-
-# 3. Relancer le script SOUS node_exporter (pas root, pour eviter de recreer un fichier root:root)
-sudo -u node_exporter /usr/local/bin/generate_uid_map.sh
-ls -l /var/lib/node_exporter/textfile_collector/
-
-# 4. Redemarrer node_exporter et verifier les logs
-sudo systemctl restart node_exporter
-sudo journalctl -u node_exporter -n 10 --no-pager
-
-# 5. Test final
-curl -s localhost:9100/metrics | grep node_uid_username
+label_replace(
+  sum by (utilisateur) (
+    (
+      label_replace(
+        label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~"$server_host:9256", job="process_exporter"}[5m]) * 100, "utilisateur", "$2", "groupname", "(.+):([^:]+)"), "processus", "$1", "groupname", "(.+):([^:]+)")
+        * on(utilisateur) group_left(username)
+        label_replace(node_uid_username{instance=~"$server_host:9100", job="node_exporter"}, "utilisateur", "$1", "uid", "(.*)"),
+        "utilisateur", "$1", "username", "(.*)"
+      )
+    )
+    or
+    (
+      label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~"$server_host:9256", job="process_exporter"}[5m]) * 100, "utilisateur", "$2", "groupname", "(.+):([^:]+)"), "processus", "$1", "groupname", "(.+):([^:]+)")
+      unless on(utilisateur)
+      label_replace(node_uid_username{instance=~"$server_host:9100", job="node_exporter"}, "utilisateur", "$1", "uid", "(.*)")
+    )
+  ) / scalar(count(node_cpu_seconds_total{instance=~"$server_host:9100", job="node_exporter", mode="idle"})),
+  "categorie", "CPU", "", ""
+)
 
 
 
-ls -ld /var/lib/node_exporter
-sudo chmod 755 /var/lib/node_exporter
 
-sudo -u node_exporter /usr/local/bin/generate_uid_map.sh
-ls -l /var/lib/node_exporter/textfile_collector/
-sudo systemctl restart node_exporter
-curl -s localhost:9100/metrics | grep node_uid_username
-
-
-sudo cp generate_uid_map.sh /usr/local/bin/generate_uid_map.sh
-sudo chmod 755 /usr/local/bin/generate_uid_map.sh
-sudo -u node_exporter /usr/local/bin/generate_uid_map.sh
-
-
-------------------------------------------------------------------------------------------------------------------------------
-
-[admin_BRG@smfidf5125 ~]$ sudo -u node_exporter /usr/local/bin/generate_uid_map.sh
-mv: replace '/var/lib/node_exporter/textfile_collector/uid_username_map.prom', overriding mode 0644 (rw-r--r--)? y
-[admin_BRG@smfidf5125 ~]$ ls -l /var/lib/node_exporter/textfile_collector/
-total 4
--rw-r--r--. 1 node_exporter node_exporter 283 Aug 27 16:16 uid_username_map.prom
-[admin_BRG@smfidf5125 ~]$ sudo systemctl restart node_exporter
-[admin_BRG@smfidf5125 ~]$ curl -s localhost:9100/metrics | grep node_uid_username
-# HELP node_uid_username Correspondance UID vers nom d'utilisateur (lookup cible via getent/SSSD)
-# TYPE node_uid_username gauge
-node_uid_username{uid="2339",username="pete182"} 1
-node_uid_username{uid="2345",username="kata157"} 1
-node_uid_username{uid="31037",username="melo158"} 1
-[admin_BRG@smfidf5125 ~]$ sudo cp generate_uid_map.sh /usr/local/bin/generate_uid_map.sh
-[admin_BRG@smfidf5125 ~]$ sudo chmod 755 /usr/local/bin/generate_uid_map.sh
-[admin_BRG@smfidf5125 ~]$ sudo -u node_exporter /usr/local/bin/generate_uid_map.sh
-[admin_BRG@smfidf5125 ~]$ ls -l /var/lib/node_exporter/textfile_collector/
-total 4
--rw-r--r--. 1 node_exporter node_exporter 283 Aug 27 16:19 uid_username_map.prom
-[admin_BRG@smfidf5125 ~]$ sudo systemctl restart node_exporter
-[admin_BRG@smfidf5125 ~]$ curl -s localhost:9100/metrics | grep node_uid_username
-# HELP node_uid_username Correspondance UID vers nom d'utilisateur (lookup cible via getent/SSSD)
-# TYPE node_uid_username gauge
-node_uid_username{uid="2339",username="pete182"} 1
-node_uid_username{uid="2345",username="kata157"} 1
-node_uid_username{uid="31037",username="melo158"} 1
-[admin_BRG@smfidf5125 ~]$ curl -s localhost:9100/metrics | grep node_uid_username
-# HELP node_uid_username Correspondance UID vers nom d'utilisateur (lookup cible via getent/SSSD)
-# TYPE node_uid_username gauge
-node_uid_username{uid="2339",username="pete182"} 1
-node_uid_username{uid="2345",username="kata157"} 1
-node_uid_username{uid="31037",username="melo158"} 1
-[admin_BRG@smfidf5125 ~]$
-
+label_replace(label_replace(
+  avg(rate(node_cpu_seconds_total{instance=~"$server_host:9100", job="node_exporter", mode="idle"}[5m])) * 100,
+  "utilisateur", "Libre", "", ""
+), "categorie", "CPU", "", "")
