@@ -748,7 +748,23 @@
           },
           "unit": "percent"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Libre"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -758,15 +774,30 @@
       },
       "id": 10,
       "options": {
-        "cellHeight": "sm",
-        "enablePagination": false,
-        "showHeader": true,
-        "sortBy": [
-          {
-            "desc": true,
-            "displayName": "% CPU (machine entiere)"
-          }
-        ]
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "pluginVersion": "12.3.11",
       "targets": [
@@ -794,7 +825,7 @@
         }
       ],
       "title": "CPU par utilisateur",
-      "type": "table",
+      "type": "piechart",
       "transformations": [
         {
           "id": "merge",
@@ -1005,7 +1036,7 @@
             "renameByName": {
               "utilisateur": "Utilisateur",
               "processus": "Processus",
-              "Value #A": "CPU %",
+              "Value #A": "CPU % (par coeur, style top)",
               "Value #B": "RAM",
               "Value #C": "Nb instances"
             }
