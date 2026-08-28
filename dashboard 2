@@ -728,31 +728,26 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "palette-classic"
           },
           "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            }
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 70,
+            "gradientMode": "none",
+            "lineWidth": 1,
+            "orientation": "horizontal"
           },
           "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          },
+          "max": 100,
+          "min": 0,
           "unit": "percent"
         },
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "Libre"
+              "id": "byRegexp",
+              "options": "Libre.*"
             },
             "properties": [
               {
@@ -774,29 +769,16 @@
       },
       "id": 10,
       "options": {
-        "displayLabels": [
-          "name",
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "right",
-          "values": [
-            "value",
-            "percent"
-          ]
-        },
-        "pieType": "pie",
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "showUnfilled": true,
+        "valueMode": "color",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
           ],
           "fields": "",
           "values": false
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
         }
       },
       "pluginVersion": "12.3.11",
@@ -806,10 +788,10 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "sum by (utilisateur) ((\n  label_replace(\n    label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m]) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n    * on(utilisateur) group_left(username)\n    label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\"),\n    \"utilisateur\", \"$1\", \"username\", \"(.*)\"\n  )\n)\nor\n(\n  label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m]) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n  unless on(utilisateur)\n  label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")\n)) / scalar(count(node_cpu_seconds_total{instance=~\"$server_host:9100\", job=\"node_exporter\", mode=\"idle\"}))",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
+          "editorMode": "code",
+          "expr": "label_replace(avg(rate(node_cpu_seconds_total{instance=~\"$server_host:9100\", job=\"node_exporter\", mode=\"idle\"}[5m])) * 100, \"utilisateur\", \"Libre\", \"\", \"\")",
+          "legendFormat": "{{utilisateur}}",
+          "range": true,
           "refId": "A"
         },
         {
@@ -817,40 +799,15 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "label_replace(avg(rate(node_cpu_seconds_total{instance=~\"$server_host:9100\", job=\"node_exporter\", mode=\"idle\"}[5m])) * 100, \"utilisateur\", \"Libre\", \"\", \"\")",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
+          "editorMode": "code",
+          "expr": "sum by (utilisateur) ((\n  label_replace(\n    label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m]) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n    * on(utilisateur) group_left(username)\n    label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\"),\n    \"utilisateur\", \"$1\", \"username\", \"(.*)\"\n  )\n)\nor\n(\n  label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m]) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n  unless on(utilisateur)\n  label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")\n)) / scalar(count(node_cpu_seconds_total{instance=~\"$server_host:9100\", job=\"node_exporter\", mode=\"idle\"}))",
+          "legendFormat": "{{utilisateur}}",
+          "range": true,
           "refId": "B"
         }
       ],
       "title": "CPU par utilisateur",
-      "type": "piechart",
-      "transformations": [
-        {
-          "id": "merge",
-          "options": {}
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true,
-              "__name__": true,
-              "instance": true,
-              "job": true
-            },
-            "indexByName": {
-              "utilisateur": 0,
-              "Value": 1
-            },
-            "renameByName": {
-              "utilisateur": "Utilisateur",
-              "Value": "% CPU (machine entiere)"
-            }
-          }
-        }
-      ]
+      "type": "bargauge"
     },
     {
       "datasource": {
@@ -967,7 +924,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "(\n  label_replace(\n    label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m]) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n    * on(utilisateur) group_left(username)\n    label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\"),\n    \"utilisateur\", \"$1\", \"username\", \"(.*)\"\n  )\n)\nor\n(\n  label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m]) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n  unless on(utilisateur)\n  label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")\n)",
+          "expr": "((\n  label_replace(\n    label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m]) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n    * on(utilisateur) group_left(username)\n    label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\"),\n    \"utilisateur\", \"$1\", \"username\", \"(.*)\"\n  )\n)\nor\n(\n  label_replace(label_replace(rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m]) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n  unless on(utilisateur)\n  label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")\n)) / scalar(count(node_cpu_seconds_total{instance=~\"$server_host:9100\", job=\"node_exporter\", mode=\"idle\"}))",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -1036,7 +993,7 @@
             "renameByName": {
               "utilisateur": "Utilisateur",
               "processus": "Processus",
-              "Value #A": "CPU % (par coeur, style top)",
+              "Value #A": "CPU %",
               "Value #B": "RAM",
               "Value #C": "Nb instances"
             }
