@@ -903,6 +903,20 @@
               {
                 "id": "unit",
                 "value": "dateTimeAsSystem"
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "special",
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "N/A"
+                      }
+                    }
+                  }
+                ]
               }
             ]
           }
@@ -1026,6 +1040,24 @@
               "Value #C": "Nb instances",
               "Value #D": "Depuis"
             }
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "fieldName": "Utilisateur",
+                "config": {
+                  "id": "regex",
+                  "options": {
+                    "value": "^(root|node_exporter)$"
+                  }
+                }
+              }
+            ],
+            "type": "exclude",
+            "match": "any"
           }
         }
       ],
