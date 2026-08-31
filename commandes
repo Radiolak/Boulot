@@ -12,3 +12,34 @@
 
 sudo promtool check config /etc/prometheus/prometheus.yml
 sudo systemctl reload prometheus
+
+
+[r.fral192@main.fr.ds.corp@saxfrc0154 ~]$ sudo grep -n -A 30 "job_name: 'process_exporter'" /etc/prometheus/prometheus.yml | cat -A | head -40
+70:  - job_name: 'process_exporter'$
+71-    scrape_interval: 30s$
+72-    static_configs:$
+73-    - targets:$
+74-      - 'coxa.fr.airbusds.corp:9256'$
+75-      - 'arz.fr.airbusds.corp:9256'$
+76-      - 'chara.fr.airbusds.corp:9256'$
+77-      - 'calx.fr.airbusds.corp:9256'$
+78-      - 'cursa.fr.airbusds.corp:9256'$
+79-      - 'celeno.fr.airbusds.corp:9256'$
+80-      - 'baguio.fr.airbusds.corp:9256'$
+81-      - 'bolon.fr.airbusds.corp:9256'$
+82-      - 'binic.fr.airbusds.corp:9256'$
+83-      - 'buran.fr.airbusds.corp:9256'$
+84-      - 'burga.fr.airbusds.corp:9256'$
+85-      - 'burle.fr.airbusds.corp:9256'$
+86-      - 'zembra.fr.airbusds.corp:9256'$
+87-      - 'zealand.fr.airbusds.corp:9256'$
+88-      - 'yuma.fr.airbusds.corp:9256'$
+89-      - 'york.fr.airbusds.corp:9256'$
+90-      - 'wallis.fr.airbusds.corp:9256'$
+91-      - 'vanavana.fr.airbusds.corp:9256'$
+92-      - 'taiwan.fr.airbusds.corp:9256'$
+93-      - 'nexus.main.fr.ds.corp:9256'$
+94-    metric_relabel_configs:$
+95-      - source_labels: [__name__]$
+96-      regex: 'namedprocess_namegroup_(cpu_seconds_total|memory_bytes|num_procs|oldest_start_time_seconds)|namedprocess_scrape_(errors|partial_errors|procread_errors)'$
+97-      action: keep$
