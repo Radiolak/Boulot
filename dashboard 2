@@ -893,6 +893,18 @@
                 "value": "bytes"
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Depuis"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsSystem"
+              }
+            ]
           }
         ]
       },
@@ -951,6 +963,17 @@
           "instant": true,
           "legendFormat": "",
           "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "namedprocess_namegroup_oldest_start_time_seconds{instance=~\"$server_host:9256\", job=\"process_exporter\"} * 1000",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "D"
         }
       ],
       "title": "Detail processus par utilisateur",
@@ -981,124 +1004,27 @@
               "memtype": true,
               "groupname": true,
               "username": true,
-              "username 1": true
+              "username 1": true,
+              "Time 3": true,
+              "__name__ 3": true,
+              "instance 3": true,
+              "job 3": true
             },
             "indexByName": {
               "utilisateur": 0,
               "processus": 1,
               "Value #A": 2,
               "Value #B": 3,
-              "Value #C": 4
+              "Value #C": 4,
+              "Value #D": 5
             },
             "renameByName": {
               "utilisateur": "Utilisateur",
               "processus": "Processus",
               "Value #A": "CPU %",
               "Value #B": "RAM",
-              "Value #C": "Nb instances"
-            }
-          }
-        }
-      ],
-      "type": "table"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "filterable": true
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Depuis"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "dtdurations"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 44
-      },
-      "id": 13,
-      "options": {
-        "cellHeight": "sm",
-        "enablePagination": false,
-        "showHeader": true,
-        "sortBy": [
-          {
-            "desc": true,
-            "displayName": "Depuis"
-          }
-        ]
-      },
-      "pluginVersion": "12.3.11",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "label_replace(label_replace(\n  time() - namedprocess_namegroup_oldest_start_time_seconds{instance=~\"$server_host:9256\", job=\"process_exporter\", groupname!~\".*:(node_exporter|root)\"},\n  \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"\n), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "title": "Processus les plus anciens (encore actifs)",
-      "transformations": [
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true,
-              "__name__": true,
-              "instance": true,
-              "job": true,
-              "groupname": true
-            },
-            "indexByName": {
-              "utilisateur": 0,
-              "processus": 1,
-              "Value": 2
-            },
-            "renameByName": {
-              "utilisateur": "Utilisateur",
-              "processus": "Processus",
-              "Value": "Depuis"
+              "Value #C": "Nb instances",
+              "Value #D": "Depuis"
             }
           }
         }
