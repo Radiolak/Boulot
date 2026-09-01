@@ -152,7 +152,19 @@
             "properties": [
               {
                 "id": "unit",
-                "value": "decbytes"
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Uptime"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dtdurations"
               }
             ]
           }
@@ -200,7 +212,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "(time() - node_boot_time_seconds{instance=\"$server\", job=\"node_exporter\"}) / 3600",
+          "expr": "(time() - node_boot_time_seconds{instance=\"$server\", job=\"node_exporter\"})",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -282,7 +294,7 @@
               "ip": "Adresse IP",
               "sysname": "OS",
               "nodename": "Hostname",
-              "Value #C": "Uptime (h)",
+              "Value #C": "Uptime",
               "Value #D": "Nb CPU",
               "Value #F": "RAM totale"
             }
