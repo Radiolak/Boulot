@@ -1,2 +1,3 @@
-curl -s localhost:9256/metrics | grep -c namedprocess_namegroup_cpu_seconds_total
-curl -s localhost:9256/metrics | grep -c namedprocess_namegroup_oldest_start_time_seconds
+
+cat /etc/update-motd.d/* 2>/dev/null | grep -i reboot
+grep -ri "reboot scheduled" /etc/cron* /etc/crontab /var/spool/cron/* 2>/dev/null
