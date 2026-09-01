@@ -236,8 +236,9 @@
           "editorMode": "code",
           "expr": "node_memory_MemTotal_bytes{instance=\"$server\", job=\"node_exporter\"}",
           "legendFormat": "",
-          "range": true,
-          "refId": "F"
+          "refId": "F",
+          "format": "table",
+          "instant": true
         }
       ],
       "title": "Infos serveur",
