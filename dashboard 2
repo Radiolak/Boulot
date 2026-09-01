@@ -152,7 +152,7 @@
             "properties": [
               {
                 "id": "unit",
-                "value": "gbytes"
+                "value": "decbytes"
               }
             ]
           }
@@ -575,6 +575,115 @@
       ],
       "title": "Disques - Espace restant",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 20
+      },
+      "id": 14,
+      "options": {
+        "cellHeight": "sm",
+        "enablePagination": false,
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "12.3.11",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "node_filesystem_avail_bytes{instance=\"$server\", fstype!~\"tmpfs|overlay|squashfs|devtmpfs\", job=\"node_exporter\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "node_filesystem_size_bytes{instance=\"$server\", fstype!~\"tmpfs|overlay|squashfs|devtmpfs\", job=\"node_exporter\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "B"
+        }
+      ],
+      "title": "Disques - Espace disponible vs Taille totale",
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "mountpoint",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Time 1": true,
+              "__name__": true,
+              "__name__ 1": true,
+              "instance": true,
+              "instance 1": true,
+              "job": true,
+              "job 1": true,
+              "fstype": true,
+              "fstype 1": true,
+              "device": true,
+              "device 1": true
+            },
+            "indexByName": {
+              "mountpoint": 0,
+              "Value #A": 1,
+              "Value #B": 2
+            },
+            "renameByName": {
+              "mountpoint": "Point de montage",
+              "Value #A": "Espace disponible",
+              "Value #B": "Taille totale"
+            }
+          }
+        }
+      ],
+      "type": "table"
     },
     {
       "datasource": {
