@@ -155,18 +155,6 @@
                 "value": "bytes"
               }
             ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Uptime"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "dtdurations"
-              }
-            ]
           }
         ]
       },
@@ -212,7 +200,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "(time() - node_boot_time_seconds{instance=\"$server\", job=\"node_exporter\"})",
+          "expr": "floor((time() - node_boot_time_seconds{instance=\"$server\", job=\"node_exporter\"}) / 86400)",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -251,6 +239,17 @@
           "refId": "F",
           "format": "table",
           "instant": true
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "floor(((time() - node_boot_time_seconds{instance=\"$server\", job=\"node_exporter\"}) % 86400) / 3600)",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "G"
         }
       ],
       "title": "Infos serveur",
@@ -275,7 +274,11 @@
               "release": true,
               "machine": true,
               "Time 1": true,
-              "version": true
+              "version": true,
+              "Time 2": true,
+              "__name__ 2": true,
+              "instance 2": true,
+              "job 2": true
             },
             "includeByName": {},
             "indexByName": {
@@ -284,9 +287,10 @@
               "ip": 2,
               "sysname": 3,
               "nodename": 4,
-              "Value #C": 5,
+              "Value #C": 6,
               "Value #D": 6,
-              "Value #F": 7
+              "Value #F": 7,
+              "Value #G": 7
             },
             "renameByName": {
               "instance": "Server",
@@ -294,9 +298,10 @@
               "ip": "Adresse IP",
               "sysname": "OS",
               "nodename": "Hostname",
-              "Value #C": "Uptime",
+              "Value #C": "Uptime (jours)",
               "Value #D": "Nb CPU",
-              "Value #F": "RAM totale"
+              "Value #F": "RAM totale",
+              "Value #G": "Uptime (heures)"
             }
           }
         }
