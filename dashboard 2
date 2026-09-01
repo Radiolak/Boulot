@@ -261,7 +261,8 @@
               "domainname": true,
               "release": true,
               "machine": true,
-              "Time 1": true
+              "Time 1": true,
+              "version": true
             },
             "includeByName": {},
             "indexByName": {
