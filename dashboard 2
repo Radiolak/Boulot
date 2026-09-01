@@ -1059,6 +1059,24 @@
             "type": "exclude",
             "match": "any"
           }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "fieldName": "Nb instances",
+                "config": {
+                  "id": "greater",
+                  "options": {
+                    "value": 0
+                  }
+                }
+              }
+            ],
+            "type": "include",
+            "match": "all"
+          }
         }
       ],
       "type": "table"
