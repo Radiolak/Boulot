@@ -1,3 +1,157 @@
+sudo crontab -l
+[sudo] password for admin_BRG:
+#### Update RedHatSat ####
+#Ansible: Mise à jour Red Hat Satellite
+#0 4 * * Sat /root/Satellite_Scripts/airbus-system-update.sh
+#### Clean LV audit ####
+30 5 * * * /root/clean_audit.sh
+#### Update MOTD
+0 6 * * 6 [[ $((($(date +\%-d)-1)/7+1)) -eq 3 ]] && /root/Satellite_Scripts/airbus-system-update.sh && /usr/sbin/reboot
 
-cat /etc/update-motd.d/* 2>/dev/null | grep -i reboot
-grep -ri "reboot scheduled" /etc/cron* /etc/crontab /var/spool/cron/* 2>/dev/null
+#Suppression des verrous WindU toutes les demi-journées
+0 0,12 * * * /bin/bash /softs/RemoveWindULock_Cron.sh
+[admin_BRG@smfidf5125 ~]$ cat /etc/update-motd.d/* 2>/dev/null | grep -i reboot
+[admin_BRG@smfidf5125 ~]$ grep -ri "reboot scheduled" /etc/cron* /etc/crontab /var/spool/cron/* 2>/dev/null
+[admin_BRG@smfidf5125 ~]$ ls /etc/cr
+cron.d/          cron.daily/      cron.hourly/     cron.monthly/    crontab          cron.weekly/     crypto-policies/ crypttab
+[admin_BRG@smfidf5125 ~]$ ls /etc/cr
+cron.d/          cron.daily/      cron.hourly/     cron.monthly/    crontab          cron.weekly/     crypto-policies/ crypttab
+[admin_BRG@smfidf5125 ~]$ ls /etc/crontab
+.bash_history                              .config/                                   .kshrc                                     node_exporter-1.12.1.linux-amd64.tar.gz
+.bash_logout                               DS2022.der                                 libXm.so.3                                 process-exporter-0.8.7.linux-amd64.tar.gz
+.bash_profile                              .esd_auth                                  libXm.so.3.0.2                             RHEL8_client.tar
+.bashrc                                    generate_uid_map.sh                        NessusAgent-11.0.2-el8.x86_64.rpm          TREND_LINUX_TAL3_ELC.sh
+.cache/                                    install process exporter.sh                node_exporter-1.12.1.linux-amd64/          .viminfo
+[admin_BRG@smfidf5125 ~]$ ls /etc/crontab
+/etc/crontab
+[admin_BRG@smfidf5125 ~]$ cat /etc/crontab
+cat: /etc/crontab: Permission denied
+[admin_BRG@smfidf5125 ~]$ sudo cat /etc/crontab
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+
+# For details see man 4 crontabs
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * user-name  command to be executed
+
+05 4 * * * root /usr/sbin/aide --check
+[admin_BRG@smfidf5125 ~]$ sudo cat /etc/
+Display all 220 possibilities? (y or n)
+[admin_BRG@smfidf5125 ~]$ sudo cat /etc/cr
+cron.d/          cron.daily/      cron.hourly/     cron.monthly/    crontab          cron.weekly/     crypto-policies/ crypttab
+[admin_BRG@smfidf5125 ~]$ sudo cat /etc/cron.d/
+0hourly                katello-tracer-upload  raid-check             uid_username_map
+[admin_BRG@smfidf5125 ~]$ sudo cat /etc/cron.d/
+0hourly                katello-tracer-upload  raid-check             uid_username_map
+[admin_BRG@smfidf5125 ~]$ sudo cat /etc/cron.d/0hourly
+# Run the hourly jobs
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+01 * * * * root run-parts /etc/cron.hourly
+[admin_BRG@smfidf5125 ~]$ sudo cat /etc/cron.d/raid-check
+# Run system wide raid-check once a week on Sunday at 1am by default
+0 1 * * Sun root /usr/sbin/raid-check
+
+[admin_BRG@smfidf5125 ~]$ sudo cat /etc/cr
+cron.d/          cron.daily/      cron.hourly/     cron.monthly/    crontab          cron.weekly/     crypto-policies/ crypttab
+[admin_BRG@smfidf5125 ~]$ sudo ls -la /etc/cron*
+-rw-------. 1 root root 490 Feb  8  2024 /etc/crontab
+
+/etc/cron.d:
+total 28
+drwxr-xr-x.   2 root root   92 Aug 27 16:09 .
+drwxr-xr-x. 106 root root 8192 Aug 27 14:54 ..
+-rw-r--r--.   1 root root  128 Nov 30  2023 0hourly
+-rw-r--r--.   1 root root  140 May 16  2025 katello-tracer-upload
+-rw-r--r--.   1 root root  108 Oct 26  2025 raid-check
+-rw-r-----.   1 root root   62 Aug 27 16:09 uid_username_map
+
+/etc/cron.daily:
+total 16
+drwx------.   2 root root   23 Feb  8  2024 .
+drwxr-xr-x. 106 root root 8192 Aug 27 14:54 ..
+-rwxr-xr-x.   1 root root  189 Jan  4  2018 logrotate
+
+/etc/cron.hourly:
+total 20
+drwx------.   2 root root   50 Jan 13  2026 .
+drwxr-xr-x. 106 root root 8192 Aug 27 14:54 ..
+-rwxr-xr-x.   1 root root  575 Nov 30  2023 0anacron
+-rwxr-x---.   1 root root   93 Jan 13  2026 reboot_motd_generate
+
+/etc/cron.monthly:
+total 12
+drwx------.   2 root root    6 Jan  8  2021 .
+drwxr-xr-x. 106 root root 8192 Aug 27 14:54 ..
+
+/etc/cron.weekly:
+total 12
+drwx------.   2 root root    6 Jan  8  2021 .
+drwxr-xr-x. 106 root root 8192 Aug 27 14:54 ..
+[admin_BRG@smfidf5125 ~]$ sudo cat /etc/cron.hourly/reboot_motd_generate
+#!/bin/bash
+
+/softs/acces_cao/servers/MOTD/reboot_motd_generate.pl Saturday 3rd > /etc/motd
+
+[admin_BRG@smfidf5125 ~]$ sudo cat /softs/acces_cao/servers/MOTD/reboot_motd_generate.pl
+#!/softs/ActivePerl-5.14_64bits/bin/perl
+
+use strict;
+use warnings;
+use diagnostics;
+
+use Date::Manip;
+
+# Script créé par Christophe Le Lann le 07/05/2024
+
+# Affiche un message dans le MOTD pour prévenir de l'occurrence du prochain reboot planifié
+
+# Ce script est censé être appelé toutes les heures pour régénérer un fichier MOTD (ou équivalent), lequel est affiché à l'utilisateur quand il se connecte en SSH sur la machine
+# La planification peut se faire via tâche CRON, ou via un timer systemd
+#
+# Dans la ligne d'appel, on peut spécifier le timing du reboot, sous cette forme :
+# "reboot_motd_generate.pl Wednesday 3rd 6 > /etc/motd" => le 3e mercredi du mois à 6h du matin
+# Si on ne spécifie rien, les valeurs par défaut sont le 3e samedi du mois à 6h du matin
+
+# Le calcul de date est défini selon un pattern du type "3e mardi du mois", où l'on peut configurer le jour (mardi) et le numéro (3e) ci-dessous
+# Pour avoir un même script sur tous les serveurs malgré des dates différentes, il est possible de sourcer ces paramètres depuis la ligne de commande ($ARGV[0], $ARGV[1], etc)
+my $weekday              = $ARGV[0] || "Saturday";
+my $Nth_weekday_of_month = $ARGV[1] || "3rd";
+my $hour                 = $ARGV[2] || 6;
+
+my $now = ParseDate("now");
+my $this_month = UnixDate($now, "%B %Y");
+my $next_month = UnixDate(ParseDate("next month"), "%B %Y");
+
+my $this_month_reboot = ParseDate("$Nth_weekday_of_month $weekday in $this_month at $hour:00")."\n";
+my $next_month_reboot = ParseDate("$Nth_weekday_of_month $weekday in $next_month at $hour:00")."\n";
+
+my $next_reboot = (Date_Cmp($now, $this_month_reboot) < 0) ? $this_month_reboot : $next_month_reboot;
+my $next_reboot_as_str = UnixDate($next_reboot, "%d/%m/%Y %H:%M");
+
+my $delta = DateCalc($now, $next_reboot)."\n";
+my $delta_in_days  = Delta_Format($delta, "%dys") + 0;
+my $delta_in_hours = Delta_Format($delta, "%hys") + 0;
+
+# On affiche vert si le reboot est lointain, orange s'il est proche, rouge s'il est très proche
+my $color = ($delta_in_days > 5) ? "\e[0;42m\e[1;37m" : ($delta_in_days > 1.5) ? "\e[0;43m\e[1;37m" : "\e[0;41m\e[1;37m";
+my $color_default = "\e[0m";
+
+print "+----------------------------------------------------------+\n";
+print "| Merci de composer le 68-00 pour toute demande de support |\n";
+print "|            et intervention sur cette machine.            |\n";
+print "+----------------------------------------------------------+\n";
+printf "| $color        Reboot scheduled in %2d days and %2d hours        $color_default |\n", int($delta_in_days), int($delta_in_hours)-24*int($delta_in_days);
+print "| $color                   ($next_reboot_as_str)                   $color_default |\n";
+print "+----------------------------------------------------------+\n";
+
+[admin_BRG@smfidf5125 ~]$
