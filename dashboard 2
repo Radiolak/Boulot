@@ -143,6 +143,18 @@
                 ]
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RAM totale"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "gbytes"
+              }
+            ]
           }
         ]
       },
@@ -215,6 +227,17 @@
           "instant": true,
           "legendFormat": "",
           "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "node_memory_MemTotal_bytes{instance=\"$server\", job=\"node_exporter\"}",
+          "legendFormat": "",
+          "range": true,
+          "refId": "F"
         }
       ],
       "title": "Infos serveur",
@@ -237,7 +260,8 @@
               "job": true,
               "domainname": true,
               "release": true,
-              "machine": true
+              "machine": true,
+              "Time 1": true
             },
             "includeByName": {},
             "indexByName": {
@@ -247,7 +271,8 @@
               "sysname": 3,
               "nodename": 4,
               "Value #C": 5,
-              "Value #D": 6
+              "Value #D": 6,
+              "Value #F": 7
             },
             "renameByName": {
               "instance": "Server",
@@ -256,7 +281,8 @@
               "sysname": "OS",
               "nodename": "Hostname",
               "Value #C": "Uptime (h)",
-              "Value #D": "Nb CPU"
+              "Value #D": "Nb CPU",
+              "Value #F": "RAM totale"
             }
           }
         }
