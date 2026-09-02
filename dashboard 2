@@ -15,6 +15,7 @@
       }
     ]
   },
+  "description": "Detail par vendeur FlexLM - licences, utilisateurs, expiration, historique",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -30,939 +31,11 @@
       "title": "Retour a la vue globale",
       "tooltip": "",
       "type": "link",
-      "url": "/d/global-overview-dash/supervision-vue-globale-des-serveurs"
+      "url": "/d/flexlm-supervision-dash/supervision-flexlm-vue-globale"
     }
   ],
   "liveNow": false,
   "panels": [
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "filterable": false,
-            "footer": {
-              "reducers": []
-            },
-            "inspect": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Etat"
-            },
-            "properties": [
-              {
-                "id": "custom.cellOptions",
-                "value": {
-                  "type": "color-background"
-                }
-              },
-              {
-                "id": "custom.align",
-                "value": "center"
-              },
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": 0
-                    },
-                    {
-                      "color": "yellow",
-                      "value": 60
-                    },
-                    {
-                      "color": "red",
-                      "value": 95
-                    }
-                  ]
-                }
-              },
-              {
-                "id": "mappings",
-                "value": [
-                  {
-                    "type": "range",
-                    "options": {
-                      "from": 0,
-                      "to": 60,
-                      "result": {
-                        "text": "OK",
-                        "color": "green"
-                      }
-                    }
-                  },
-                  {
-                    "type": "range",
-                    "options": {
-                      "from": 60.01,
-                      "to": 95,
-                      "result": {
-                        "text": "HIGH",
-                        "color": "yellow"
-                      }
-                    }
-                  },
-                  {
-                    "type": "range",
-                    "options": {
-                      "from": 95.01,
-                      "to": 1000,
-                      "result": {
-                        "text": "CRITICAL",
-                        "color": "red"
-                      }
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "RAM totale"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "bytes"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 24,
-        "x": 0,
-        "y": 0
-      },
-      "id": 8,
-      "options": {
-        "cellHeight": "sm",
-        "enablePagination": false,
-        "showHeader": true,
-        "sortBy": []
-      },
-      "pluginVersion": "12.3.11",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "max(\n  100 - (avg by(instance) (rate(node_cpu_seconds_total{instance=\"$server\", mode=\"idle\", job=\"node_exporter\"}[5m])) * 100)\nor\n  100 * (1 - ((node_memory_MemAvailable_bytes{instance=\"$server\", job=\"node_exporter\"} or node_memory_Buffers_bytes{instance=\"$server\", job=\"node_exporter\"} + node_memory_Cached_bytes{instance=\"$server\", job=\"node_exporter\"} + node_memory_MemFree_bytes{instance=\"$server\", job=\"node_exporter\"}) / node_memory_MemTotal_bytes{instance=\"$server\", job=\"node_exporter\"}))\n)",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "node_uname_info{instance=\"$server\", job=\"node_exporter\"}",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "(time() - node_boot_time_seconds{instance=\"$server\", job=\"node_exporter\"}) / 3600",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "count by(instance) (node_cpu_seconds_total{instance=\"$server\", mode=\"idle\", job=\"node_exporter\"})",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "D"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "up{instance=\"$server\", job=\"node_exporter\"}",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "E"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "node_memory_MemTotal_bytes{instance=\"$server\", job=\"node_exporter\"}",
-          "legendFormat": "",
-          "refId": "F",
-          "format": "table",
-          "instant": true
-        }
-      ],
-      "title": "Infos serveur",
-      "transformations": [
-        {
-          "id": "joinByField",
-          "options": {
-            "byField": "instance",
-            "mode": "outer"
-          }
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true,
-              "Value #B": true,
-              "Value #E": true,
-              "__name__": true,
-              "job": true,
-              "domainname": true,
-              "release": true,
-              "machine": true,
-              "Time 1": true,
-              "version": true
-            },
-            "includeByName": {},
-            "indexByName": {
-              "instance": 0,
-              "Value #A": 1,
-              "ip": 2,
-              "sysname": 3,
-              "nodename": 4,
-              "Value #C": 6,
-              "Value #D": 6,
-              "Value #F": 7
-            },
-            "renameByName": {
-              "instance": "Server",
-              "Value #A": "Etat",
-              "ip": "Adresse IP",
-              "sysname": "OS",
-              "nodename": "Hostname",
-              "Value #C": "Uptime (h)",
-              "Value #D": "Nb CPU",
-              "Value #F": "RAM totale"
-            }
-          }
-        }
-      ],
-      "type": "table"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "axisLabel": "%",
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "lineWidth": 1,
-            "showPoints": "never"
-          },
-          "max": 100,
-          "min": 0,
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 12,
-        "x": 0,
-        "y": 4
-      },
-      "id": 1,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "100 - (avg by(instance) (rate(node_cpu_seconds_total{instance=\"$server\", mode=\"idle\", job=\"node_exporter\"}[5m])) * 100)",
-          "legendFormat": "CPU global",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "CPU - Utilisation globale",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "axisLabel": "%",
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "lineWidth": 1,
-            "showPoints": "never"
-          },
-          "max": 100,
-          "min": 0,
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 12,
-        "x": 12,
-        "y": 9
-      },
-      "id": 2,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "100 - (avg by(cpu) (rate(node_cpu_seconds_total{instance=\"$server\", mode=\"idle\", job=\"node_exporter\"}[5m])) * 100)",
-          "legendFormat": "CPU {{cpu}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "CPU - Utilisation par CPU logique",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "axisLabel": "%",
-            "drawStyle": "line",
-            "fillOpacity": 15,
-            "lineWidth": 2,
-            "showPoints": "never"
-          },
-          "max": 100,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 70
-              },
-              {
-                "color": "red",
-                "value": 90
-              }
-            ]
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 12,
-        "x": 0,
-        "y": 14
-      },
-      "id": 3,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max",
-            "last"
-          ],
-          "displayMode": "table",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "100 * (1 - (node_memory_MemAvailable_bytes{instance=\"$server\", job=\"node_exporter\"} / node_memory_MemTotal_bytes{instance=\"$server\", job=\"node_exporter\"}))",
-          "legendFormat": "RAM utilisee",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "RAM - Usage / Evolution",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "axisLabel": "",
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "lineWidth": 1,
-            "showPoints": "never"
-          },
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 21474836480
-              },
-              {
-                "color": "green",
-                "value": 53687091200
-              }
-            ]
-          },
-          "unit": "bytes"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": ".*Taille totale.*"
-            },
-            "properties": [
-              {
-                "id": "custom.hideFrom",
-                "value": {
-                  "viz": true,
-                  "legend": false,
-                  "tooltip": true
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 12,
-        "x": 12,
-        "y": 19
-      },
-      "id": 4,
-      "options": {
-        "legend": {
-          "calcs": [
-            "last"
-          ],
-          "displayMode": "table",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "node_filesystem_avail_bytes{instance=\"$server\", fstype!~\"tmpfs|overlay|squashfs|devtmpfs\", job=\"node_exporter\"}",
-          "legendFormat": "{{mountpoint}}",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "node_filesystem_size_bytes{instance=\"$server\", fstype!~\"tmpfs|overlay|squashfs|devtmpfs\", job=\"node_exporter\"}",
-          "legendFormat": "{{mountpoint}} (Taille totale)",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "Disques - Espace restant",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "decbytes"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 24,
-        "x": 0,
-        "y": 24
-      },
-      "id": 14,
-      "options": {
-        "cellHeight": "sm",
-        "enablePagination": false,
-        "showHeader": true,
-        "sortBy": []
-      },
-      "pluginVersion": "12.3.11",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "node_filesystem_avail_bytes{instance=\"$server\", fstype!~\"tmpfs|overlay|squashfs|devtmpfs\", job=\"node_exporter\"}",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "node_filesystem_size_bytes{instance=\"$server\", fstype!~\"tmpfs|overlay|squashfs|devtmpfs\", job=\"node_exporter\"}",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "B"
-        }
-      ],
-      "title": "Disques - Espace disponible vs Taille totale",
-      "transformations": [
-        {
-          "id": "joinByField",
-          "options": {
-            "byField": "mountpoint",
-            "mode": "outer"
-          }
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true,
-              "Time 1": true,
-              "__name__": true,
-              "__name__ 1": true,
-              "instance": true,
-              "instance 1": true,
-              "job": true,
-              "job 1": true,
-              "fstype": true,
-              "fstype 1": true,
-              "device": true,
-              "device 1": true
-            },
-            "indexByName": {
-              "mountpoint": 0,
-              "Value #A": 1,
-              "Value #B": 2
-            },
-            "renameByName": {
-              "mountpoint": "Point de montage",
-              "Value #A": "Espace disponible",
-              "Value #B": "Taille totale"
-            }
-          }
-        }
-      ],
-      "type": "table"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "axisLabel": "bits/s",
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "lineWidth": 1,
-            "showPoints": "never"
-          },
-          "min": 0,
-          "unit": "bps"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": "/sortant/"
-            },
-            "properties": [
-              {
-                "id": "custom.transform",
-                "value": "negative-Y"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 12,
-        "x": 0,
-        "y": 28
-      },
-      "id": 5,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "rate(node_network_receive_bytes_total{instance=\"$server\", device!=\"lo\", job=\"node_exporter\"}[5m]) * 8",
-          "legendFormat": "{{device}} entrant",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "rate(node_network_transmit_bytes_total{instance=\"$server\", device!=\"lo\", job=\"node_exporter\"}[5m]) * 8",
-          "legendFormat": "{{device}} sortant",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "node_network_speed_bytes{instance=\"$server\", job=\"node_exporter\"} * 8",
-          "legendFormat": "{{device}}{{interface}} - Vitesse max port (theorique)",
-          "range": true,
-          "refId": "C"
-        }
-      ],
-      "title": "Reseau - Debit entrant / sortant",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "axisLabel": "paquets/s",
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "lineWidth": 1,
-            "showPoints": "never"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 1
-              }
-            ]
-          },
-          "unit": "pps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 12,
-        "x": 12,
-        "y": 33
-      },
-      "id": 6,
-      "options": {
-        "legend": {
-          "calcs": [
-            "sum"
-          ],
-          "displayMode": "table",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "rate(node_network_receive_errs_total{instance=\"$server\", job=\"node_exporter\"}[5m])",
-          "legendFormat": "{{device}} erreurs entrantes",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "rate(node_network_transmit_errs_total{instance=\"$server\", job=\"node_exporter\"}[5m])",
-          "legendFormat": "{{device}} erreurs sortantes",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "rate(node_network_receive_drop_total{instance=\"$server\", job=\"node_exporter\"}[5m])",
-          "legendFormat": "{{device}} paquets perdus (in)",
-          "range": true,
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "rate(node_network_transmit_drop_total{instance=\"$server\", job=\"node_exporter\"}[5m])",
-          "legendFormat": "{{device}} paquets perdus (out)",
-          "range": true,
-          "refId": "D"
-        }
-      ],
-      "title": "Reseau - Erreurs et pertes de paquets",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "fillOpacity": 70,
-            "gradientMode": "none",
-            "lineWidth": 1,
-            "orientation": "horizontal"
-          },
-          "mappings": [],
-          "max": 100,
-          "min": 0,
-          "unit": "percent"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": "Libre.*"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 24,
-        "x": 0,
-        "y": 38
-      },
-      "id": 10,
-      "options": {
-        "displayMode": "gradient",
-        "orientation": "horizontal",
-        "showUnfilled": true,
-        "valueMode": "color",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        }
-      },
-      "pluginVersion": "12.3.11",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "label_replace(avg(rate(node_cpu_seconds_total{instance=~\"$server_host:9100\", job=\"node_exporter\", mode=\"idle\"}[5m])) * 100, \"utilisateur\", \"Libre\", \"\", \"\")",
-          "legendFormat": "{{utilisateur}}",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "sum by (utilisateur) ((\n  label_replace(\n    label_replace(label_replace(sum by (groupname, instance, job) (rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m])) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n    * on(utilisateur) group_left(username)\n    label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\"),\n    \"utilisateur\", \"$1\", \"username\", \"(.*)\"\n  )\n)\nor\n(\n  label_replace(label_replace(sum by (groupname, instance, job) (rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m])) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n  unless on(utilisateur)\n  label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")\n)) / scalar(count(node_cpu_seconds_total{instance=~\"$server_host:9100\", job=\"node_exporter\", mode=\"idle\"}))",
-          "legendFormat": "{{utilisateur}}",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "CPU par utilisateur",
-      "type": "bargauge"
-    },
     {
       "datasource": {
         "type": "prometheus",
@@ -994,108 +67,69 @@
               }
             ]
           },
-          "unit": "short"
+          "unit": "d"
         },
         "overrides": [
           {
             "matcher": {
               "id": "byName",
-              "options": "CPU %"
+              "options": "Total"
             },
             "properties": [
               {
                 "id": "unit",
-                "value": "percent"
-              },
+                "value": "short"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Utilisees"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "short"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Expiration"
+            },
+            "properties": [
               {
                 "id": "custom.cellOptions",
                 "value": {
-                  "type": "color-background",
-                  "mode": "gradient"
+                  "type": "color-background"
                 }
               },
               {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": 0
-                    },
-                    {
-                      "color": "orange",
-                      "value": 50
-                    },
-                    {
-                      "color": "red",
-                      "value": 90
-                    }
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "RAM"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "bytes"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Depuis"
-            },
-            "properties": [
+                "id": "custom.align",
+                "value": "center"
+              },
               {
                 "id": "unit",
                 "value": "dateTimeAsSystem"
-              },
-              {
-                "id": "mappings",
-                "value": [
-                  {
-                    "type": "special",
-                    "options": {
-                      "match": "null",
-                      "result": {
-                        "text": "N/A"
-                      }
-                    }
-                  }
-                ]
               }
             ]
           }
         ]
       },
       "gridPos": {
-        "h": 8,
+        "h": 10,
         "w": 24,
         "x": 0,
-        "y": 43
+        "y": 0
       },
-      "id": 11,
+      "id": 1,
       "options": {
         "cellHeight": "sm",
         "enablePagination": false,
-        "footer": {
-          "reducers": []
-        },
         "showHeader": true,
-        "sortBy": [
-          {
-            "desc": true,
-            "displayName": "CPU %"
-          }
-        ]
+        "sortBy": []
       },
       "pluginVersion": "12.3.11",
       "targets": [
@@ -1104,7 +138,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "((\n  label_replace(\n    label_replace(label_replace(sum by (groupname, instance, job) (rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m])) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n    * on(utilisateur) group_left(username)\n    label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\"),\n    \"utilisateur\", \"$1\", \"username\", \"(.*)\"\n  )\n)\nor\n(\n  label_replace(label_replace(sum by (groupname, instance, job) (rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m])) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n  unless on(utilisateur)\n  label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")\n)) / scalar(count(node_cpu_seconds_total{instance=~\"$server_host:9100\", job=\"node_exporter\", mode=\"idle\"}))",
+          "expr": "flexlm_feature_issued{app=\"$vendor\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -1115,7 +149,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "namedprocess_namegroup_memory_bytes{instance=~\"$server_host:9256\", job=\"process_exporter\", memtype=\"resident\"}",
+          "expr": "flexlm_feature_used{app=\"$vendor\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -1126,30 +160,30 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "namedprocess_namegroup_num_procs{instance=~\"$server_host:9256\", job=\"process_exporter\"}",
+          "expr": "flexlm_feature_expiration_seconds{app=\"$vendor\"} * 1000",
           "format": "table",
           "instant": true,
           "legendFormat": "",
           "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "namedprocess_namegroup_oldest_start_time_seconds{instance=~\"$server_host:9256\", job=\"process_exporter\"} * 1000",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "D"
         }
       ],
-      "title": "Detail processus par utilisateur",
+      "title": "Licences du vendeur",
       "transformations": [
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "name",
+                "destinationType": "string"
+              }
+            ]
+          }
+        },
         {
           "id": "joinByField",
           "options": {
-            "byField": "groupname",
+            "byField": "name",
             "mode": "outer"
           }
         },
@@ -1160,90 +194,279 @@
               "Time": true,
               "Time 1": true,
               "Time 2": true,
+              "app 1": true,
+              "app 2": true,
               "__name__": true,
-              "__name__ 1": true,
-              "__name__ 2": true,
+              "index": true,
+              "vendor": true,
+              "version": true,
+              "licenses": true,
               "instance": true,
               "instance 1": true,
               "instance 2": true,
               "job": true,
               "job 1": true,
               "job 2": true,
-              "memtype": true,
-              "groupname": true,
-              "username": true,
-              "username 1": true,
-              "Time 3": true,
-              "__name__ 3": true,
-              "instance 3": true,
-              "job 3": true,
-              "mode": true,
-              "mode 1": true,
-              "mode 2": true,
-              "mode 3": true
+              "app": true
             },
             "indexByName": {
-              "utilisateur": 0,
-              "processus": 1,
+              "app": 0,
+              "name": 1,
               "Value #A": 2,
               "Value #B": 3,
-              "Value #C": 4,
-              "Value #D": 5
+              "Value #C": 4
             },
             "renameByName": {
-              "utilisateur": "Utilisateur",
-              "processus": "Processus",
-              "Value #A": "CPU %",
-              "Value #B": "RAM",
-              "Value #C": "Nb instances",
-              "Value #D": "Depuis"
+              "app": "Vendeur",
+              "name": "Licence",
+              "Value #A": "Total",
+              "Value #B": "Utilisees",
+              "Value #C": "Expiration_raw"
             }
           }
         },
         {
-          "id": "filterByValue",
+          "id": "convertFieldType",
           "options": {
-            "filters": [
+            "conversions": [
               {
-                "fieldName": "Utilisateur",
-                "config": {
-                  "id": "regex",
-                  "options": {
-                    "value": "^(root|node_exporter)$"
-                  }
-                }
+                "targetField": "Expiration_raw",
+                "destinationType": "time"
               }
-            ],
-            "type": "exclude",
-            "match": "any"
+            ]
           }
         },
         {
-          "id": "filterByValue",
+          "id": "organize",
           "options": {
-            "filters": [
-              {
-                "fieldName": "Nb instances",
-                "config": {
-                  "id": "greater",
-                  "options": {
-                    "value": 0
-                  }
-                }
-              }
-            ],
-            "type": "include",
-            "match": "all"
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "Expiration_raw": "Expiration"
+            }
           }
         }
       ],
       "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Connecte depuis"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsSystem"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 10
+      },
+      "id": 2,
+      "options": {
+        "cellHeight": "sm",
+        "enablePagination": false,
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "12.3.11",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "flexlm_feature_used_users{app=\"$vendor\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Utilisateurs connectes",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true,
+              "Value": true,
+              "app": true,
+              "instance": true,
+              "job": true
+            },
+            "indexByName": {
+              "name": 0,
+              "user": 1,
+              "since": 2
+            },
+            "renameByName": {
+              "name": "Licence",
+              "user": "Utilisateur",
+              "since": "since_raw"
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "since_raw",
+                "destinationType": "number"
+              }
+            ]
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "since_ms",
+            "mode": "binary",
+            "binary": {
+              "left": "since_raw",
+              "operator": "*",
+              "right": "1000"
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "since_ms",
+                "destinationType": "time"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "since_raw": true
+            },
+            "indexByName": {
+              "Licence": 0,
+              "Utilisateur": 1,
+              "since_ms": 2
+            },
+            "renameByName": {
+              "since_ms": "Connecte depuis"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisLabel": "Licences utilisees",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 2,
+            "showPoints": "never",
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            }
+          },
+          "min": 0,
+          "unit": "percent",
+          "max": 100
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 18
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max",
+            "last"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "flexlm_feature_used{app=\"$vendor\", name=~\"$license\"} / flexlm_feature_issued{app=\"$vendor\", name=~\"$license\"} * 100",
+          "legendFormat": "{{name}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Historique d'utilisation par licence",
+      "type": "timeseries"
     }
   ],
-  "refresh": "30s",
+  "refresh": "60s",
   "schemaVersion": 42,
   "tags": [
-    "supervision",
+    "flexlm",
+    "licences",
     "airbus"
   ],
   "templating": {
@@ -1264,15 +487,15 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(node_uname_info, instance)",
+        "definition": "label_values(flexlm_vendor_status, app)",
         "hide": 0,
         "includeAll": false,
-        "label": "Serveur",
+        "label": "Vendeur",
         "multi": false,
-        "name": "server",
+        "name": "vendor",
         "options": [],
         "query": {
-          "query": "label_values(node_uname_info, instance)",
+          "query": "label_values(flexlm_vendor_status, app)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 2,
@@ -1287,19 +510,19 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(node_uname_info{instance=\"$server\"}, instance)",
-        "hide": 2,
-        "includeAll": false,
-        "label": "server_host",
-        "multi": false,
-        "name": "server_host",
+        "definition": "label_values(flexlm_feature_used{app=\"$vendor\"}, name)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Licences a afficher",
+        "multi": true,
+        "name": "license",
         "options": [],
         "query": {
-          "query": "label_values(node_uname_info{instance=\"$server\"}, instance)",
+          "query": "label_values(flexlm_feature_used{app=\"$vendor\"}, name)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 2,
-        "regex": "/([^:]+):/",
+        "regex": "",
         "skipUrlSync": false,
         "sort": 1,
         "type": "query"
@@ -1307,12 +530,11 @@
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-7d",
     "to": "now"
   },
   "timepicker": {
     "refresh_intervals": [
-      "30s",
       "1m",
       "5m",
       "15m",
@@ -1320,15 +542,15 @@
       "1h"
     ],
     "time_options": [
-      "6h",
-      "12h",
-      "24h",
-      "2d",
-      "7d"
+      "7d",
+      "30d",
+      "90d",
+      "180d",
+      "1y"
     ]
   },
-  "timezone": "browser",
-  "title": "Detail serveur",
-  "uid": "server-detail-dash",
+  "timezone": "Europe/Paris",
+  "title": "Detail vendeur FlexLM",
+  "uid": "flexlm-vendor-detail",
   "version": 1
 }
