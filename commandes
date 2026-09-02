@@ -1,1 +1,15 @@
-null
+Bug si j'affiche une seule License via le bouton en haut de l'écran
+
+Savoir si on peut faire remonter la puissance du processeur, indice de performance /proc/cpuinfo BogoMips
+
+Mettre les métriques en premier et le tableau après et rajouter les hypertexte sur Dashboard global servers CAO
+
+Pour les licences flexlm je peux vérifier toutes les 5 secondes
+
+Corriger l'affichage du temps pour l'utilisation des licences utilisateurs connectés: heure en avance sur le dashboard alors que l'heure est bonne sur l'historique d'utilsiation par license.
+
+Voir si on peut retirer le bandeau de partage et export sur la bannière en haut Graphana
+
+Faire en sorte que les dashboards soient plus petits pour s'adapter à un écran de laptop 
+
+
