@@ -1,60 +1,9 @@
-Bug si j'affiche une seule License via le bouton en haut de l'écran
-
-Savoir si on peut faire remonter la puissance du processeur, indice de performance /proc/cpuinfo BogoMips
-
-Mettre les métriques en premier et le tableau après et rajouter les hypertexte sur Dashboard global servers CAO
-
-Pour les licences flexlm je peux vérifier toutes les 5 secondes
-
-Corriger l'affichage du temps pour l'utilisation des licences utilisateurs connectés: heure en avance sur le dashboard alors que l'heure est bonne sur l'historique d'utilsiation par license.
-
-Voir si on peut retirer le bandeau de partage et export sur la bannière en haut Graphana
-
-Faire en sorte que les Dashboard soient plus petits pour s'adapter à un écran de laptop 
+sudo cp generate_bogomips.sh /usr/local/bin/generate_bogomips.sh
+sudo chmod 755 /usr/local/bin/generate_bogomips.sh
+sudo /usr/local/bin/generate_bogomips.sh
+curl -s localhost:9100/metrics | grep bogomips
 
 
-
-
-Des Dashboard synthétique vue utilisateur: 
-
-exemple conception fpga, conception carte, liste des serveurs avec %process % utilisateurs connectés, et disques l'utilisateur choisit SES disques et connait ses quotas, 
-Pour fpga: 
-Graf license avec que certaines licences importantes: vivado, questasim,
-Sur le tableau cpu par utilisateur un graph dans le temps comme cpu par utilisateur possibilité de faire des menus déroulants pour avoir des affichages propres depuis global vers détails ram en absolu pas en % voir si cookie pour enregistrer les disques etc. pour sur un poste utilisateur ou stocker dans l'url, que si on copie un projet après sélection 
-
-
-
-
-- Graph concaténé dans le temps pour les serveurs 
-Regroupé les graphiques CPU dans un seul avec 3 onglets : CPU Global / Par CPU / Par User
-FlexLM :
-Cookies pour garder les préférences utilisateurs (à étudier) 
-Pages thématiques : 
-Concepteur FPGA
-Concepteur Carte
-Perfo du processeur : nombre d'instruction générale dans /proc/cpuinfo
-Metric overview en page d'accueil
-Supprimer les licences à 0
-Supprimer les boutons export share
-Je rajoute : 
-
-	• File System important : 
-		○ /scratch
-		○ /tmp
-		○ /asic_tmp
-
-
-Remplace les colonnes:  Uptime été Server par  overused unused servers
-
-Dédie un onglets (health) sur la Security (uptime last reboot) Performance ou tu indique CPU Memory Disk Network
-Dedie un onglet:  Top CPU   Top Memory
-Qui travail ou ?
-Applications qui tournent ou depuis combien de temps
-Collecte des events viewer / log de sortie des applicatifs ?  
-
-Dédie un onglets sur les issues les plus communes:
-
-    • Process qui tourne pendant plus de XX jours 
-    • Quel utilisateur/application sature le CPU/RAM pendant combien de temps 
-    • Quel sont les Process par user par machine
-Consommation process / CPU / memoire
+sudo tee /etc/cron.d/cpu_bogomips > /dev/null << 'EOF'
+*/15 * * * * root /usr/local/bin/generate_bogomips.sh
+EOF
