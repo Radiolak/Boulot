@@ -1275,7 +1275,7 @@
           "query": "label_values(node_uname_info, instance)",
           "refId": "StandardVariableQuery"
         },
-        "refresh": 1,
+        "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
         "sort": 1,
@@ -1298,7 +1298,7 @@
           "query": "label_values(node_uname_info{instance=\"$server\"}, instance)",
           "refId": "StandardVariableQuery"
         },
-        "refresh": 1,
+        "refresh": 2,
         "regex": "/([^:]+):/",
         "skipUrlSync": false,
         "sort": 1,
