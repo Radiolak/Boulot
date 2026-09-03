@@ -1,0 +1,37 @@
+#!/bin/bash
+# Expose le BogoMips via le textfile collector de node_exporter (deja en place, rien a
+# ajouter au service). A noter pour l'equipe : BogoMips est une constante de calibration
+# du noyau Linux au demarrage, pas un vrai benchmark - ne pas comparer entre architectures
+# CPU differentes, seulement entre machines tres similaires.
+
+set -euo pipefail
+
+OUTPUT_DIR="/var/lib/node_exporter/textfile_collector"
+OUTPUT_FILE="$OUTPUT_DIR/cpu_bogomips.prom"
+TMP_FILE="${OUTPUT_FILE}.tmp"
+
+mkdir -p "$OUTPUT_DIR"
+chmod 755 "$OUTPUT_DIR" 2>/dev/null || true
+
+BOGOMIPS_VALUES=$(grep -i '^bogomips' /proc/cpuinfo | awk -F: '{print $2}' | tr -d ' ')
+
+if [ -z "$BOGOMIPS_VALUES" ]; then
+  echo "Aucune valeur bogomips trouvee dans /proc/cpuinfo - abandon."
+  exit 1
+fi
+
+TOTAL=$(echo "$BOGOMIPS_VALUES" | awk '{sum+=$1} END {printf "%.2f", sum}')
+AVG=$(echo "$BOGOMIPS_VALUES" | awk '{sum+=$1; n++} END {printf "%.2f", sum/n}')
+NB_CORES=$(echo "$BOGOMIPS_VALUES" | wc -l)
+
+{
+  echo "# HELP node_cpu_bogomips_total Somme des BogoMips de tous les coeurs logiques (indicateur approximatif, non comparable entre architectures differentes)"
+  echo "# TYPE node_cpu_bogomips_total gauge"
+  echo "node_cpu_bogomips_total $TOTAL"
+  echo "# HELP node_cpu_bogomips_avg BogoMips moyen par coeur logique"
+  echo "# TYPE node_cpu_bogomips_avg gauge"
+  echo "node_cpu_bogomips_avg $AVG"
+} > "$TMP_FILE"
+
+mv -f "$TMP_FILE" "$OUTPUT_FILE"
+chmod 644 "$OUTPUT_FILE"
