@@ -1,0 +1,258 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "Retour a la vue globale",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/global-overview-dash/calcul-cao-global"
+    }
+  ],
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 30,
+            "gradientMode": "none",
+            "lineWidth": 1,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Libre"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max",
+            "last"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.11",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum by (utilisateur) ((\n  label_replace(\n    label_replace(label_replace(sum by (groupname, instance, job) (rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m])) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n    * on(utilisateur) group_left(username)\n    label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\"),\n    \"utilisateur\", \"$1\", \"username\", \"(.*)\"\n  )\n)\nor\n(\n  label_replace(label_replace(sum by (groupname, instance, job) (rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server_host:9256\", job=\"process_exporter\"}[5m])) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n  unless on(utilisateur)\n  label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")\n)) / scalar(count(node_cpu_seconds_total{instance=~\"$server_host:9100\", job=\"node_exporter\", mode=\"idle\"}))",
+          "legendFormat": "{{utilisateur}}",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "label_replace(avg(rate(node_cpu_seconds_total{instance=~\"$server_host:9100\", job=\"node_exporter\", mode=\"idle\"}[5m])) * 100, \"utilisateur\", \"Libre\", \"\", \"\")",
+          "legendFormat": "{{utilisateur}}",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "CPU par utilisateur - evolution dans le temps",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 30,
+            "gradientMode": "none",
+            "lineWidth": 1,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max",
+            "last"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.11",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum by (utilisateur) ((\n  label_replace(\n    label_replace(label_replace(namedprocess_namegroup_memory_bytes{instance=~\"$server_host:9256\", job=\"process_exporter\", memtype=\"resident\"}, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n    * on(utilisateur) group_left(username)\n    label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\"),\n    \"utilisateur\", \"$1\", \"username\", \"(.*)\"\n  )\n)\nor\n(\n  label_replace(label_replace(namedprocess_namegroup_memory_bytes{instance=~\"$server_host:9256\", job=\"process_exporter\", memtype=\"resident\"}, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n  unless on(utilisateur)\n  label_replace(node_uid_username{instance=~\"$server_host:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")\n))",
+          "legendFormat": "{{utilisateur}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "RAM par utilisateur - evolution dans le temps (valeur absolue)",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": [
+    "fpga",
+    "utilisateur"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "name": "DS_PROMETHEUS",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(node_uname_info, instance)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Serveur",
+        "multi": false,
+        "name": "server",
+        "options": [],
+        "query": {
+          "query": "label_values(node_uname_info, instance)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(node_uname_info{instance=\"$server\"}, instance)",
+        "hide": 2,
+        "includeAll": false,
+        "label": "server_host",
+        "multi": false,
+        "name": "server_host",
+        "options": [],
+        "query": {
+          "query": "label_values(node_uname_info{instance=\"$server\"}, instance)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "/([^:]+):/",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "Europe/Paris",
+  "title": "Vue FPGA - Utilisateur",
+  "uid": "fpga-vue-utilisateur",
+  "version": 1
+}
