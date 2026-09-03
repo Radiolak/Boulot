@@ -943,7 +943,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "label_replace(avg(rate(node_cpu_seconds_total{instance=~\"$server_host:9100\", job=\"node_exporter\", mode=\"idle\"}[5m])) * 100, \"utilisateur\", \"Libre\", \"\", \"\")",
+          "expr": "avg by(instance) (rate(node_cpu_seconds_total{instance=~\"$server_host:9100\", job=\"node_exporter\", mode=\"idle\"}[5m])) * 100",
           "legendFormat": "{{utilisateur}}",
           "refId": "A",
           "instant": true
@@ -1275,7 +1275,7 @@
           "query": "label_values(node_uname_info, instance)",
           "refId": "StandardVariableQuery"
         },
-        "refresh": 2,
+        "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
         "sort": 1,
@@ -1298,7 +1298,7 @@
           "query": "label_values(node_uname_info{instance=\"$server\"}, instance)",
           "refId": "StandardVariableQuery"
         },
-        "refresh": 2,
+        "refresh": 1,
         "regex": "/([^:]+):/",
         "skipUrlSync": false,
         "sort": 1,
