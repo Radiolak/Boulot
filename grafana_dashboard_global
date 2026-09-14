@@ -600,7 +600,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "group by(instance, OS) (\n  label_join(node_uname_info * on(instance) group_left(name, version) node_os_info, \"OS\", \" \", \"name\", \"version\")\n)",
+          "expr": "group by(host, OS) (\n  label_join(node_uname_info * on(instance, host) group_left(name, version) node_os_info, \"OS\", \" \", \"name\", \"version\")\n)",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -701,15 +701,16 @@
             },
             "includeByName": {},
             "indexByName": {
-              "OS": 2,
-              "Value #A": 1,
-              "Value #C": 4,
-              "Value #D": 5,
+              "OS": 3,
+              "Value #A": 2,
+              "Value #C": 5,
+              "Value #D": 6,
               "alias": 0,
-              "fqdn": 6,
+              "fqdn": 7,
               "instance": 7,
-              "nodename": 3,
-              "Value #H": 99
+              "nodename": 4,
+              "Value #H": 99,
+              "host": 1
             },
             "renameByName": {
               "Value #A": "Usage",
