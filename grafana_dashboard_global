@@ -79,7 +79,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "sum(up{job=\"node_exporter\"})",
-          "legendFormat": "Serveurs UP",
+          "legendFormat": "Servers UP",
           "range": false,
           "instant": true,
           "refId": "A"
@@ -90,13 +90,13 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "count(up{job=\"node_exporter\"})",
-          "legendFormat": "Total configure",
+          "legendFormat": "Total configured",
           "range": false,
           "instant": true,
           "refId": "B"
         }
       ],
-      "title": "Etat global des cibles Prometheus (UP / Configure)",
+      "title": "Prometheus Targets Status",
       "type": "stat"
     },
     {
@@ -528,13 +528,42 @@
               "id": "byName",
               "options": "Hostname"
             },
+            "properties": []
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "FPGA View"
+            },
             "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "special",
+                    "options": {
+                      "match": "true",
+                      "result": {
+                        "text": "[FPGA View]"
+                      }
+                    }
+                  },
+                  {
+                    "type": "value",
+                    "options": {
+                      "1": {
+                        "text": "[FPGA View]"
+                      }
+                    }
+                  }
+                ]
+              },
               {
                 "id": "links",
                 "value": [
                   {
                     "targetBlank": false,
-                    "title": "Vue FPGA",
+                    "title": "FPGA View",
                     "url": "/d/fpga-vue-utilisateur/vue-fpga-utilisateur?var-server=${__data.fields.serverlink}"
                   }
                 ]
@@ -653,7 +682,7 @@
           "refId": "H"
         }
       ],
-      "title": "Etat des serveurs",
+      "title": "Servers Status",
       "transformations": [
         {
           "id": "joinByField",
@@ -677,7 +706,21 @@
               "machine": true,
               "release": true,
               "Time 1": true,
-              "__name__ 1": true
+              "__name__ 1": true,
+              "instance": true,
+              "instance 1": true,
+              "serverlink": true,
+              "serverlink 1": true,
+              "sysname": true,
+              "sysname 1": true,
+              "version": true,
+              "version 1": true,
+              "domainname 1": true,
+              "fqdn 1": true,
+              "machine 1": true,
+              "release 1": true,
+              "job 1": true,
+              "Value #H": false
             },
             "includeByName": {},
             "indexByName": {
@@ -688,17 +731,18 @@
               "alias": 0,
               "fqdn": 6,
               "instance": 7,
-              "nodename": 3
+              "nodename": 3,
+              "Value #H": 99
             },
             "renameByName": {
               "Value #A": "Usage",
               "Value #C": "Uptime (h)",
-              "Value #D": "Nb CPU",
+              "Value #D": "CPU Count",
               "Value #F": "",
               "alias": "Alias",
               "fqdn": "FQDN",
-              "instance": "Server",
-              "nodename": "Hostname"
+              "nodename": "Hostname",
+              "Value #H": "FPGA View"
             }
           }
         }
@@ -737,7 +781,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Calcul CAO - Global",
+  "title": "CAO Compute - Global Overview",
   "uid": "global-overview-dash",
   "version": 21
 }
