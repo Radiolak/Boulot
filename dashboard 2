@@ -4,8 +4,8 @@
       {
         "builtIn": 1,
         "datasource": {
-          "type": "datasource",
-          "uid": "grafana"
+          "type": "grafana",
+          "uid": "-- Grafana --"
         },
         "enable": true,
         "hide": true,
@@ -15,12 +15,25 @@
       }
     ]
   },
-  "description": "Vue globale des serveurs - Etat OK/HIGH/CRITICAL",
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "graphTooltip": 0,
-  "id": 0,
-  "links": [],
+  "graphTooltip": 1,
+  "id": null,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": false,
+      "title": "Retour a la vue globale",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/global-overview-dash/supervision-vue-globale-des-serveurs"
+    }
+  ],
+  "liveNow": false,
   "panels": [
     {
       "datasource": {
@@ -32,23 +45,118 @@
           "color": {
             "mode": "thresholds"
           },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "red",
+                "color": "green",
                 "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Etat"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
               },
               {
-                "color": "green",
-                "value": 20
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 60
+                    },
+                    {
+                      "color": "red",
+                      "value": 95
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "range",
+                    "options": {
+                      "from": 0,
+                      "to": 60,
+                      "result": {
+                        "text": "OK",
+                        "color": "green"
+                      }
+                    }
+                  },
+                  {
+                    "type": "range",
+                    "options": {
+                      "from": 60.01,
+                      "to": 95,
+                      "result": {
+                        "text": "HIGH",
+                        "color": "yellow"
+                      }
+                    }
+                  },
+                  {
+                    "type": "range",
+                    "options": {
+                      "from": 95.01,
+                      "to": 1000,
+                      "result": {
+                        "text": "CRITICAL",
+                        "color": "red"
+                      }
+                    }
+                  }
+                ]
               }
             ]
           },
-          "unit": "none"
-        },
-        "overrides": []
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RAM totale"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 4,
@@ -56,20 +164,12 @@
         "x": 0,
         "y": 0
       },
-      "id": 20,
+      "id": 8,
       "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "value_and_name"
+        "cellHeight": "sm",
+        "enablePagination": false,
+        "showHeader": true,
+        "sortBy": []
       },
       "pluginVersion": "12.3.11",
       "targets": [
@@ -78,10 +178,10 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "sum(up{job=\"node_exporter\"})",
-          "legendFormat": "Serveurs UP",
-          "range": false,
+          "expr": "max(\n  100 - (avg by(instance) (rate(node_cpu_seconds_total{instance=\"$server:9100\", mode=\"idle\", job=\"node_exporter\"}[5m])) * 100)\nor\n  100 * (1 - ((node_memory_MemAvailable_bytes{instance=\"$server:9100\", job=\"node_exporter\"} or node_memory_Buffers_bytes{instance=\"$server:9100\", job=\"node_exporter\"} + node_memory_Cached_bytes{instance=\"$server:9100\", job=\"node_exporter\"} + node_memory_MemFree_bytes{instance=\"$server:9100\", job=\"node_exporter\"}) / node_memory_MemTotal_bytes{instance=\"$server:9100\", job=\"node_exporter\"}))\n)",
+          "format": "table",
           "instant": true,
+          "legendFormat": "",
           "refId": "A"
         },
         {
@@ -89,174 +189,81 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "count(up{job=\"node_exporter\"})",
-          "legendFormat": "Total configure",
-          "range": false,
+          "expr": "node_uname_info{instance=\"$server:9100\", job=\"node_exporter\"}",
+          "format": "table",
           "instant": true,
+          "legendFormat": "",
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "(time() - node_boot_time_seconds{instance=\"$server:9100\", job=\"node_exporter\"}) / 3600",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "count by(instance) (node_cpu_seconds_total{instance=\"$server:9100\", mode=\"idle\", job=\"node_exporter\"})",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "up{instance=\"$server:9100\", job=\"node_exporter\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "node_memory_MemTotal_bytes{instance=\"$server:9100\", job=\"node_exporter\"}",
+          "legendFormat": "",
+          "refId": "F",
+          "format": "table",
+          "instant": true
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "node_network_address_info{instance=\"$server:9100\", job=\"node_exporter\", scope!=\"link-local\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "H"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "node_cpu_bogomips_avg{instance=\"$server:9100\", job=\"node_exporter\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "I"
         }
       ],
-      "title": "Etat global des cibles Prometheus (UP / Configure)",
-      "type": "stat"
-    },
-    {
-      "id": 3,
-      "type": "table",
-      "title": "Server Metrics Overview",
-      "gridPos": {
-        "h": 6,
-        "w": 23,
-        "x": 0,
-        "y": 4
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "align": "auto",
-            "footer": {
-              "reducers": []
-            },
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false,
-            "filterable": true
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 70
-              },
-              {
-                "color": "red",
-                "value": 85
-              }
-            ]
-          },
-          "color": {
-            "mode": "thresholds"
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "CPU Usage"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "percent"
-              },
-              {
-                "id": "custom.cellOptions",
-                "value": {
-                  "mode": "gradient",
-                  "type": "gauge"
-                }
-              },
-              {
-                "id": "max",
-                "value": 100
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Memory Usage"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "percent"
-              },
-              {
-                "id": "custom.cellOptions",
-                "value": {
-                  "mode": "gradient",
-                  "type": "gauge"
-                }
-              },
-              {
-                "id": "max",
-                "value": 100
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Disk Usage"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "percent"
-              },
-              {
-                "id": "custom.cellOptions",
-                "value": {
-                  "mode": "gradient",
-                  "type": "gauge"
-                }
-              },
-              {
-                "id": "max",
-                "value": 100
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Network I/O"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "Bps"
-              },
-              {
-                "id": "custom.cellOptions",
-                "value": {
-                  "mode": "lcd",
-                  "type": "gauge"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "instance"
-            },
-            "properties": [
-              {
-                "id": "links",
-                "value": [
-                  {
-                    "targetBlank": false,
-                    "title": "Voir le detail",
-                    "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.serverlink}"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
+      "title": "Infos serveur",
       "transformations": [
         {
           "id": "joinByField",
@@ -270,51 +277,326 @@
           "options": {
             "excludeByName": {
               "Time": true,
-              "Time 1": true,
-              "Time 2": true,
-              "Time 3": true,
+              "Value #B": true,
+              "Value #E": true,
               "__name__": true,
-              "device": true,
-              "fstype": true,
               "job": true,
-              "job 1": true,
+              "domainname": true,
+              "release": true,
+              "machine": true,
+              "Time 1": true,
+              "version": true,
+              "Time 2": true,
+              "__name__ 2": true,
+              "instance 2": true,
               "job 2": true,
+              "Time 3": true,
+              "__name__ 3": true,
+              "instance 3": true,
               "job 3": true,
-              "mountpoint": false
+              "device": true,
+              "netmask": true,
+              "scope": true
             },
+            "includeByName": {},
             "indexByName": {
               "instance": 0,
               "Value #A": 1,
-              "Value #B": 2,
-              "Value #C": 3,
-              "Value #D": 4
+              "ip": 2,
+              "sysname": 3,
+              "nodename": 4,
+              "Value #C": 6,
+              "Value #D": 6,
+              "Value #F": 7,
+              "address": 8,
+              "Value #I": 9
             },
             "renameByName": {
-              "Value #A": "CPU Usage",
-              "Value #B": "Memory Usage",
-              "Value #C": "Disk Usage",
-              "Value #D": "Network I/O",
               "instance": "Server",
-              "mountpoint": ""
-            },
-            "includeByName": {}
+              "Value #A": "Etat",
+              "ip": "Adresse IP",
+              "sysname": "OS",
+              "nodename": "Hostname",
+              "Value #C": "Uptime (h)",
+              "Value #D": "Nb CPU",
+              "Value #F": "RAM totale",
+              "address": "Adresse IP",
+              "Value #I": "BogoMips (moyen/coeur)"
+            }
           }
         }
       ],
-      "pluginVersion": "12.3.11",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisLabel": "%",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 1,
+            "showPoints": "never"
+          },
+          "max": 100,
+          "min": 0,
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 23,
+        "x": 0,
+        "y": 4
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "100 - (avg by(instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
-          "format": "table",
-          "instant": true,
-          "interval": "",
-          "legendFormat": "__auto",
-          "refId": "A",
-          "editorMode": "code"
+          "editorMode": "code",
+          "expr": "100 - (avg by(instance) (rate(node_cpu_seconds_total{instance=\"$server:9100\", mode=\"idle\", job=\"node_exporter\"}[5m])) * 100)",
+          "legendFormat": "CPU global",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "CPU - Utilisation globale",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisLabel": "%",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 1,
+            "showPoints": "never"
+          },
+          "max": 100,
+          "min": 0,
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 23,
+        "x": 12,
+        "y": 9
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "100 - (avg by(cpu) (rate(node_cpu_seconds_total{instance=\"$server:9100\", mode=\"idle\", job=\"node_exporter\"}[5m])) * 100)",
+          "legendFormat": "CPU {{cpu}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "CPU - Utilisation par CPU logique",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisLabel": "%",
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 23,
+        "x": 0,
+        "y": 14
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max",
+            "last"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "100 * (1 - (node_memory_MemAvailable_bytes{instance=\"$server:9100\", job=\"node_exporter\"} / node_memory_MemTotal_bytes{instance=\"$server:9100\", job=\"node_exporter\"}))",
+          "legendFormat": "RAM utilisee",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "RAM - Usage / Evolution",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisLabel": "",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 1,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 21474836480
+              },
+              {
+                "color": "green",
+                "value": 53687091200
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*Taille totale.*"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "viz": true,
+                  "legend": false,
+                  "tooltip": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 23,
+        "x": 12,
+        "y": 19
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "node_filesystem_avail_bytes{instance=\"$server:9100\", job=\"node_exporter\", fstype!~\"tmpfs|overlay|squashfs|devtmpfs\"}\nor\nnode_filesystem_avail_bytes{instance=\"$server:9100\", job=\"node_exporter\", mountpoint=~\"/scratch|/tmp|/asic_tmp\"}",
+          "legendFormat": "{{mountpoint}}",
+          "range": true,
+          "refId": "A"
         },
         {
           "datasource": {
@@ -322,11 +604,197 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "100 * (1 - ((node_memory_MemAvailable_bytes or node_memory_Buffers_bytes + node_memory_Cached_bytes + node_memory_MemFree_bytes) / node_memory_MemTotal_bytes))",
+          "expr": "node_filesystem_size_bytes{instance=\"$server:9100\", job=\"node_exporter\", fstype!~\"tmpfs|overlay|squashfs|devtmpfs\"}\nor\nnode_filesystem_size_bytes{instance=\"$server:9100\", job=\"node_exporter\", mountpoint=~\"/scratch|/tmp|/asic_tmp\"}",
+          "legendFormat": "{{mountpoint}} (Taille totale)",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Disques - Espace restant",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 23,
+        "x": 0,
+        "y": 24
+      },
+      "id": 14,
+      "options": {
+        "cellHeight": "sm",
+        "enablePagination": false,
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "12.3.11",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "node_filesystem_avail_bytes{instance=\"$server:9100\", job=\"node_exporter\", fstype!~\"tmpfs|overlay|squashfs|devtmpfs\"}\nor\nnode_filesystem_avail_bytes{instance=\"$server:9100\", job=\"node_exporter\", mountpoint=~\"/scratch|/tmp|/asic_tmp\"}",
           "format": "table",
           "instant": true,
-          "interval": "",
           "legendFormat": "",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "node_filesystem_size_bytes{instance=\"$server:9100\", job=\"node_exporter\", fstype!~\"tmpfs|overlay|squashfs|devtmpfs\"}\nor\nnode_filesystem_size_bytes{instance=\"$server:9100\", job=\"node_exporter\", mountpoint=~\"/scratch|/tmp|/asic_tmp\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "B"
+        }
+      ],
+      "title": "Disques - Espace disponible vs Taille totale",
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "mountpoint",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Time 1": true,
+              "__name__": true,
+              "__name__ 1": true,
+              "instance": true,
+              "instance 1": true,
+              "job": true,
+              "job 1": true,
+              "fstype": true,
+              "fstype 1": true,
+              "device": true,
+              "device 1": true
+            },
+            "indexByName": {
+              "mountpoint": 0,
+              "Value #A": 1,
+              "Value #B": 2
+            },
+            "renameByName": {
+              "mountpoint": "Point de montage",
+              "Value #A": "Espace disponible",
+              "Value #B": "Taille totale"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisLabel": "bits/s",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 1,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "bps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/sortant/"
+            },
+            "properties": [
+              {
+                "id": "custom.transform",
+                "value": "negative-Y"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 23,
+        "x": 0,
+        "y": 28
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_receive_bytes_total{instance=\"$server:9100\", device!=\"lo\", job=\"node_exporter\"}[5m]) * 8",
+          "legendFormat": "{{device}} entrant",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_transmit_bytes_total{instance=\"$server:9100\", device!=\"lo\", job=\"node_exporter\"}[5m]) * 8",
+          "legendFormat": "{{device}} sortant",
+          "range": true,
           "refId": "B"
         },
         {
@@ -335,11 +803,97 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "100 - avg by(instance) (\n  (node_filesystem_avail_bytes{fstype=~\"ext4|xfs|btrfs\"} * 100) / node_filesystem_size_bytes{fstype=~\"ext4|xfs|btrfs\"}\n)",
-          "format": "table",
-          "instant": true,
-          "interval": "",
-          "legendFormat": "",
+          "expr": "node_network_speed_bytes{instance=\"$server:9100\", job=\"node_exporter\"} * 8",
+          "legendFormat": "{{device}}{{interface}} - Vitesse max port (theorique)",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "Reseau - Debit entrant / sortant",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisLabel": "paquets/s",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 1,
+            "showPoints": "never"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "pps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 23,
+        "x": 12,
+        "y": 33
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_receive_errs_total{instance=\"$server:9100\", job=\"node_exporter\"}[5m])",
+          "legendFormat": "{{device}} erreurs entrantes",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_transmit_errs_total{instance=\"$server:9100\", job=\"node_exporter\"}[5m])",
+          "legendFormat": "{{device}} erreurs sortantes",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_receive_drop_total{instance=\"$server:9100\", job=\"node_exporter\"}[5m])",
+          "legendFormat": "{{device}} paquets perdus (in)",
+          "range": true,
           "refId": "C"
         },
         {
@@ -347,36 +901,104 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "sum by(instance) (rate(node_network_receive_bytes_total[5m]) + rate(node_network_transmit_bytes_total[5m]))",
-          "format": "table",
-          "instant": true,
-          "interval": "",
-          "legendFormat": "",
+          "editorMode": "code",
+          "expr": "rate(node_network_transmit_drop_total{instance=\"$server:9100\", job=\"node_exporter\"}[5m])",
+          "legendFormat": "{{device}} paquets perdus (out)",
+          "range": true,
           "refId": "D"
+        }
+      ],
+      "title": "Reseau - Erreurs et pertes de paquets",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 70,
+            "gradientMode": "none",
+            "lineWidth": 1,
+            "orientation": "horizontal"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "Libre.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 23,
+        "x": 0,
+        "y": 38
+      },
+      "id": 10,
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "showUnfilled": true,
+        "valueMode": "color",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "pluginVersion": "12.3.11",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "avg by(instance) (rate(node_cpu_seconds_total{instance=~\"$server:9100\", job=\"node_exporter\", mode=\"idle\"}[5m])) * 100",
+          "legendFormat": "{{utilisateur}}",
+          "refId": "A",
+          "instant": true
         },
         {
           "datasource": {
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "label_replace(node_uname_info, \"serverlink\", \"$1\", \"instance\", \"([^:]+):.*\")",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "E"
+          "editorMode": "code",
+          "expr": "clamp_max(\nsum by (utilisateur) ((\n  label_replace(\n    label_replace(label_replace(sum by (groupname, instance, job) (rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server:9256\", job=\"process_exporter\", groupname!~\".*:(root|node_exporter|sshd)\"}[5m])) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n    * on(utilisateur) group_left(username)\n    label_replace(node_uid_username{instance=~\"$server:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\"),\n    \"utilisateur\", \"$1\", \"username\", \"(.*)\"\n  )\n)\nor\n(\n  label_replace(label_replace(sum by (groupname, instance, job) (rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server:9256\", job=\"process_exporter\", groupname!~\".*:(root|node_exporter|sshd)\"}[5m])) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n  unless on(utilisateur)\n  label_replace(node_uid_username{instance=~\"$server:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")\n)) / scalar(count(node_cpu_seconds_total{instance=~\"$server:9100\", job=\"node_exporter\", mode=\"idle\"})),\n100\n)",
+          "legendFormat": "{{utilisateur}}",
+          "refId": "B",
+          "instant": true
         }
       ],
-      "options": {
-        "showHeader": true,
-        "cellHeight": "sm",
-        "enablePagination": false,
-        "sortBy": [
-          {
-            "displayName": "CPU Usage",
-            "desc": true
-          }
-        ]
-      }
+      "title": "CPU par utilisateur",
+      "type": "bargauge"
     },
     {
       "datasource": {
@@ -406,136 +1028,84 @@
               {
                 "color": "green",
                 "value": 0
-              },
-              {
-                "color": "yellow",
-                "value": 60
-              },
-              {
-                "color": "red",
-                "value": 95
               }
             ]
-          }
+          },
+          "unit": "short"
         },
         "overrides": [
           {
             "matcher": {
               "id": "byName",
-              "options": "Usage"
+              "options": "CPU %"
             },
             "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
               {
                 "id": "custom.cellOptions",
                 "value": {
-                  "type": "color-background"
+                  "type": "color-background",
+                  "mode": "gradient"
                 }
               },
               {
-                "id": "custom.align",
-                "value": "center"
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "orange",
+                      "value": 50
+                    },
+                    {
+                      "color": "red",
+                      "value": 90
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RAM"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Depuis"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsSystem"
               },
               {
-                "id": "custom.width",
-                "value": 72
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "name"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 238
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "os_complet"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 276
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Server"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 220
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "OS"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 309
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Uptime (h)"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 50
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Alias"
-            },
-            "properties": [
-              {
-                "id": "links",
+                "id": "mappings",
                 "value": [
                   {
-                    "targetBlank": false,
-                    "title": "Voir le detail",
-                    "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.serverlink}"
-                  }
-                ]
-              },
-              {
-                "id": "custom.width",
-                "value": 180
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Hostname"
-            },
-            "properties": [
-              {
-                "id": "links",
-                "value": [
-                  {
-                    "targetBlank": false,
-                    "title": "Vue FPGA",
-                    "url": "/d/fpga-vue-utilisateur/vue-fpga-utilisateur?var-server=${__data.fields.serverlink}"
+                    "type": "special",
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "N/A"
+                      }
+                    }
                   }
                 ]
               }
@@ -547,17 +1117,20 @@
         "h": 8,
         "w": 23,
         "x": 0,
-        "y": 10
+        "y": 43
       },
-      "id": 2,
+      "id": 11,
       "options": {
         "cellHeight": "sm",
         "enablePagination": false,
+        "footer": {
+          "reducers": []
+        },
         "showHeader": true,
         "sortBy": [
           {
-            "desc": false,
-            "displayName": "Nb CPU"
+            "desc": true,
+            "displayName": "CPU %"
           }
         ]
       },
@@ -568,12 +1141,10 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "editorMode": "code",
-          "expr": "max by(instance) (\n  100 - (avg by(instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)\nor\n  100 * (1 - ((node_memory_MemAvailable_bytes or node_memory_Buffers_bytes + node_memory_Cached_bytes + node_memory_MemFree_bytes) / node_memory_MemTotal_bytes))\nor\n  (time() - node_boot_time_seconds < 300) * 100\n)",
+          "expr": "((\n  label_replace(\n    label_replace(label_replace(sum by (groupname, instance, job) (rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server:9256\", job=\"process_exporter\"}[5m])) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n    * on(utilisateur) group_left(username)\n    label_replace(node_uid_username{instance=~\"$server:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\"),\n    \"utilisateur\", \"$1\", \"username\", \"(.*)\"\n  )\n)\nor\n(\n  label_replace(label_replace(sum by (groupname, instance, job) (rate(namedprocess_namegroup_cpu_seconds_total{instance=~\"$server:9256\", job=\"process_exporter\"}[5m])) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n  unless on(utilisateur)\n  label_replace(node_uid_username{instance=~\"$server:9100\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")\n)) / scalar(count(node_cpu_seconds_total{instance=~\"$server:9100\", job=\"node_exporter\", mode=\"idle\"}))",
           "format": "table",
           "instant": true,
-          "interval": "",
-          "legendFormat": "__auto",
+          "legendFormat": "",
           "refId": "A"
         },
         {
@@ -581,11 +1152,9 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "editorMode": "code",
-          "expr": "group by(instance, OS) (\n  label_join(node_uname_info * on(instance) group_left(name, version) node_os_info, \"OS\", \" \", \"name\", \"version\")\n)",
+          "expr": "namedprocess_namegroup_memory_bytes{instance=~\"$server:9256\", job=\"process_exporter\", memtype=\"resident\"}",
           "format": "table",
           "instant": true,
-          "interval": "",
           "legendFormat": "",
           "refId": "B"
         },
@@ -594,11 +1163,9 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "editorMode": "code",
-          "expr": "(time() - node_boot_time_seconds) / 3600",
+          "expr": "namedprocess_namegroup_num_procs{instance=~\"$server:9256\", job=\"process_exporter\"}",
           "format": "table",
           "instant": true,
-          "interval": "",
           "legendFormat": "",
           "refId": "C"
         },
@@ -607,58 +1174,19 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "editorMode": "code",
-          "expr": "count by(instance) (node_cpu_seconds_total{mode=\"idle\"})",
+          "expr": "namedprocess_namegroup_oldest_start_time_seconds{instance=~\"$server:9256\", job=\"process_exporter\"} * 1000",
           "format": "table",
           "instant": true,
-          "interval": "",
           "legendFormat": "",
           "refId": "D"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "label_replace(up{job=\"node_exporter\"}, \"alias\", \"$1\", \"instance\", \"([^.:]+).*\")",
-          "format": "table",
-          "instant": true,
-          "interval": "",
-          "legendFormat": "",
-          "refId": "E"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "label_replace(up{job=\"node_exporter\"}, \"fqdn\", \"$1\", \"instance\", \"([^:]+).*\")",
-          "format": "table",
-          "instant": true,
-          "interval": "",
-          "legendFormat": "",
-          "refId": "F"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "label_replace(node_uname_info, \"serverlink\", \"$1\", \"instance\", \"([^:]+):.*\")",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "H"
         }
       ],
-      "title": "Etat des serveurs",
+      "title": "Detail processus par utilisateur",
       "transformations": [
         {
           "id": "joinByField",
           "options": {
-            "byField": "instance",
+            "byField": "groupname",
             "mode": "outer"
           }
         },
@@ -667,60 +1195,98 @@
           "options": {
             "excludeByName": {
               "Time": true,
-              "Value #B": true,
-              "Value #E": true,
-              "Value #F": true,
-              "__name__": true,
-              "domainname": true,
-              "fqdn": true,
-              "job": true,
-              "machine": true,
-              "release": true,
               "Time 1": true,
-              "__name__ 1": true
+              "Time 2": true,
+              "__name__": true,
+              "__name__ 1": true,
+              "__name__ 2": true,
+              "instance": true,
+              "instance 1": true,
+              "instance 2": true,
+              "job": true,
+              "job 1": true,
+              "job 2": true,
+              "memtype": true,
+              "groupname": true,
+              "username": true,
+              "username 1": true,
+              "Time 3": true,
+              "__name__ 3": true,
+              "instance 3": true,
+              "job 3": true,
+              "mode": true,
+              "mode 1": true,
+              "mode 2": true,
+              "mode 3": true
             },
-            "includeByName": {},
             "indexByName": {
-              "OS": 2,
-              "Value #A": 1,
+              "utilisateur": 0,
+              "processus": 1,
+              "Value #A": 2,
+              "Value #B": 3,
               "Value #C": 4,
-              "Value #D": 5,
-              "alias": 0,
-              "fqdn": 6,
-              "instance": 7,
-              "nodename": 3
+              "Value #D": 5
             },
             "renameByName": {
-              "Value #A": "Usage",
-              "Value #C": "Uptime (h)",
-              "Value #D": "Nb CPU",
-              "Value #F": "",
-              "alias": "Alias",
-              "fqdn": "FQDN",
-              "instance": "Server",
-              "nodename": "Hostname"
+              "utilisateur": "Utilisateur",
+              "processus": "Processus",
+              "Value #A": "CPU %",
+              "Value #B": "RAM",
+              "Value #C": "Nb instances",
+              "Value #D": "Depuis"
             }
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "fieldName": "Utilisateur",
+                "config": {
+                  "id": "regex",
+                  "options": {
+                    "value": "^(root|node_exporter)$"
+                  }
+                }
+              }
+            ],
+            "type": "exclude",
+            "match": "any"
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "fieldName": "Nb instances",
+                "config": {
+                  "id": "greater",
+                  "options": {
+                    "value": 0
+                  }
+                }
+              }
+            ],
+            "type": "include",
+            "match": "all"
           }
         }
       ],
       "type": "table"
     }
   ],
-  "preload": false,
   "refresh": "30s",
   "schemaVersion": 42,
   "tags": [
     "supervision",
-    "airbus",
-    "node-exporter"
+    "airbus"
   ],
   "templating": {
     "list": [
       {
-        "current": {
-          "text": "prometheus",
-          "value": "dfvnqurhin56oa"
-        },
+        "current": {},
         "includeAll": false,
         "name": "DS_PROMETHEUS",
         "options": [],
@@ -728,6 +1294,29 @@
         "refresh": 1,
         "regex": "",
         "type": "datasource"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(node_uname_info, instance)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Serveur",
+        "multi": false,
+        "name": "server",
+        "options": [],
+        "query": {
+          "query": "label_values(node_uname_info, instance)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "/([^:]+):/",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
       }
     ]
   },
@@ -735,9 +1324,25 @@
     "from": "now-6h",
     "to": "now"
   },
-  "timepicker": {},
-  "timezone": "",
-  "title": "Calcul CAO - Global",
-  "uid": "global-overview-dash",
-  "version": 21
+  "timepicker": {
+    "refresh_intervals": [
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h"
+    ],
+    "time_options": [
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Detail serveur",
+  "uid": "server-detail-dash",
+  "version": 1
 }
