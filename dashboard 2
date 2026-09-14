@@ -168,7 +168,12 @@
         "cellHeight": "sm",
         "enablePagination": false,
         "showHeader": true,
-        "sortBy": []
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "host 1"
+          }
+        ]
       },
       "pluginVersion": "12.3.11",
       "targets": [
@@ -281,11 +286,17 @@
               "Time 3": true,
               "Value #B": true,
               "Value #E": true,
+              "Value #H": true,
               "__name__": true,
               "__name__ 2": true,
               "__name__ 3": true,
               "device": true,
               "domainname": true,
+              "host 1": true,
+              "host 2": true,
+              "host 3": true,
+              "host 4": true,
+              "host 5": true,
               "instance 2": true,
               "instance 3": true,
               "job": true,
@@ -1612,5 +1623,5 @@
   "timezone": "browser",
   "title": "Detail serveur",
   "uid": "server-detail-dash",
-  "version": 38
+  "version": 39
 }
