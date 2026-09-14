@@ -662,6 +662,17 @@
           "interval": "",
           "legendFormat": "",
           "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "group by(host) (node_uname_info)",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "H"
         }
       ],
       "title": "Servers Status",
@@ -678,52 +689,49 @@
           "options": {
             "excludeByName": {
               "Time": true,
+              "Time 1": true,
+              "Time 2": true,
+              "__name__": true,
+              "__name__ 1": true,
               "Value #B": true,
               "Value #E": true,
               "Value #F": true,
-              "__name__": true,
               "domainname": true,
-              "fqdn": true,
+              "domainname 1": true,
+              "fqdn": false,
               "job": true,
+              "job 1": true,
               "machine": true,
+              "machine 1": true,
               "release": true,
-              "Time 1": true,
-              "__name__ 1": true,
+              "release 1": true,
               "serverlink": true,
               "serverlink 1": true,
               "sysname": true,
               "sysname 1": true,
               "version": true,
               "version 1": true,
-              "domainname 1": true,
-              "fqdn 1": true,
-              "machine 1": true,
-              "release 1": true,
-              "job 1": true,
-              "Value #H": false,
+              "instance": true,
               "host": true
             },
             "includeByName": {},
             "indexByName": {
-              "OS": 3,
-              "Value #A": 2,
-              "Value #C": 5,
-              "Value #D": 6,
               "alias": 0,
-              "fqdn": 7,
-              "instance": 7,
-              "nodename": 4,
-              "Value #H": 99,
-              "host": 1
+              "Value #A": 1,
+              "OS": 2,
+              "nodename": 3,
+              "Value #C": 4,
+              "Value #D": 5,
+              "fqdn": 6,
+              "Value #H": 7
             },
             "renameByName": {
+              "alias": "Alias",
               "Value #A": "Usage",
+              "nodename": "Hostname",
               "Value #C": "Uptime (h)",
               "Value #D": "CPU Count",
-              "Value #F": "",
-              "alias": "Alias",
               "fqdn": "FQDN",
-              "nodename": "Hostname",
               "Value #H": "FPGA View"
             }
           }
