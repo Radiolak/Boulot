@@ -23,14 +23,91 @@
   "links": [],
   "panels": [
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 20
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 23,
+        "x": 0,
+        "y": 0
+      },
+      "id": 20,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      },
+      "pluginVersion": "12.3.11",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum(up{job=\"node_exporter\"})",
+          "legendFormat": "Serveurs UP",
+          "range": false,
+          "instant": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "count(up{job=\"node_exporter\"})",
+          "legendFormat": "Total configure",
+          "range": false,
+          "instant": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Etat global des cibles Prometheus (UP / Configure)",
+      "type": "stat"
+    },
+    {
       "id": 3,
       "type": "table",
       "title": "Server Metrics Overview",
       "gridPos": {
         "h": 6,
-        "w": 24,
+        "w": 23,
         "x": 0,
-        "y": 0
+        "y": 4
       },
       "datasource": {
         "type": "prometheus",
@@ -172,21 +249,7 @@
                   {
                     "targetBlank": false,
                     "title": "Voir le detail",
-                    "url": "/d/server-detail-dash/detail-serveur?var-server=${__value.text}"
-                  }
-                ]
-              },
-              {
-                "id": "mappings",
-                "value": [
-                  {
-                    "type": "regex",
-                    "options": {
-                      "pattern": "^(.*):\\d+$",
-                      "result": {
-                        "text": "$1"
-                      }
-                    }
+                    "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.serverlink}"
                   }
                 ]
               }
@@ -290,6 +353,17 @@
           "interval": "",
           "legendFormat": "",
           "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "label_replace(node_uname_info, \"serverlink\", \"$1\", \"instance\", \"([^:]+):.*\")",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "E"
         }
       ],
       "options": {
@@ -348,7 +422,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Etat"
+              "options": "Usage"
             },
             "properties": [
               {
@@ -360,44 +434,6 @@
               {
                 "id": "custom.align",
                 "value": "center"
-              },
-              {
-                "id": "mappings",
-                "value": [
-                  {
-                    "options": {
-                      "from": 0,
-                      "result": {
-                        "color": "green",
-                        "text": "OK"
-                      },
-                      "to": 60
-                    },
-                    "type": "range"
-                  },
-                  {
-                    "options": {
-                      "from": 60.01,
-                      "result": {
-                        "color": "yellow",
-                        "text": "HIGH"
-                      },
-                      "to": 95
-                    },
-                    "type": "range"
-                  },
-                  {
-                    "options": {
-                      "from": 95.01,
-                      "result": {
-                        "color": "red",
-                        "text": "CRITICAL"
-                      },
-                      "to": 100
-                    },
-                    "type": "range"
-                  }
-                ]
               },
               {
                 "id": "custom.width",
@@ -438,20 +474,6 @@
               {
                 "id": "custom.width",
                 "value": 220
-              },
-              {
-                "id": "mappings",
-                "value": [
-                  {
-                    "type": "regex",
-                    "options": {
-                      "pattern": "^(.*):\\d+$",
-                      "result": {
-                        "text": "$1"
-                      }
-                    }
-                  }
-                ]
               }
             ]
           },
@@ -491,7 +513,7 @@
                   {
                     "targetBlank": false,
                     "title": "Voir le detail",
-                    "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.Server}"
+                    "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.serverlink}"
                   }
                 ]
               },
@@ -500,14 +522,32 @@
                 "value": 180
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Hostname"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": false,
+                    "title": "Vue FPGA",
+                    "url": "/d/fpga-vue-utilisateur/vue-fpga-utilisateur?var-server=${__data.fields.serverlink}"
+                  }
+                ]
+              }
+            ]
           }
         ]
       },
       "gridPos": {
         "h": 8,
-        "w": 24,
+        "w": 23,
         "x": 0,
-        "y": 6
+        "y": 10
       },
       "id": 2,
       "options": {
@@ -600,6 +640,17 @@
           "interval": "",
           "legendFormat": "",
           "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "label_replace(node_uname_info, \"serverlink\", \"$1\", \"instance\", \"([^:]+):.*\")",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "H"
         }
       ],
       "title": "Etat des serveurs",
@@ -624,7 +675,9 @@
               "fqdn": true,
               "job": true,
               "machine": true,
-              "release": true
+              "release": true,
+              "Time 1": true,
+              "__name__ 1": true
             },
             "includeByName": {},
             "indexByName": {
@@ -638,7 +691,7 @@
               "nodename": 3
             },
             "renameByName": {
-              "Value #A": "Etat",
+              "Value #A": "Usage",
               "Value #C": "Uptime (h)",
               "Value #D": "Nb CPU",
               "Value #F": "",
