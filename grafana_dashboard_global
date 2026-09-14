@@ -281,7 +281,7 @@
               "job 2": true,
               "job 3": true,
               "mountpoint": false,
-              "host": true
+              "host": false
             },
             "indexByName": {
               "instance": 0,
@@ -697,7 +697,7 @@
               "release 1": true,
               "job 1": true,
               "Value #H": false,
-              "host": true
+              "host": false
             },
             "includeByName": {},
             "indexByName": {
