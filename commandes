@@ -44,3 +44,10 @@ Pour la page détaillée c'est important avecserveur hostname etc dans le tablea
 	8/ Sur les 3 dasboard qu'on vas modifier là  faudrait mettre tous les titres en anglais et les données enfin tout en anglais c'est important ou alors adapter la langue qui est écrite en fonction de la lanque 
 
 Pour tous les dashboard laisse un peu de marge à droite des tableaux, le souci en fait quand on à redimentionné les tableaux c'est pas la hauteur des tableaux mais leur largeur, les tableaux rentrentent et sinon mes utilisateur scrollent vers le bas ça c'est bon mais ils n'ont pas là place de tout bien voir en largeur donc redimentionne tout ça et sur les 3 dashboards il faudrait vraiment que tu laisse une petite marge d'environ 1cm sur un écran de 14" pour que les utilisateurs puissent mettre leur curseur de sourie pour scroller car la si on scrolle au milieu on est vite bloqués par les menus déroulants des tableaux qu'on à mis ducoup on n'arrives pas bien à descendre la page
+
+
+
+
+
+
+La j'ai tojours un souci avec le dashboard 1 global en fait là quand on clique pour la vie fpga ça me renvoie vers la page fpga mais toujours avec la case vide c'est pas ce que je voulais et on à un bug ici aides moi à le régler, le souci viens peutetre de la page fpga elle-même ? 
