@@ -51,7 +51,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
+        "h": 5,
         "w": 23,
         "x": 0,
         "y": 0
@@ -104,10 +104,10 @@
       "type": "table",
       "title": "Server Metrics Overview",
       "gridPos": {
-        "h": 6,
+        "h": 8,
         "w": 23,
         "x": 0,
-        "y": 4
+        "y": 5
       },
       "datasource": {
         "type": "prometheus",
@@ -240,7 +240,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "instance"
+              "options": "host"
             },
             "properties": [
               {
@@ -249,7 +249,7 @@
                   {
                     "targetBlank": false,
                     "title": "Voir le detail",
-                    "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.serverlink}"
+                    "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.host}"
                   }
                 ]
               }
@@ -261,7 +261,7 @@
         {
           "id": "joinByField",
           "options": {
-            "byField": "instance",
+            "byField": "host",
             "mode": "outer"
           }
         },
@@ -280,7 +280,8 @@
               "job 1": true,
               "job 2": true,
               "job 3": true,
-              "mountpoint": false
+              "mountpoint": false,
+              "host": true
             },
             "indexByName": {
               "instance": 0,
@@ -294,7 +295,6 @@
               "Value #B": "Memory Usage",
               "Value #C": "Disk Usage",
               "Value #D": "Network I/O",
-              "instance": "Server",
               "mountpoint": ""
             },
             "includeByName": {}
@@ -308,7 +308,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "100 - (avg by(instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+          "expr": "100 - (avg by(host) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -335,7 +335,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "100 - avg by(instance) (\n  (node_filesystem_avail_bytes{fstype=~\"ext4|xfs|btrfs\"} * 100) / node_filesystem_size_bytes{fstype=~\"ext4|xfs|btrfs\"}\n)",
+          "expr": "100 - avg by(host) (\n  (node_filesystem_avail_bytes{fstype=~\"ext4|xfs|btrfs\"} * 100) / node_filesystem_size_bytes{fstype=~\"ext4|xfs|btrfs\"}\n)",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -347,23 +347,12 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "sum by(instance) (rate(node_network_receive_bytes_total[5m]) + rate(node_network_transmit_bytes_total[5m]))",
+          "expr": "sum by(host) (rate(node_network_receive_bytes_total[5m]) + rate(node_network_transmit_bytes_total[5m]))",
           "format": "table",
           "instant": true,
           "interval": "",
           "legendFormat": "",
           "refId": "D"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "label_replace(node_uname_info, \"serverlink\", \"$1\", \"instance\", \"([^:]+):.*\")",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "E"
         }
       ],
       "options": {
@@ -513,7 +502,7 @@
                   {
                     "targetBlank": false,
                     "title": "Voir le detail",
-                    "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.serverlink}"
+                    "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.host}"
                   }
                 ]
               },
@@ -564,7 +553,7 @@
                   {
                     "targetBlank": false,
                     "title": "FPGA View",
-                    "url": "/d/fpga-vue-utilisateur/vue-fpga-utilisateur?var-server=${__data.fields.serverlink}"
+                    "url": "/d/fpga-vue-utilisateur/vue-fpga-utilisateur?var-server=${__data.fields.host}"
                   }
                 ]
               }
@@ -573,10 +562,10 @@
         ]
       },
       "gridPos": {
-        "h": 8,
+        "h": 11,
         "w": 23,
         "x": 0,
-        "y": 10
+        "y": 13
       },
       "id": 2,
       "options": {
@@ -598,7 +587,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "max by(instance) (\n  100 - (avg by(instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)\nor\n  100 * (1 - ((node_memory_MemAvailable_bytes or node_memory_Buffers_bytes + node_memory_Cached_bytes + node_memory_MemFree_bytes) / node_memory_MemTotal_bytes))\nor\n  (time() - node_boot_time_seconds < 300) * 100\n)",
+          "expr": "max by(host) (\n  100 - (avg by(host) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)\nor\n  100 * (1 - ((node_memory_MemAvailable_bytes or node_memory_Buffers_bytes + node_memory_Cached_bytes + node_memory_MemFree_bytes) / node_memory_MemTotal_bytes))\nor\n  (time() - node_boot_time_seconds < 300) * 100\n)",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -637,7 +626,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "count by(instance) (node_cpu_seconds_total{mode=\"idle\"})",
+          "expr": "count by(host) (node_cpu_seconds_total{mode=\"idle\"})",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -669,17 +658,6 @@
           "interval": "",
           "legendFormat": "",
           "refId": "F"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "label_replace(node_uname_info, \"serverlink\", \"$1\", \"instance\", \"([^:]+):.*\")",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "",
-          "refId": "H"
         }
       ],
       "title": "Servers Status",
@@ -687,7 +665,7 @@
         {
           "id": "joinByField",
           "options": {
-            "byField": "instance",
+            "byField": "host",
             "mode": "outer"
           }
         },
@@ -707,8 +685,6 @@
               "release": true,
               "Time 1": true,
               "__name__ 1": true,
-              "instance": true,
-              "instance 1": true,
               "serverlink": true,
               "serverlink 1": true,
               "sysname": true,
@@ -720,7 +696,8 @@
               "machine 1": true,
               "release 1": true,
               "job 1": true,
-              "Value #H": false
+              "Value #H": false,
+              "host": true
             },
             "includeByName": {},
             "indexByName": {
