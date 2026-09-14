@@ -1,3 +1,29 @@
-Bon le bouton remarche aç c'est super mais point inquiétant c'est que pour le bouton de vue fpgale clique sur hostname ça le fait pas trop tu peux rajouter une colone et retirer les colones server, serverlink, sysname, version, value #h qui ne servent à rien et ne devraient pas être visibles, enfin la surle dashboard global on à trop trop de colones inutiles là c'est nul et le lien sur le hostname on retire les liens et les liens tu mets une colone tout à la fin avec vue PGFA et l'alias du serveur servant de lien vers le dashboard fpga ça fait doublon mais c'est plus propre mais dans chaque ligne de cette colone un simple texte "[vue fpga suffirait]" D'ailleurs en parlant dece bouton tu as réglé le souci de redirection qu'on avait vers la page détaillée mais on à un souci pour ce bouton qui fait le meme souci que nous avions précédement avec le bouton de page détaillée donc à régler: 
+# A ajouter dans CHACUN des deux jobs suivants (node_exporter et process_exporter),
+# juste apres la ligne "job_name:", au meme niveau que "static_configs:"
 
-Déjà sur cette page donne moi toute la page en anglais on vas y aller petit à petit donne moi déjà cette page en anglais et on verra la suite 
+  relabel_configs:
+    - source_labels: [__address__]
+      regex: '([^:]+):.*'
+      target_label: host
+      replacement: '${1}'
+
+# Exemple complet pour node_exporter (meme bloc a dupliquer sur process_exporter) :
+#
+# - job_name: 'node_exporter'
+#   relabel_configs:
+#     - source_labels: [__address__]
+#       regex: '([^:]+):.*'
+#       target_label: host
+#       replacement: '${1}'
+#   static_configs:
+#     - targets:
+#       - 'chara.fr.airbusds.corp:9100'
+#       - 'coxa.fr.airbusds.corp:9100'
+#       ... (le reste de ta liste inchangee
+
+sudo promtool check config /etc/prometheus/prometheus.yml
+sudo systemctl reload prometheus
+
+
+curl -s 'http://localhost:9090/api/v1/query?query=node_uname_info' | grep -o '"host":"[^"]*"' | head -5
+
