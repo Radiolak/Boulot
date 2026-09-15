@@ -697,14 +697,14 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(node_filesystem_size_bytes{host=\"$server\"}, mountpoint)",
+        "definition": "label_values(node_filesystem_size_bytes, mountpoint)",
         "includeAll": true,
         "label": "Disques",
         "multi": true,
         "name": "mountpoint",
         "options": [],
         "query": {
-          "query": "label_values(node_filesystem_size_bytes{host=\"$server\"}, mountpoint)",
+          "query": "label_values(node_filesystem_size_bytes, mountpoint)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 2,
