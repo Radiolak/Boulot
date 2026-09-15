@@ -1,9 +1,27 @@
 #!/bin/bash
-# Expose le BogoMips via le textfile collector de node_exporter (deja en place, rien a
-# ajouter au service). A noter pour l'equipe : BogoMips est une constante de calibration
-# du noyau Linux au demarrage, pas un vrai benchmark - ne pas comparer entre architectures
-# CPU differentes, seulement entre machines tres similaires.
+# Deploiement complet BogoMips - idempotent, sans danger a relancer plusieurs fois
+# meme si le textfile collector est deja configure (travail UID precedent).
+#
+# Usage : sudo ./install_bogomips.sh
 
+set -euo pipefail
+
+fail() { echo "ERREUR: $1" >&2; exit 1; }
+step() { echo ""; echo "=== $1 ==="; }
+
+[ "$(id -u)" -eq 0 ] || fail "Ce script doit etre lance avec sudo/root."
+
+TEXTFILE_DIR="/var/lib/node_exporter/textfile_collector"
+NODE_EXPORTER_SERVICE="/etc/systemd/system/node_exporter.service"
+BOGOMIPS_SCRIPT="/usr/local/bin/generate_bogomips.sh"
+
+id node_exporter >/dev/null 2>&1 || fail "Le compte systeme 'node_exporter' n'existe pas sur cette machine."
+
+# ------------------------------------------------------------------------------
+step "1/6 - Ecriture du script generate_bogomips.sh"
+# ------------------------------------------------------------------------------
+cat > "$BOGOMIPS_SCRIPT" << 'SCRIPT_EOF'
+#!/bin/bash
 set -euo pipefail
 
 OUTPUT_DIR="/var/lib/node_exporter/textfile_collector"
@@ -22,10 +40,9 @@ fi
 
 TOTAL=$(echo "$BOGOMIPS_VALUES" | awk '{sum+=$1} END {printf "%.2f", sum}')
 AVG=$(echo "$BOGOMIPS_VALUES" | awk '{sum+=$1; n++} END {printf "%.2f", sum/n}')
-NB_CORES=$(echo "$BOGOMIPS_VALUES" | wc -l)
 
 {
-  echo "# HELP node_cpu_bogomips_total Somme des BogoMips de tous les coeurs logiques (indicateur approximatif, non comparable entre architectures differentes)"
+  echo "# HELP node_cpu_bogomips_total Somme des BogoMips de tous les coeurs logiques"
   echo "# TYPE node_cpu_bogomips_total gauge"
   echo "node_cpu_bogomips_total $TOTAL"
   echo "# HELP node_cpu_bogomips_avg BogoMips moyen par coeur logique"
@@ -35,3 +52,59 @@ NB_CORES=$(echo "$BOGOMIPS_VALUES" | wc -l)
 
 mv -f "$TMP_FILE" "$OUTPUT_FILE"
 chmod 644 "$OUTPUT_FILE"
+SCRIPT_EOF
+chmod 755 "$BOGOMIPS_SCRIPT"
+echo "OK"
+
+# ------------------------------------------------------------------------------
+step "2/6 - Dossier textfile_collector (parent + lui-meme, permissions completes)"
+# ------------------------------------------------------------------------------
+mkdir -p "$TEXTFILE_DIR"
+chmod 755 /var/lib/node_exporter
+chown node_exporter:node_exporter "$TEXTFILE_DIR"
+chmod 755 "$TEXTFILE_DIR"
+echo "OK"
+
+# ------------------------------------------------------------------------------
+step "3/6 - Flag --collector.textfile.directory sur node_exporter (sans doublon)"
+# ------------------------------------------------------------------------------
+[ -f "$NODE_EXPORTER_SERVICE" ] || fail "$NODE_EXPORTER_SERVICE introuvable"
+
+RESTART_NEEDED=false
+if grep -q "collector.textfile.directory" "$NODE_EXPORTER_SERVICE"; then
+  echo "Deja configure - rien a faire."
+else
+  sed -i "/^ExecStart=/ s|\$| --collector.textfile.directory=${TEXTFILE_DIR}|" "$NODE_EXPORTER_SERVICE"
+  echo "Flag ajoute:"
+  grep ExecStart "$NODE_EXPORTER_SERVICE"
+  RESTART_NEEDED=true
+fi
+
+# ------------------------------------------------------------------------------
+step "4/6 - Cron (toutes les 15 minutes, sous l'utilisateur node_exporter)"
+# ------------------------------------------------------------------------------
+cat > /etc/cron.d/cpu_bogomips << EOF
+*/15 * * * * node_exporter $BOGOMIPS_SCRIPT
+EOF
+echo "OK"
+
+# ------------------------------------------------------------------------------
+step "5/6 - Generation immediate + redemarrage si necessaire"
+# ------------------------------------------------------------------------------
+sudo -u node_exporter "$BOGOMIPS_SCRIPT"
+
+if [ "$RESTART_NEEDED" = true ]; then
+  systemctl daemon-reload
+  systemctl restart node_exporter
+  sleep 2
+fi
+echo "OK"
+
+# ------------------------------------------------------------------------------
+step "6/6 - VERIFICATION"
+# ------------------------------------------------------------------------------
+echo ""
+cat "$TEXTFILE_DIR/cpu_bogomips.prom"
+echo ""
+echo "--- Depuis node_exporter ---"
+curl -s localhost:9100/metrics | grep bogomips || echo "RIEN - probleme, verifier les etapes ci-dessus"
