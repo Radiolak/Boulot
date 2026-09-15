@@ -1,1 +1,3 @@
-node_uname_info{domainname="(none)",host="celeno.fr.airbusds.corp",instance="celeno.fr.airbusds.corp:9100",job="node_exporter",machine="x86_64",nodename="smfidf5122.main.fr.ds.corp",release="4.18.0-553.150.1.el8_10.x86_64",sysname="Linux",version="#1 SMP Wed Jul 29 03:01:18 EDT 2026"}
+sudo cp install_bogomips.sh /usr/local/bin/
+sudo chmod +x /usr/local/bin/install_bogomips.sh
+sudo /usr/local/bin/install_bogomips.sh
