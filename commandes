@@ -1,10 +1,13 @@
-# 1. SELinux actif ?
-getenforce
-
-# 2. Erreurs recentes de node_exporter sur le textfile collector
-sudo journalctl -u node_exporter -n 30 --no-pager | grep -i textfile
-
-# 3. Permissions completes de la chaine de dossiers
-ls -ld /var/lib/node_exporter /var/lib/node_exporter/textfile_collector
-ls -l /var/lib/node_exporter/textfile_collector/cpu_bogomips.prom
-ls -Zd /var/lib/node_exporter/textfile_collector 2>/dev/null
+[admin_BRG@smfidf5114 ~]$ getenforce
+Permissive
+[admin_BRG@smfidf5114 ~]$ sudo journalctl -u node_exporter -n 30 --no-pager | grep -i textfile
+[sudo] password for admin_BRG:
+Aug 25 09:19:38 smfidf5114 node_exporter[1818222]: time=2026-08-25T09:19:38.609+02:00 level=INFO source=node_exporter.go:142 msg=textfile
+[admin_BRG@smfidf5114 ~]$ ls -ld /var/lib/node_exporter /var/lib/node_exporter/textfile_collector
+drwxr-xr-x. 3 root          root          32 Aug 28 08:47 /var/lib/node_exporter
+drwxr-xr-x. 2 node_exporter node_exporter 60 Sep 15 11:45 /var/lib/node_exporter/textfile_collector
+[admin_BRG@smfidf5114 ~]$ ls -l /var/lib/node_exporter/textfile_collector/cpu_bogomips.prom
+-rw-r--r--. 1 node_exporter node_exporter 276 Sep 15 11:45 /var/lib/node_exporter/textfile_collector/cpu_bogomips.prom
+[admin_BRG@smfidf5114 ~]$ ls -Zd /var/lib/node_exporter/textfile_collector 2>/dev/null
+unconfined_u:object_r:var_lib_t:s0 /var/lib/node_exporter/textfile_collector
+[admin_BRG@smfidf5114 ~]$
