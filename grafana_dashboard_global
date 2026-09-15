@@ -431,6 +431,64 @@
               {
                 "id": "custom.width",
                 "value": 72
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "range",
+                    "options": {
+                      "from": 0,
+                      "to": 60,
+                      "result": {
+                        "text": "Normal",
+                        "color": "green"
+                      }
+                    }
+                  },
+                  {
+                    "type": "range",
+                    "options": {
+                      "from": 60.01,
+                      "to": 85,
+                      "result": {
+                        "text": "High",
+                        "color": "yellow"
+                      }
+                    }
+                  },
+                  {
+                    "type": "range",
+                    "options": {
+                      "from": 85.01,
+                      "to": 100,
+                      "result": {
+                        "text": "Critical",
+                        "color": "red"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 60.01
+                    },
+                    {
+                      "color": "red",
+                      "value": 85.01
+                    }
+                  ]
+                }
               }
             ]
           },
