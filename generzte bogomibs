@@ -70,15 +70,17 @@ step "3/6 - Flag --collector.textfile.directory sur node_exporter (sans doublon)
 # ------------------------------------------------------------------------------
 [ -f "$NODE_EXPORTER_SERVICE" ] || fail "$NODE_EXPORTER_SERVICE introuvable"
 
-RESTART_NEEDED=false
 if grep -q "collector.textfile.directory" "$NODE_EXPORTER_SERVICE"; then
-  echo "Deja configure - rien a faire."
+  echo "Flag deja present dans le fichier de service."
 else
   sed -i "/^ExecStart=/ s|\$| --collector.textfile.directory=${TEXTFILE_DIR}|" "$NODE_EXPORTER_SERVICE"
   echo "Flag ajoute:"
   grep ExecStart "$NODE_EXPORTER_SERVICE"
-  RESTART_NEEDED=true
 fi
+
+# On redemarre TOUJOURS, meme si le flag etait deja dans le fichier :
+# un fichier modifie sans redemarrage depuis ne change rien au process en cours.
+RESTART_NEEDED=true
 
 # ------------------------------------------------------------------------------
 step "4/6 - Cron (toutes les 15 minutes, sous l'utilisateur node_exporter)"
