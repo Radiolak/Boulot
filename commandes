@@ -1,29 +1,10 @@
-[admin_BRG@smfidf5114 ~]$ sudo /usr/local/bin/install_bogomips.sh
+# 1. SELinux actif ?
+getenforce
 
-=== 1/6 - Ecriture du script generate_bogomips.sh ===
-OK
+# 2. Erreurs recentes de node_exporter sur le textfile collector
+sudo journalctl -u node_exporter -n 30 --no-pager | grep -i textfile
 
-=== 2/6 - Dossier textfile_collector (parent + lui-meme, permissions completes) ===
-OK
-
-=== 3/6 - Flag --collector.textfile.directory sur node_exporter (sans doublon) ===
-Deja configure - rien a faire.
-
-=== 4/6 - Cron (toutes les 15 minutes, sous l'utilisateur node_exporter) ===
-OK
-
-=== 5/6 - Generation immediate + redemarrage si necessaire ===
-OK
-
-=== 6/6 - VERIFICATION ===
-
-# HELP node_cpu_bogomips_total Somme des BogoMips de tous les coeurs logiques
-# TYPE node_cpu_bogomips_total gauge
-node_cpu_bogomips_total 148000.00
-# HELP node_cpu_bogomips_avg BogoMips moyen par coeur logique
-# TYPE node_cpu_bogomips_avg gauge
-node_cpu_bogomips_avg 7400.00
-
---- Depuis node_exporter ---
-RIEN - probleme, verifier les etapes ci-dessus
-[admin_BRG@smfidf5114 ~]$
+# 3. Permissions completes de la chaine de dossiers
+ls -ld /var/lib/node_exporter /var/lib/node_exporter/textfile_collector
+ls -l /var/lib/node_exporter/textfile_collector/cpu_bogomips.prom
+ls -Zd /var/lib/node_exporter/textfile_collector 2>/dev/null
