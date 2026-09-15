@@ -479,26 +479,6 @@
                     "type": "range"
                   }
                 ]
-              },
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": 0
-                    },
-                    {
-                      "color": "yellow",
-                      "value": 60.01
-                    },
-                    {
-                      "color": "red",
-                      "value": 85.01
-                    }
-                  ]
-                }
               }
             ]
           },
@@ -574,7 +554,7 @@
                   {
                     "targetBlank": false,
                     "title": "Voir le detail",
-                    "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.host}"
+                    "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.fqdn}"
                   }
                 ]
               },
@@ -625,7 +605,7 @@
                   {
                     "targetBlank": false,
                     "title": "FPGA View",
-                    "url": "/d/fpga-vue-utilisateur/vue-fpga-utilisateur?var-server=${__data.fields.instance}"
+                    "url": "/d/fpga-vue-utilisateur/vue-fpga-utilisateur?var-server=${__data.fields.fqdn}"
                   }
                 ]
               }
