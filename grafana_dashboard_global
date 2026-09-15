@@ -62,6 +62,7 @@
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -69,7 +70,9 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
       },
       "pluginVersion": "12.3.11",
       "targets": [
@@ -79,9 +82,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "sum(up{job=\"node_exporter\"})",
+          "instant": true,
           "legendFormat": "Servers UP",
           "range": false,
-          "instant": true,
           "refId": "A"
         },
         {
@@ -90,9 +93,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "count(up{job=\"node_exporter\"})",
+          "instant": true,
           "legendFormat": "Total configured",
           "range": false,
-          "instant": true,
           "refId": "B"
         }
       ],
@@ -100,31 +103,25 @@
       "type": "stat"
     },
     {
-      "id": 3,
-      "type": "table",
-      "title": "Server Metrics Overview",
-      "gridPos": {
-        "h": 8,
-        "w": 23,
-        "x": 0,
-        "y": 5
-      },
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
           "custom": {
             "align": "auto",
-            "footer": {
-              "reducers": []
-            },
             "cellOptions": {
               "type": "auto"
             },
-            "inspect": false,
-            "filterable": true
+            "filterable": true,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
           },
           "mappings": [],
           "thresholds": {
@@ -132,7 +129,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "yellow",
@@ -143,9 +140,6 @@
                 "value": 85
               }
             ]
-          },
-          "color": {
-            "mode": "thresholds"
           }
         },
         "overrides": [
@@ -257,54 +251,24 @@
           }
         ]
       },
-      "transformations": [
-        {
-          "id": "joinByField",
-          "options": {
-            "byField": "host",
-            "mode": "outer"
+      "gridPos": {
+        "h": 8,
+        "w": 23,
+        "x": 0,
+        "y": 5
+      },
+      "id": 3,
+      "options": {
+        "cellHeight": "sm",
+        "enablePagination": false,
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "CPU Usage"
           }
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true,
-              "Time 1": true,
-              "Time 2": true,
-              "Time 3": true,
-              "__name__": true,
-              "device": true,
-              "fstype": true,
-              "job": true,
-              "job 1": true,
-              "job 2": true,
-              "job 3": true,
-              "mountpoint": false,
-              "host": false,
-              "instance": true,
-              "instance 1": true,
-              "instance 2": true,
-              "instance 3": true
-            },
-            "indexByName": {
-              "instance": 0,
-              "Value #A": 1,
-              "Value #B": 2,
-              "Value #C": 3,
-              "Value #D": 4
-            },
-            "renameByName": {
-              "Value #A": "CPU Usage",
-              "Value #B": "Memory Usage",
-              "Value #C": "Disk Usage",
-              "Value #D": "Network I/O",
-              "mountpoint": ""
-            },
-            "includeByName": {}
-          }
-        }
-      ],
+        ]
+      },
       "pluginVersion": "12.3.11",
       "targets": [
         {
@@ -312,13 +276,13 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
+          "editorMode": "code",
           "expr": "100 - (avg by(host) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
           "format": "table",
           "instant": true,
           "interval": "",
           "legendFormat": "__auto",
-          "refId": "A",
-          "editorMode": "code"
+          "refId": "A"
         },
         {
           "datasource": {
@@ -359,17 +323,56 @@
           "refId": "D"
         }
       ],
-      "options": {
-        "showHeader": true,
-        "cellHeight": "sm",
-        "enablePagination": false,
-        "sortBy": [
-          {
-            "displayName": "CPU Usage",
-            "desc": true
+      "title": "Server Metrics Overview",
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "host",
+            "mode": "outer"
           }
-        ]
-      }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Time 1": true,
+              "Time 2": true,
+              "Time 3": true,
+              "__name__": true,
+              "device": true,
+              "fstype": true,
+              "host": false,
+              "instance": true,
+              "instance 1": true,
+              "instance 2": true,
+              "instance 3": true,
+              "job": true,
+              "job 1": true,
+              "job 2": true,
+              "job 3": true,
+              "mountpoint": false
+            },
+            "includeByName": {},
+            "indexByName": {
+              "Value #A": 1,
+              "Value #B": 2,
+              "Value #C": 3,
+              "Value #D": 4,
+              "instance": 0
+            },
+            "renameByName": {
+              "Value #A": "CPU Usage",
+              "Value #B": "Memory Usage",
+              "Value #C": "Disk Usage",
+              "Value #D": "Network I/O",
+              "mountpoint": ""
+            }
+          }
+        }
+      ],
+      "type": "table"
     },
     {
       "datasource": {
@@ -399,14 +402,6 @@
               {
                 "color": "green",
                 "value": 0
-              },
-              {
-                "color": "yellow",
-                "value": 60
-              },
-              {
-                "color": "red",
-                "value": 95
               }
             ]
           }
@@ -436,37 +431,52 @@
                 "id": "mappings",
                 "value": [
                   {
-                    "type": "range",
+                    "options": {
+                      "from": 80.01,
+                      "result": {
+                        "color": "red",
+                        "index": 0,
+                        "text": "Critical"
+                      },
+                      "to": 100
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 50.01,
+                      "result": {
+                        "color": "yellow",
+                        "index": 1,
+                        "text": "High"
+                      },
+                      "to": 80
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 20.01,
+                      "result": {
+                        "color": "green",
+                        "index": 2,
+                        "text": "Normal"
+                      },
+                      "to": 50
+                    },
+                    "type": "range"
+                  },
+                  {
                     "options": {
                       "from": 0,
-                      "to": 60,
                       "result": {
-                        "text": "Normal",
-                        "color": "green"
-                      }
-                    }
-                  },
-                  {
-                    "type": "range",
-                    "options": {
-                      "from": 60.01,
-                      "to": 85,
-                      "result": {
-                        "text": "High",
-                        "color": "yellow"
-                      }
-                    }
-                  },
-                  {
-                    "type": "range",
-                    "options": {
-                      "from": 85.01,
-                      "to": 100,
-                      "result": {
-                        "text": "Critical",
-                        "color": "red"
-                      }
-                    }
+                        "color": "blue",
+                        "index": 3,
+                        "text": "Unused"
+                      },
+                      "to": 20
+                    },
+                    "type": "range"
                   }
                 ]
               },
@@ -591,21 +601,21 @@
                 "id": "mappings",
                 "value": [
                   {
-                    "type": "special",
                     "options": {
                       "match": "true",
                       "result": {
                         "text": "[FPGA View]"
                       }
-                    }
+                    },
+                    "type": "special"
                   },
                   {
-                    "type": "value",
                     "options": {
                       "1": {
                         "text": "[FPGA View]"
                       }
-                    }
+                    },
+                    "type": "value"
                   }
                 ]
               },
@@ -615,7 +625,7 @@
                   {
                     "targetBlank": false,
                     "title": "FPGA View",
-                    "url": "/d/fpga-vue-utilisateur/vue-fpga-utilisateur?var-server=${__data.fields.host}"
+                    "url": "/d/fpga-vue-utilisateur/vue-fpga-utilisateur?var-server=${__data.fields.instance}"
                   }
                 ]
               }
@@ -636,8 +646,8 @@
         "showHeader": true,
         "sortBy": [
           {
-            "desc": false,
-            "displayName": "Nb CPU"
+            "desc": true,
+            "displayName": "Usage"
           }
         ]
       },
@@ -749,14 +759,16 @@
               "Time": true,
               "Time 1": true,
               "Time 2": true,
-              "__name__": true,
-              "__name__ 1": true,
               "Value #B": true,
               "Value #E": true,
               "Value #F": true,
+              "__name__": true,
+              "__name__ 1": true,
               "domainname": true,
               "domainname 1": true,
               "fqdn": false,
+              "host": true,
+              "instance": true,
               "job": true,
               "job 1": true,
               "machine": true,
@@ -768,29 +780,27 @@
               "sysname": true,
               "sysname 1": true,
               "version": true,
-              "version 1": true,
-              "instance": true,
-              "host": true
+              "version 1": true
             },
             "includeByName": {},
             "indexByName": {
-              "alias": 0,
-              "Value #A": 1,
               "OS": 2,
-              "nodename": 3,
+              "Value #A": 1,
               "Value #C": 4,
               "Value #D": 5,
+              "Value #H": 7,
+              "alias": 0,
               "fqdn": 6,
-              "Value #H": 7
+              "nodename": 3
             },
             "renameByName": {
-              "alias": "Alias",
               "Value #A": "Usage",
-              "nodename": "Hostname",
               "Value #C": "Uptime (h)",
               "Value #D": "CPU Count",
+              "Value #H": "FPGA View",
+              "alias": "Alias",
               "fqdn": "FQDN",
-              "Value #H": "FPGA View"
+              "nodename": "Hostname"
             }
           }
         }
@@ -831,5 +841,5 @@
   "timezone": "",
   "title": "CAO Compute - Global Overview",
   "uid": "global-overview-dash",
-  "version": 21
+  "version": 12
 }
