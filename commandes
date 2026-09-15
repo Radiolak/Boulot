@@ -1,22 +1,4 @@
-curl -s 'http://localhost:9090/api/v1/query?query=node_cpu_bogomips_avg' | grep -o '"host":"[^"]*"' | wc -l
-
-
-
-Voici ce que ça donne après le script: 
-
-
-# HELP node_cpu_bogomips_avg BogoMips moyen par coeur logique
-# TYPE node_cpu_bogomips_avg gauge
-node_cpu_bogomips_avg 7203.56
-# HELP node_cpu_bogomips_total Somme des BogoMips de tous les coeurs logiques
-# TYPE node_cpu_bogomips_total gauge
-node_cpu_bogomips_total 115256.96
-
-
-Voici ce que ressort le script: 
-
-
-root@smfidf5115# sudo /usr/local/bin/install_bogomips.sh
+[admin_BRG@smfidf5114 ~]$ sudo /usr/local/bin/install_bogomips.sh
 
 === 1/6 - Ecriture du script generate_bogomips.sh ===
 OK
@@ -37,16 +19,11 @@ OK
 
 # HELP node_cpu_bogomips_total Somme des BogoMips de tous les coeurs logiques
 # TYPE node_cpu_bogomips_total gauge
-node_cpu_bogomips_total 115256.96
+node_cpu_bogomips_total 148000.00
 # HELP node_cpu_bogomips_avg BogoMips moyen par coeur logique
 # TYPE node_cpu_bogomips_avg gauge
-node_cpu_bogomips_avg 7203.56
+node_cpu_bogomips_avg 7400.00
 
 --- Depuis node_exporter ---
-# HELP node_cpu_bogomips_avg BogoMips moyen par coeur logique
-# TYPE node_cpu_bogomips_avg gauge
-node_cpu_bogomips_avg 7203.56
-# HELP node_cpu_bogomips_total Somme des BogoMips de tous les coeurs logiques
-# TYPE node_cpu_bogomips_total gauge
-node_cpu_bogomips_total 115256.96
-node_textfile_mtime_seconds{file="/var/lib/node_exporter/textfile_collector/cpu_bogomips.prom"} 1.789463669e+09
+RIEN - probleme, verifier les etapes ci-dessus
+[admin_BRG@smfidf5114 ~]$
