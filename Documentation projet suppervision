@@ -1,42 +1,391 @@
-Tuas oublié pas mal de choses, on à pas les contenus des fichiers, on à pas flexlm exporter, on détaille pas quand on installe process exporter comment on fait dans le fichier .yml promethus, voici le fichier en question:
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+body { font-family: Calibri, Arial, sans-serif; }
+h1 { color: #1f4e79; }
+h2 { color: #2e75b6; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
+h3 { color: #2e75b6; }
+pre { background: #f4f4f4; border: 1px solid #ddd; padding: 10px; overflow-x: auto; white-space: pre-wrap; font-family: Consolas, monospace; font-size: 13px; }
+code { font-family: Consolas, monospace; background: #f4f4f4; padding: 1px 4px; }
+table { border-collapse: collapse; width: 100%; }
+td, th { border: 1px solid #ccc; padding: 6px 10px; text-align: left; }
+th { background: #dde8f0; }
+.warning { background: #fff3cd; border-left: 4px solid #e6a817; padding: 8px 12px; margin: 10px 0; }
+.filename { font-weight: bold; color: #555; margin-bottom: 4px; }
+</style>
+</head>
+<body>
 
-[r.fral192@main.fr.ds.corp@saxfrc0154 ~]$  cat /etc/prometheus/prometheus.yml
-#Sample config for Prometheus.
+<h1>Supervision CAO — Documentation d'installation complète</h1>
 
-global:
-  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
-  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
-  # scrape_timeout is set to the global default (10s).
+<div class="warning">
+Contenu de fichiers reconstruit fidèlement à partir de ce qui a été réellement déployé.
+Pour <code>install_node_exporter.sh</code> uniquement (écrit avant le début de cette
+session de travail), la reconstruction se base sur sa description documentée plutôt que
+sur son contenu exact d'origine — à comparer avec le fichier réel présent sur les machines
+si besoin d'une vérité absolue.
+</div>
 
-  # Attach these labels to any time series or alerts when communicating with
-  # external systems (federation, remote storage, Alertmanager).
+<h2>1. node_exporter</h2>
+
+<h3>1.1 Script d'installation</h3>
+<div class="filename">install_node_exporter.sh</div>
+<pre>#!/bin/bash
+set -euo pipefail
+
+fail() { echo "ERREUR: $1" >&2; exit 1; }
+
+ARCHIVE="$1"
+[ -z "$ARCHIVE" ] &amp;&amp; fail "Usage: $0 &lt;archive_node_exporter.tar.gz&gt;"
+[ -f "$ARCHIVE" ] || fail "Archive introuvable: $ARCHIVE"
+
+INSTALL_DIR="/usr/share/node_exporter"
+
+id node_exporter &gt;/dev/null 2&gt;&amp;1 || sudo useradd --no-create-home --shell /usr/sbin/nologin node_exporter
+
+EXTRACT_DIR=$(tar -tzf "$ARCHIVE" | head -1 | cut -f1 -d"/")
+[ -z "$EXTRACT_DIR" ] &amp;&amp; fail "Impossible de determiner le dossier d'extraction"
+
+TMPDIR=$(mktemp -d)
+tar -xzf "$ARCHIVE" -C "$TMPDIR" || fail "Extraction echouee"
+
+sudo mkdir -p "$INSTALL_DIR"
+sudo cp "$TMPDIR/$EXTRACT_DIR/node_exporter" "$INSTALL_DIR/node_exporter"
+sudo chown node_exporter:node_exporter "$INSTALL_DIR/node_exporter"
+sudo chmod 755 "$INSTALL_DIR/node_exporter"
+sudo restorecon -Rv "$INSTALL_DIR/" || true
+
+sudo tee /etc/systemd/system/node_exporter.service &gt; /dev/null &lt;&lt; 'EOF'
+[Unit]
+Description=Node Exporter
+After=network.target
+
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/share/node_exporter/node_exporter
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now node_exporter
+
+sudo firewall-cmd --permanent --add-port=9100/tcp 2&gt;/dev/null || true
+sudo firewall-cmd --reload 2&gt;/dev/null || true
+
+rm -rf "$TMPDIR"
+echo "OK - node_exporter installe"
+</pre>
+
+<h3>1.2 Fichier de service final (après ajout des collecteurs et du textfile collector)</h3>
+<div class="filename">/etc/systemd/system/node_exporter.service</div>
+<pre>[Unit]
+Description=Node Exporter
+After=network.target
+
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/share/node_exporter/node_exporter --collector.processes --collector.netdev.address-info --collector.textfile.directory=/var/lib/node_exporter/textfile_collector
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+</pre>
+
+<h2>2. process-exporter</h2>
+
+<h3>2.1 Script d'installation complet</h3>
+<div class="filename">install_process_exporter.sh</div>
+<pre>#!/bin/bash
+set -euo pipefail
+
+fail() { echo "ERREUR: $1" &gt;&amp;2; exit 1; }
+
+[ "$(id -u)" -eq 0 ] || fail "Ce script doit etre lance avec sudo/root."
+
+ARCHIVE="${1:-}"
+[ -z "$ARCHIVE" ] &amp;&amp; fail "Usage: $0 &lt;archive_process-exporter.tar.gz&gt;"
+[ -f "$ARCHIVE" ] || fail "Archive introuvable: $ARCHIVE"
+
+id node_exporter &gt;/dev/null 2&gt;&amp;1 || fail "Le compte systeme 'node_exporter' n'existe pas - installer node_exporter d'abord."
+
+INSTALL_DIR="/usr/share/process_exporter"
+CONFIG_DIR="/etc/process_exporter"
+
+TMPDIR=$(mktemp -d)
+
+if command -v tar &gt;/dev/null 2&gt;&amp;1; then
+  tar -xzf "$ARCHIVE" -C "$TMPDIR" || fail "Extraction echouee (tar)"
+elif command -v python3 &gt;/dev/null 2&gt;&amp;1; then
+  python3 -c "import tarfile,sys; tarfile.open(sys.argv[1]).extractall(sys.argv[2])" "$ARCHIVE" "$TMPDIR" \
+    || fail "Extraction echouee (python3 tarfile)"
+else
+  fail "Ni 'tar' ni 'python3' disponibles - impossible d'extraire l'archive."
+fi
+
+BINARY_PATH=$(find "$TMPDIR" -type f -name "process-exporter" | head -1)
+[ -z "$BINARY_PATH" ] &amp;&amp; fail "Binaire 'process-exporter' introuvable dans l'archive"
+
+mkdir -p "$INSTALL_DIR" "$CONFIG_DIR"
+cp "$BINARY_PATH" "$INSTALL_DIR/process-exporter"
+chown -R node_exporter:node_exporter "$INSTALL_DIR"
+chmod 755 "$INSTALL_DIR" "$INSTALL_DIR/process-exporter" "$CONFIG_DIR"
+restorecon -Rv "$INSTALL_DIR" 2&gt;/dev/null || true
+rm -rf "$TMPDIR"
+
+cat &gt; "$CONFIG_DIR/config.yml" &lt;&lt; 'EOF'
+process_names:
+  - name: "{{.ExeBase}}:{{.Username}}"
+    cmdline:
+    - '.+'
+EOF
+chmod 644 "$CONFIG_DIR/config.yml"
+
+cat &gt; /etc/systemd/system/process_exporter.service &lt;&lt; 'EOF'
+[Unit]
+Description=Process Exporter
+After=network.target
+
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/share/process_exporter/process-exporter \
+  --config.path /etc/process_exporter/config.yml \
+  --web.listen-address=:9256
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+if command -v firewall-cmd &gt;/dev/null 2&gt;&amp;1 &amp;&amp; systemctl is-active --quiet firewalld; then
+  firewall-cmd --permanent --add-port=9256/tcp
+  firewall-cmd --reload
+fi
+
+mkdir -p /var/lib/node_exporter/textfile_collector
+chmod 755 /var/lib/node_exporter
+chown node_exporter:node_exporter /var/lib/node_exporter/textfile_collector
+chmod 755 /var/lib/node_exporter/textfile_collector
+
+systemctl daemon-reload
+systemctl enable --now process_exporter
+
+echo "--- Verification ---"
+sleep 3
+curl -s localhost:9256/metrics | grep -c namedprocess_namegroup_cpu_seconds_total || true
+</pre>
+
+<h3>2.2 Config process-exporter</h3>
+<div class="filename">/etc/process_exporter/config.yml</div>
+<pre>process_names:
+  - name: "{{.ExeBase}}:{{.Username}}"
+    cmdline:
+    - '.+'
+</pre>
+<div class="warning">
+Utilise <code>.ExeBase</code>, pas <code>.Comm</code> — le noyau Linux tronque
+<code>.Comm</code> à 15 caractères (ex: "process_exporte" au lieu de
+"process_exporter"), ce qui aurait donné des noms de process faux et incohérents.
+</div>
+
+<h3>2.3 Résolution des utilisateurs AD</h3>
+<div class="filename">generate_uid_map.sh</div>
+<pre>#!/bin/bash
+# Lookup CIBLE par UID (pas d'enumeration globale - SSSD n'enumere pas l'AD par defaut)
+set -euo pipefail
+
+OUTPUT_DIR="/var/lib/node_exporter/textfile_collector"
+OUTPUT_FILE="$OUTPUT_DIR/uid_username_map.prom"
+TMP_FILE="${OUTPUT_FILE}.tmp"
+
+mkdir -p "$OUTPUT_DIR"
+
+UIDS=$(curl -s localhost:9256/metrics 2&gt;/dev/null \
+  | grep -oP 'groupname="[^"]*:\K[0-9]+(?=")' \
+  | sort -u)
+
+{
+  echo "# HELP node_uid_username Correspondance UID vers nom d'utilisateur (lookup cible via getent/SSSD)"
+  echo "# TYPE node_uid_username gauge"
+  for uid in $UIDS; do
+    entry=$(getent passwd "$uid" 2&gt;/dev/null || true)
+    if [ -n "$entry" ]; then
+      user=$(echo "$entry" | cut -d: -f1)
+      user_escaped=$(printf '%s' "$user" | sed 's/"/\\"/g')
+      echo "node_uid_username{uid=\"$uid\",username=\"$user_escaped\"} 1"
+    fi
+  done
+} &gt; "$TMP_FILE"
+
+mv -f "$TMP_FILE" "$OUTPUT_FILE"
+chmod 644 "$OUTPUT_FILE"
+</pre>
+<div class="warning">
+<b>Pourquoi un lookup ciblé par UID et pas un <code>getent passwd</code> global</b> :
+SSSD ne fait pas d'énumération complète de l'annuaire AD par défaut (trop coûteux) — un
+<code>getent passwd</code> seul ne renverrait que les comptes locaux/déjà en cache. Un
+lookup individuel par UID déclenche toujours une vraie requête SSSD et fonctionne.<br><br>
+<b>Piège du <code>mv</code> interactif</b> : sur certains comptes, <code>mv</code> est
+aliasé en <code>mv -i</code> et demande confirmation — invisible en usage manuel, mais
+bloque le script indéfiniment sous cron (personne pour répondre). D'où le <code>mv -f</code>
+explicite.
+</div>
+
+Cron (sous l'utilisateur <code>node_exporter</code>, jamais root) :
+<pre>*/10 * * * * node_exporter /usr/local/bin/generate_uid_map.sh</pre>
+
+<h2>3. BogoMips</h2>
+<div class="filename">generate_bogomips.sh</div>
+<pre>#!/bin/bash
+set -euo pipefail
+
+OUTPUT_DIR="/var/lib/node_exporter/textfile_collector"
+OUTPUT_FILE="$OUTPUT_DIR/cpu_bogomips.prom"
+TMP_FILE="${OUTPUT_FILE}.tmp"
+
+mkdir -p "$OUTPUT_DIR"
+chmod 755 "$OUTPUT_DIR" 2&gt;/dev/null || true
+
+BOGOMIPS_VALUES=$(grep -i '^bogomips' /proc/cpuinfo | awk -F: '{print $2}' | tr -d ' ')
+
+if [ -z "$BOGOMIPS_VALUES" ]; then
+  echo "Aucune valeur bogomips trouvee dans /proc/cpuinfo - abandon."
+  exit 1
+fi
+
+TOTAL=$(echo "$BOGOMIPS_VALUES" | awk '{sum+=$1} END {printf "%.2f", sum}')
+AVG=$(echo "$BOGOMIPS_VALUES" | awk '{sum+=$1; n++} END {printf "%.2f", sum/n}')
+
+{
+  echo "# HELP node_cpu_bogomips_total Somme des BogoMips de tous les coeurs logiques"
+  echo "# TYPE node_cpu_bogomips_total gauge"
+  echo "node_cpu_bogomips_total $TOTAL"
+  echo "# HELP node_cpu_bogomips_avg BogoMips moyen par coeur logique"
+  echo "# TYPE node_cpu_bogomips_avg gauge"
+  echo "node_cpu_bogomips_avg $AVG"
+} &gt; "$TMP_FILE"
+
+mv -f "$TMP_FILE" "$OUTPUT_FILE"
+chmod 644 "$OUTPUT_FILE"
+</pre>
+
+Cron :
+<pre>*/15 * * * * node_exporter /usr/local/bin/generate_bogomips.sh</pre>
+
+<div class="warning">
+<b>Piège rencontré</b> : si <code>node_exporter</code> tourne depuis longtemps sans
+redémarrage, le flag <code>--collector.textfile.directory</code> peut être présent dans
+le fichier de service sans être actif dans le process réel en mémoire (un changement de
+fichier service ne s'applique qu'au redémarrage). Toujours forcer un
+<code>systemctl restart node_exporter</code> après ajout du flag, même s'il semblait déjà
+présent.
+</div>
+
+<h2>4. flexlm_exporter (section manquante précédemment)</h2>
+
+<h3>4.1 Contexte</h3>
+Exporte les métriques de licences FlexLM (issued/used/expiration/utilisateurs connectés)
+en interrogeant <code>lmutil</code>/<code>lmstat</code> sur les serveurs de licences
+(triade phi/khi/psi).
+
+<h3>4.2 Installation</h3>
+<pre>sudo mkdir -p /usr/share/flexlm_exporter /etc/flexlm_exporter
+sudo useradd --no-create-home --shell /usr/sbin/nologin flexlm_exporter
+
+# Binaire flexlm_exporter (Go, v0.0.13 linux_x86_64) + lmutil copie depuis
+# un serveur de licence existant (ex: smfidf5102:/admin/flexlm/bin/11.19.3.0/lmutil)
+sudo cp flexlm_exporter /usr/share/flexlm_exporter/
+sudo cp lmutil /usr/share/flexlm_exporter/
+sudo chown -R flexlm_exporter:flexlm_exporter /usr/share/flexlm_exporter
+sudo chmod 755 /usr/share/flexlm_exporter/flexlm_exporter /usr/share/flexlm_exporter/lmutil</pre>
+
+<div class="warning">
+<b>Piège RHEL 9</b> : <code>lmutil</code> nécessite le loader LSB
+(<code>ld-lsb-x86-64.so.3</code>), absent par défaut sur RHEL 9 et non disponible en RPM.
+Contournement :
+<pre>sudo ln -s /lib64/ld-linux-x86-64.so.2 /lib64/ld-lsb-x86-64.so.3</pre>
+</div>
+
+<h3>4.3 Configuration des licences</h3>
+<div class="filename">/etc/flexlm_exporter/licenses.yml</div>
+<pre>licenses:
+  - {name: cam350, license_server: 7102@phi,7102@khi,7102@psi, monitor_users: true, monitor_reservations: true}
+  - {name: femap, license_server: 1745@phi,1745@khi,1745@psi, monitor_users: true, monitor_reservations: true}
+  - {name: matlab, license_server: 2010@phi,2010@khi,2010@psi, monitor_users: true, monitor_reservations: true}
+  - {name: siemens, license_server: 1717@phi,1717@khi,1717@psi, monitor_users: true, monitor_reservations: true}
+  - {name: nanoxplore, license_server: 28000@phi,28000@khi,28000@psi, monitor_users: true, monitor_reservations: true}
+  - {name: orcad, license_server: 5280@phi,5280@khi,5280@psi, monitor_users: true, monitor_reservations: true}
+  - {name: ptc, license_server: 7788@phi,7788@khi,7788@psi, monitor_users: true, monitor_reservations: true}
+  - {name: simetrix, license_server: 27010@phi,27010@khi,27010@psi, monitor_users: true, monitor_reservations: true}
+  - {name: synopsys, license_server: 27000@phi,27000@khi,27000@psi, monitor_users: true, monitor_reservations: true}
+  - {name: timingdesigner, license_server: 2100@phi,2100@khi,2100@psi, monitor_users: true, monitor_reservations: true}
+  - {name: vectorcast, license_server: 7650@phi,7650@khi,7650@psi, monitor_users: true, monitor_reservations: true}
+  - {name: xilinx, license_server: 2200@phi,2200@khi,2200@psi, monitor_users: true, monitor_reservations: true}
+</pre>
+<div class="warning">Ne jamais utiliser de tabulations dans ce fichier — uniquement des espaces (une tabulation a déjà fait planter Prometheus).</div>
+
+<h3>4.4 Service systemd (avec correctif fuseau horaire)</h3>
+<div class="filename">/etc/systemd/system/flexlm_exporter.service</div>
+<pre>[Unit]
+Description=FlexLM Exporter
+After=network.target
+
+[Service]
+User=flexlm_exporter
+Group=flexlm_exporter
+Type=simple
+ExecStart=/usr/share/flexlm_exporter/flexlm_exporter \
+  --path.lmutil=/usr/share/flexlm_exporter/lmutil \
+  --path.config=/etc/flexlm_exporter/licenses.yml
+Restart=on-failure
+Environment=TZ=Europe/Paris
+
+[Install]
+WantedBy=multi-user.target
+</pre>
+<div class="warning">
+<b>Piège fuseau horaire</b> : sans <code>Environment=TZ=Europe/Paris</code>,
+<code>flexlm_exporter</code> traite l'heure locale renvoyée par <code>lmstat</code> comme
+si elle était déjà en UTC, créant un décalage de +2h figé dans chaque session tant
+qu'elle reste ouverte (les sessions déjà connectées avant le correctif gardent leur
+mauvaise heure jusqu'à reconnexion).
+</div>
+
+<pre>sudo systemctl daemon-reload
+sudo systemctl enable --now flexlm_exporter
+curl -s localhost:9319/metrics | grep flexlm_feature_issued | head -5</pre>
+
+<h2>5. prometheus.yml — fichier complet réel</h2>
+<div class="filename">/etc/prometheus/prometheus.yml (sur saxfrc0154)</div>
+<pre>global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
   external_labels:
       monitor: 'example'
 
-# Alertmanager configuration
 alerting:
   alertmanagers:
   - static_configs:
     - targets: ['localhost:9093']
 
-# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
 rule_files:
   # - "first_rules.yml"
-  # - "second_rules.yml"
 
-# A scrape configuration containing exactly one endpoint to scrape:
-# Here it's Prometheus itself.
 scrape_configs:
-  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
   - job_name: 'prometheus'
-
-    # Override the global default and scrape targets from this job every 5 seconds.
     scrape_interval: 10s
     scrape_timeout: 10s
-
-    # metrics_path defaults to '/metrics'
-    # scheme defaults to 'http'.
-
     static_configs:
       - targets: ['localhost:9090']
 
@@ -108,6 +457,48 @@ scrape_configs:
       - source_labels: [__name__]
         regex: 'namedprocess_namegroup_(cpu_seconds_total|memory_bytes|num_procs|oldest_start_time_seconds)|namedprocess_scrape_(errors|partial_errors|procread_errors)'
         action: keep
+</pre>
 
+<h3>5.1 Explication des 4 jobs</h3>
+<table>
+<tr><th>Job</th><th>Port</th><th>Rôle</th></tr>
+<tr><td><code>prometheus</code></td><td>9090</td><td>Prometheus se scrape lui-même (santé de l'outil)</td></tr>
+<tr><td><code>node_exporter</code></td><td>9100</td><td>Métriques système (CPU/RAM/disque/réseau) de chaque machine</td></tr>
+<tr><td><code>flexlm</code></td><td>9319 (localhost)</td><td>Licences FlexLM — un seul exporter centralisé sur saxfrc0154, pas par machine</td></tr>
+<tr><td><code>process_exporter</code></td><td>9256</td><td>Détail CPU/RAM par processus et par utilisateur, sur chaque machine</td></tr>
+</table>
 
-Et pour la doc s'il te plait donne moi au format html que je puisse directement ocpier coller sur le one note
+<h3>5.2 Pourquoi le <code>relabel_configs</code> sur node_exporter et process_exporter</h3>
+Ajoute un label <code>host</code> (nom de machine sans port) identique sur les deux jobs
+malgré leurs ports différents (9100 vs 9256) — extrait directement de
+<code>__address__</code> au moment de la découverte de la cible, avant même le scrape.
+Permet à Grafana d'utiliser une seule variable <code>$server</code> simple pour filtrer
+les deux types de métriques, sans jonglage de port ni variable dépendante fragile
+(source de plusieurs bugs de redirection résolus grâce à ça).
+
+<h3>5.3 Pourquoi le <code>metric_relabel_configs</code> sur process_exporter uniquement</h3>
+Ne garde que les métriques <code>namedprocess_namegroup_*</code> réellement utilisées par
+les dashboards (CPU, RAM, nb instances, date de démarrage) + les métriques de santé de
+l'exporter lui-même — élimine tout le reste (write/read bytes, threads, métriques internes
+Go) pour réduire drastiquement le volume de séries stockées, sans rien changer côté
+node_exporter (moins de cardinalité par nature, pas besoin de filtrer).
+
+<h2>6. Ajouter un nouveau client — checklist complète</h2>
+<ol>
+<li>node_exporter (§1) — avec collecteurs additionnels et textfile collector activés</li>
+<li>process-exporter (§2)</li>
+<li>Script de résolution UID + cron (§2.3)</li>
+<li>BogoMips + cron (§3)</li>
+<li>Ajouter la machine dans <b>les deux blocs</b> <code>targets:</code> de
+<code>node_exporter</code> ET <code>process_exporter</code> dans <code>prometheus.yml</code></li>
+<li><code>sudo promtool check config /etc/prometheus/prometheus.yml</code></li>
+<li><code>sudo systemctl reload prometheus</code></li>
+<li>Vérifier <a href="http://10.94.192.177:9090/targets">http://10.94.192.177:9090/targets</a> — la machine doit apparaître "UP" sur les deux jobs</li>
+</ol>
+<div class="warning">
+flexlm_exporter n'est <b>pas</b> à réinstaller par machine — un seul exporter centralisé
+sur <code>saxfrc0154</code> interroge tous les serveurs de licences pour l'ensemble du parc.
+</div>
+
+</body>
+</html>
