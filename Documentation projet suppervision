@@ -1,270 +1,113 @@
-# Installation Grafana + Prometheus (serveur central)
+Tuas oublié pas mal de choses, on à pas les contenus des fichiers, on à pas flexlm exporter, on détaille pas quand on installe process exporter comment on fait dans le fichier .yml promethus, voici le fichier en question:
 
-⚠️ Ce document reflète l'installation **réellement faite** sur `saxfrc0155` (Grafana) et
-`saxfrc0154` (Prometheus), qui diffère par endroits du tutoriel générique suivi au tout
-début du projet (versions plus anciennes, méthode d'installation différente pour
-Prometheus). En cas de doute sur une valeur, vérifier directement sur les machines
-plutôt que de se fier uniquement à ce document.
+[r.fral192@main.fr.ds.corp@saxfrc0154 ~]$  cat /etc/prometheus/prometheus.yml
+#Sample config for Prometheus.
 
----
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
 
-## Prometheus — saxfrc0154
+  # Attach these labels to any time series or alerts when communicating with
+  # external systems (federation, remote storage, Alertmanager).
+  external_labels:
+      monitor: 'example'
 
-Installé via le gestionnaire de paquets du système (yum), pas en tar.gz comme dans le
-tutoriel d'origine.
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets: ['localhost:9093']
 
-```bash
-sudo yum install prometheus2
-sudo systemctl status prometheus
-```
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
 
-Fichier de config : `/etc/prometheus/prometheus.yml`
-Fichier de service : géré par le paquet — vérifier son emplacement exact avec :
-```bash
-systemctl status prometheus
-# regarder la ligne "Loaded:" pour le chemin du fichier .service
-```
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
 
-Rétention des données :
-```bash
-sudo vi /etc/default/prometheus
-# bloc storage.tsdb.retention.size
-```
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 10s
+    scrape_timeout: 10s
 
-Après toute modification de `prometheus.yml`, **toujours valider avant de recharger** :
-```bash
-sudo promtool check config /etc/prometheus/prometheus.yml
-sudo systemctl reload prometheus
-```
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
 
-Port 9090 exposé via firewalld :
-```bash
-sudo firewall-cmd --add-port=9090/tcp
-sudo firewall-cmd --permanent --add-port=9090/tcp
-sudo firewall-cmd --reload
-```
+    static_configs:
+      - targets: ['localhost:9090']
 
-Vérification : http://10.94.192.177:9090/targets
+  - job_name: 'node_exporter'
+    relabel_configs:
+        - source_labels: [__address__]
+          regex: '([^:]+):.*'
+          target_label: host
+          replacement: '${1}'
+    static_configs:
+      - targets:
+        - 'chara.fr.airbusds.corp:9100'
+        - 'coxa.fr.airbusds.corp:9100'
+        - 'calx.fr.airbusds.corp:9100'
+        - 'cursa.fr.airbusds.corp:9100'
+        - 'celeno.fr.airbusds.corp:9100'
+        - 'baguio.fr.airbusds.corp:9100'
+        - 'bolon.fr.airbusds.corp:9100'
+        - 'binic.fr.airbusds.corp:9100'
+        - 'buran.fr.airbusds.corp:9100'
+        - 'burga.fr.airbusds.corp:9100'
+        - 'burle.fr.airbusds.corp:9100'
+        - 'arz.fr.airbusds.corp:9100'
+        - 'zembra.fr.airbusds.corp:9100'
+        - 'zealand.fr.airbusds.corp:9100'
+        - 'yuma.fr.airbusds.corp:9100'
+        - 'york.fr.airbusds.corp:9100'
+        - 'wallis.fr.airbusds.corp:9100'
+        - 'vanavana.fr.airbusds.corp:9100'
+        - 'taiwan.fr.airbusds.corp:9100'
+        - 'nexus.main.fr.ds.corp:9100'
 
----
+  - job_name: 'flexlm'
+    scrape_interval: 60s
+    scrape_timeout: 45s
+    static_configs:
+      - targets: ['localhost:9319']
 
-## Grafana — saxfrc0155 (v12.3.11)
-
-Installé en tar.gz (pas de paquet officiel disponible pour cette version sur ce système).
-
-```bash
-wget <url_du_tar.gz_grafana_12.3.11>
-tar -xzf grafana-12.3.11.linux-amd64.tar.gz
-sudo mv grafana-v12.3.11/ /usr/share/grafana
-
-sudo useradd -d /usr/share/grafana -s /bin/false grafana
-sudo mkdir -p /var/lib/grafana /etc/grafana /var/log/grafana
-sudo chown -R grafana:grafana /usr/share/grafana /var/lib/grafana /var/log/grafana /etc/grafana
-```
-
-Le binaire unifié (v12+) est dans `/usr/share/grafana/bin/grafana`, symlinké :
-```bash
-sudo ln -s /usr/share/grafana/bin/grafana /usr/sbin/grafana-server
-```
-
-### Service systemd
-`/etc/systemd/system/grafana-server.service` :
-```ini
-[Unit]
-Description=Grafana instance
-Documentation=http://docs.grafana.org
-After=network-online.target
-
-[Service]
-User=grafana
-Group=grafana
-Type=simple
-Restart=on-failure
-WorkingDirectory=/usr/share/grafana
-ExecStart=/usr/share/grafana/bin/grafana server \
-  --config=/etc/grafana/grafana.ini \
-  --homepath=/usr/share/grafana \
-  cfg:default.paths.logs=/var/log/grafana \
-  cfg:default.paths.data=/var/lib/grafana \
-  cfg:default.paths.plugins=/var/lib/grafana/plugins
-
-[Install]
-WantedBy=multi-user.target
-```
-⚠️ Le flag `--homepath=/usr/share/grafana` est **obligatoire**, pas optionnel — son absence
-a été une source de plantage au démarrage (`status=203/EXEC`) lors de l'installation initiale.
-
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable --now grafana-server
-sudo systemctl status grafana-server
-```
-
-⚠️ Piège rencontré à l'installation : SELinux (`Enforcing`) et les permissions
-(`/usr/share/grafana`, `/etc/grafana`) doivent appartenir à `grafana:grafana` avec un
-contexte SELinux correct. En cas de plantage au démarrage, vérifier dans l'ordre :
-```bash
-sudo systemctl status grafana-server -l
-sudo journalctl -u grafana-server -n 30 --no-pager
-sudo restorecon -Rv /usr/share/grafana
-```
-
-### HTTPS
-Certificat : `/etc/grafana/grafana.crt`
-Clé : `/etc/grafana/grafana.key`
-Chaîne CA : `saxfrc0155_ux_main_fr_ds_corp.pem` + `saxfrc0155_ux_main_fr_ds_corp-bundle.pem`
-concaténés.
-
-Dans `/etc/grafana/grafana.ini`, section `[server]` :
-```ini
-protocol = https
-cert_file = /etc/grafana/grafana.crt
-cert_key = /etc/grafana/grafana.key
-http_port = 443
-```
-
-Port 443 nécessite une capacité Linux spécifique (le binaire ne tourne pas en root) :
-```bash
-sudo setcap cap_net_bind_service=+ep /usr/share/grafana/bin/grafana
-```
-⚠️ À **réappliquer après chaque mise à jour du binaire** — un upgrade écrase ce réglage.
-
-### Autres réglages `grafana.ini` en place
-```ini
-[plugins]
-preinstall_disabled = true   ; pas d'accès Internet sur ces machines
-
-[auth.anonymous]
-enabled = true                ; consultation sans compte pour la vue d'ensemble
-```
-
-### Connexion à Prometheus
-Configuration → Data sources → Prometheus → URL `http://10.94.192.177:9090`
-
-### Dashboard par défaut
-Administration → General → Default preferences → Home Dashboard
-(nécessite d'avoir mis le dashboard voulu en favori au préalable).
-
----
-
-# Procédure complète — Ajouter un nouveau client (machine de calcul)
-
-Ordre à respecter : `node_exporter` doit être en place avant `process-exporter`, qui
-doit être en place avant le script de résolution UID (qui interroge process-exporter).
-
-## 1. node_exporter
-
-```bash
-sudo -v
-chmod +x install_node_exporter.sh
-./install_node_exporter.sh
-sudo systemctl status node_exporter.service
-```
-
-Activer les collecteurs additionnels (processus, adresses réseau) :
-```bash
-sudo sed -i '/^ExecStart=/{/--collector.processes/!s/$/ --collector.processes/}; /^ExecStart=/{/--collector.netdev.address-info/!s/$/ --collector.netdev.address-info/}' /etc/systemd/system/node_exporter.service
-sudo systemctl daemon-reload
-sudo systemctl restart node_exporter
-```
-
-Activer le textfile collector (nécessaire pour BogoMips et la résolution UID) :
-```bash
-sudo mkdir -p /var/lib/node_exporter/textfile_collector
-sudo chmod 755 /var/lib/node_exporter              # le dossier PARENT aussi, piège classique
-sudo chown node_exporter:node_exporter /var/lib/node_exporter/textfile_collector
-sudo chmod 755 /var/lib/node_exporter/textfile_collector
-
-sudo sed -i "/^ExecStart=/ s|\$| --collector.textfile.directory=/var/lib/node_exporter/textfile_collector|" /etc/systemd/system/node_exporter.service
-sudo systemctl daemon-reload
-sudo systemctl restart node_exporter    # OBLIGATOIRE meme si le flag existait deja dans le fichier
-```
-
-Vérification :
-```bash
-curl -s http://localhost:9100/metrics | grep -c node_processes_pids
-curl -s http://localhost:9100/metrics | grep -c node_network_address_info
-```
-
-## 2. process-exporter (détail CPU/RAM par processus)
-
-```bash
-chmod +x install_process_exporter.sh
-sudo ./install_process_exporter.sh process-exporter-0.8.7.linux-amd64.tar.gz
-```
-Utilise le compte système `node_exporter` déjà existant (aucun nouveau compte créé).
-Vérifier avant de généraliser :
-```bash
-findmnt /proc    # verifier l'absence de hidepid= qui bloquerait la visibilite inter-utilisateurs
-curl -s localhost:9256/metrics | grep namedprocess_namegroup_cpu | head -5
-```
-
-## 3. Résolution des noms d'utilisateurs AD
-
-```bash
-sudo cp generate_uid_map.sh /usr/local/bin/generate_uid_map.sh
-sudo chmod 755 /usr/local/bin/generate_uid_map.sh
-sudo -u node_exporter /usr/local/bin/generate_uid_map.sh   # sous node_exporter, jamais root
-
-sudo tee /etc/cron.d/uid_username_map > /dev/null << 'EOF'
-*/10 * * * * node_exporter /usr/local/bin/generate_uid_map.sh
-EOF
-```
-Nécessaire car les comptes AD (contrairement aux comptes locaux) ne sont pas résolus par
-le binaire Go statique de process-exporter — ce script fait des lookups ciblés `getent
-passwd <uid>` (jamais une énumération globale, que SSSD ne supporte pas pour l'AD).
-
-## 4. BogoMips
-
-```bash
-sudo cp install_bogomips.sh /usr/local/bin/
-sudo chmod +x /usr/local/bin/install_bogomips.sh
-sudo /usr/local/bin/install_bogomips.sh
-```
-
-## 5. Déclarer la machine côté Prometheus (`saxfrc0154`)
-
-Dans `/etc/prometheus/prometheus.yml`, ajouter la machine dans **les deux jobs** :
-```yaml
-- job_name: 'node_exporter'
-  relabel_configs:
-    - source_labels: [__address__]
-      regex: '([^:]+):.*'
-      target_label: host
-      replacement: '${1}'
-  static_configs:
+  - job_name: 'process_exporter'
+    relabel_configs:
+        - source_labels: [__address__]
+          regex: '([^:]+):.*'
+          target_label: host
+          replacement: '${1}'
+    scrape_interval: 30s
+    static_configs:
     - targets:
-      - 'nouvelle-machine.fr.airbusds.corp:9100'
-      # ... reste de la liste inchangee
+      - 'coxa.fr.airbusds.corp:9256'
+      - 'arz.fr.airbusds.corp:9256'
+      - 'chara.fr.airbusds.corp:9256'
+      - 'calx.fr.airbusds.corp:9256'
+      - 'cursa.fr.airbusds.corp:9256'
+      - 'celeno.fr.airbusds.corp:9256'
+      - 'baguio.fr.airbusds.corp:9256'
+      - 'bolon.fr.airbusds.corp:9256'
+      - 'binic.fr.airbusds.corp:9256'
+      - 'buran.fr.airbusds.corp:9256'
+      - 'burga.fr.airbusds.corp:9256'
+      - 'burle.fr.airbusds.corp:9256'
+      - 'zembra.fr.airbusds.corp:9256'
+      - 'zealand.fr.airbusds.corp:9256'
+      - 'yuma.fr.airbusds.corp:9256'
+      - 'york.fr.airbusds.corp:9256'
+      - 'wallis.fr.airbusds.corp:9256'
+      - 'vanavana.fr.airbusds.corp:9256'
+      - 'taiwan.fr.airbusds.corp:9256'
+      - 'nexus.main.fr.ds.corp:9256'
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'namedprocess_namegroup_(cpu_seconds_total|memory_bytes|num_procs|oldest_start_time_seconds)|namedprocess_scrape_(errors|partial_errors|procread_errors)'
+        action: keep
 
-- job_name: 'process_exporter'
-  relabel_configs:
-    - source_labels: [__address__]
-      regex: '([^:]+):.*'
-      target_label: host
-      replacement: '${1}'
-  static_configs:
-    - targets:
-      - 'nouvelle-machine.fr.airbusds.corp:9256'
-      # ... reste de la liste inchangee
-```
 
-```bash
-sudo promtool check config /etc/prometheus/prometheus.yml
-sudo systemctl reload prometheus
-```
 
-## 6. Vérification finale
-
-```bash
-# Cote Prometheus - la machine doit apparaitre UP sur les deux jobs
-curl -s http://localhost:9090/api/v1/targets | grep -A2 "nouvelle-machine"
-
-# Le label host est bien present et propre (sans port)
-curl -s 'http://localhost:9090/api/v1/query?query=node_uname_info{host="nouvelle-machine.fr.airbusds.corp"}'
-```
-Ou visuellement : http://10.94.192.177:9090/targets
-
-Une fois "UP" sur les deux jobs, la machine apparaît automatiquement sur les dashboards
-Grafana (dashboard global, dashboard détaillé via le menu déroulant serveur) — aucune
-action supplémentaire côté Grafana n'est nécessaire.
