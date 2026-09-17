@@ -1,75 +1,159 @@
-# Supervision Machines de Calcul CAO — Grafana / Prometheus / Node Exporter
+# Installation Grafana + Prometheus (serveur central)
 
-## Versions déployées
-- Node Exporter : 1.12.1
-- Grafana : 12.3.11
-- Prometheus : (à reconfirmer — la version notée initialement, 13.1.7, n'existe pas officiellement, à vérifier avec `prometheus --version` sur saxfrc0154)
-- process-exporter : 0.8.7
-
-## Infrastructure
-- Serveur Grafana : saxfrc0155.ux.main.fr.ds.corp (10.94.192.178)
-- Serveur Prometheus : saxfrc0154.ux.main.fr.ds.corp (10.94.192.177)
-- Accès Grafana (hors connexion, lecture seule) : https://saxfrc0155.ux.main.fr.ds.corp/d/multi_server_monitoring
-- Cibles Prometheus : http://10.94.192.177:9090/targets
-
-## Comptes
-- admin / Ecad2025!
-- CAO_dashboard / ECAD2025!
-
-## Documentation Confluence
-https://aforge-frdr.biz.nstd.fr.airbusds.corp/confluence/spaces/ECAD3ADM/pages/1144980577/Supervision+des+Machines+de+Calcul+de+CAO
+⚠️ Ce document reflète l'installation **réellement faite** sur `saxfrc0155` (Grafana) et
+`saxfrc0154` (Prometheus), qui diffère par endroits du tutoriel générique suivi au tout
+début du projet (versions plus anciennes, méthode d'installation différente pour
+Prometheus). En cas de doute sur une valeur, vérifier directement sur les machines
+plutôt que de se fier uniquement à ce document.
 
 ---
 
-## Liste des serveurs de calcul (Élancourt)
+## Prometheus — saxfrc0154
 
-| # | Nom machine | FQDN | OS | Statut |
-|---|---|---|---|---|
-| 1 | SMFIDF5126 | chara.fr.airbusds.corp | RHEL 8.9 | Ajouté |
-| 2 | SMFIDF5125 | coxa.fr.airbusds.corp | RHEL 8.9 | Ajouté |
-| 3 | SMFIDF5124 | calx.fr.airbusds.corp | RHEL 8.9 | Ajouté |
-| 4 | SMFIDF5123 | cursa.fr.airbusds.corp | RHEL 8.9 | Ajouté |
-| 5 | SMFIDF5122 | celeno.fr.airbusds.corp | RHEL 8.9 | Ajouté |
-| 6 | SMFIDF5114 | baguio.fr.airbusds.corp | RHEL 8.10 | Ajouté |
-| 7 | SMFIDF5109 | bolon.fr.airbusds.corp | RHEL 8.10 | Ajouté |
-| 8 | SMFIDF5112 | binic.fr.airbusds.corp | RHEL 8.10 | Ajouté |
-| 9 | SMFIDF5111 | buran.fr.airbusds.corp | RHEL 8.10 | Ajouté |
-| 10 | SMFIDF5113 | burga.fr.airbusds.corp | RHEL 8.10 | Ajouté |
-| 11 | SMFIDF5110 | burle.fr.airbusds.corp | RHEL 8.10 | Ajouté |
-| 12 | SMFIDF5115 | arz.fr.airbusds.corp | RHEL 7.6 | Ajouté |
-| 13 | SMFIDF5108 | zembra.fr.airbusds.corp | RHEL 8.10 | Ajouté |
-| 14 | SMFIDF5107 | zealand.fr.airbusds.corp | RHEL 8.10 | Ajouté |
-| 15 | SMFIDF5105 | yuma.fr.airbusds.corp | RHEL 8.10 | Ajouté |
-| 16 | SMFIDF5106 | york.fr.airbusds.corp | RHEL 8.10 | Ajouté |
-| 17 | SMFIDF5119 | wallis.fr.airbusds.corp | RHEL 8.10 | Ajouté |
-| 18 | SMFIDF5117 | vanavana.fr.airbusds.corp | RHEL 7.9 | Ajouté / pas de firewall |
-| 19 | SMFIDF5118 | vanilla.fr.airbusds.corp | RHEL 6.5 | **Non supervisé** (pas de systemd, machine bientôt abandonnée) |
-| 20 | SMFIDF5116 | taiwan.fr.airbusds.corp | RHEL 7.9 | Ajouté / pas de firewall |
+Installé via le gestionnaire de paquets du système (yum), pas en tar.gz comme dans le
+tutoriel d'origine.
 
----
+```bash
+sudo yum install prometheus2
+sudo systemctl status prometheus
+```
 
-## Rappels d'architecture
+Fichier de config : `/etc/prometheus/prometheus.yml`
+Fichier de service : géré par le paquet — vérifier son emplacement exact avec :
+```bash
+systemctl status prometheus
+# regarder la ligne "Loaded:" pour le chemin du fichier .service
+```
 
-**Modèle Pull** — Prometheus contacte activement chaque cible (`node_exporter`, `process_exporter`) sur son port dédié à intervalle régulier (`scrape_interval`), via `http://<host>:<port>/metrics`. Si une cible tombe, l'échec HTTP est immédiat et visible.
+Rétention des données :
+```bash
+sudo vi /etc/default/prometheus
+# bloc storage.tsdb.retention.size
+```
 
-**Rôle de node_exporter / process_exporter** — Traducteurs passifs : ils lisent `/proc`, `/sys`, exposent en texte brut (format OpenMetrics), ne stockent rien, ne décident rien.
+Après toute modification de `prometheus.yml`, **toujours valider avant de recharger** :
+```bash
+sudo promtool check config /etc/prometheus/prometheus.yml
+sudo systemctl reload prometheus
+```
 
-**TSDB** — Prometheus stocke chaque donnée en `(timestamp, valeur)`, indexée par labels `clé=valeur` (`instance=`, `job=`, `host=`...), optimisée pour l'écriture/lecture à très haut volume.
+Port 9090 exposé via firewalld :
+```bash
+sudo firewall-cmd --add-port=9090/tcp
+sudo firewall-cmd --permanent --add-port=9090/tcp
+sudo firewall-cmd --reload
+```
 
-**PromQL** — Les calculs (taux, moyenne, %) se font à la volée à la lecture (ex: `rate()`), pas au stockage. Prometheus stocke des compteurs bruts, Grafana calcule les variations via PromQL.
-
-**Comptes de rôle (node_exporter, prometheus, grafana...)** — Chaque service tourne sous un compte système dédié, sans privilège root, activé automatiquement par systemd. Objectif : limiter l'impact d'une faille de sécurité dans l'exporter à ce compte seul, pas à toute la machine.
-
-**Rétention Prometheus** — `sudo vi /etc/default/prometheus`, bloc `storage.tsdb.retention.size`.
-Suivi d'occupation `/var` sur Prometheus (à surveiller) :
-- 70% le 28/08, 74% le 31/08 → disque agrandi
-- 19% le (date), 20% le 15/09 après agrandissement
+Vérification : http://10.94.192.177:9090/targets
 
 ---
 
-## Procédures d'installation (à jour)
+## Grafana — saxfrc0155 (v12.3.11)
 
-### Ajouter un nouveau serveur (node_exporter)
+Installé en tar.gz (pas de paquet officiel disponible pour cette version sur ce système).
+
+```bash
+wget <url_du_tar.gz_grafana_12.3.11>
+tar -xzf grafana-12.3.11.linux-amd64.tar.gz
+sudo mv grafana-v12.3.11/ /usr/share/grafana
+
+sudo useradd -d /usr/share/grafana -s /bin/false grafana
+sudo mkdir -p /var/lib/grafana /etc/grafana /var/log/grafana
+sudo chown -R grafana:grafana /usr/share/grafana /var/lib/grafana /var/log/grafana /etc/grafana
+```
+
+Le binaire unifié (v12+) est dans `/usr/share/grafana/bin/grafana`, symlinké :
+```bash
+sudo ln -s /usr/share/grafana/bin/grafana /usr/sbin/grafana-server
+```
+
+### Service systemd
+`/etc/systemd/system/grafana-server.service` :
+```ini
+[Unit]
+Description=Grafana instance
+Documentation=http://docs.grafana.org
+After=network-online.target
+
+[Service]
+User=grafana
+Group=grafana
+Type=simple
+Restart=on-failure
+WorkingDirectory=/usr/share/grafana
+ExecStart=/usr/share/grafana/bin/grafana server \
+  --config=/etc/grafana/grafana.ini \
+  --homepath=/usr/share/grafana \
+  cfg:default.paths.logs=/var/log/grafana \
+  cfg:default.paths.data=/var/lib/grafana \
+  cfg:default.paths.plugins=/var/lib/grafana/plugins
+
+[Install]
+WantedBy=multi-user.target
+```
+⚠️ Le flag `--homepath=/usr/share/grafana` est **obligatoire**, pas optionnel — son absence
+a été une source de plantage au démarrage (`status=203/EXEC`) lors de l'installation initiale.
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now grafana-server
+sudo systemctl status grafana-server
+```
+
+⚠️ Piège rencontré à l'installation : SELinux (`Enforcing`) et les permissions
+(`/usr/share/grafana`, `/etc/grafana`) doivent appartenir à `grafana:grafana` avec un
+contexte SELinux correct. En cas de plantage au démarrage, vérifier dans l'ordre :
+```bash
+sudo systemctl status grafana-server -l
+sudo journalctl -u grafana-server -n 30 --no-pager
+sudo restorecon -Rv /usr/share/grafana
+```
+
+### HTTPS
+Certificat : `/etc/grafana/grafana.crt`
+Clé : `/etc/grafana/grafana.key`
+Chaîne CA : `saxfrc0155_ux_main_fr_ds_corp.pem` + `saxfrc0155_ux_main_fr_ds_corp-bundle.pem`
+concaténés.
+
+Dans `/etc/grafana/grafana.ini`, section `[server]` :
+```ini
+protocol = https
+cert_file = /etc/grafana/grafana.crt
+cert_key = /etc/grafana/grafana.key
+http_port = 443
+```
+
+Port 443 nécessite une capacité Linux spécifique (le binaire ne tourne pas en root) :
+```bash
+sudo setcap cap_net_bind_service=+ep /usr/share/grafana/bin/grafana
+```
+⚠️ À **réappliquer après chaque mise à jour du binaire** — un upgrade écrase ce réglage.
+
+### Autres réglages `grafana.ini` en place
+```ini
+[plugins]
+preinstall_disabled = true   ; pas d'accès Internet sur ces machines
+
+[auth.anonymous]
+enabled = true                ; consultation sans compte pour la vue d'ensemble
+```
+
+### Connexion à Prometheus
+Configuration → Data sources → Prometheus → URL `http://10.94.192.177:9090`
+
+### Dashboard par défaut
+Administration → General → Default preferences → Home Dashboard
+(nécessite d'avoir mis le dashboard voulu en favori au préalable).
+
+---
+
+# Procédure complète — Ajouter un nouveau client (machine de calcul)
+
+Ordre à respecter : `node_exporter` doit être en place avant `process-exporter`, qui
+doit être en place avant le script de résolution UID (qui interroge process-exporter).
+
+## 1. node_exporter
+
 ```bash
 sudo -v
 chmod +x install_node_exporter.sh
@@ -77,102 +161,110 @@ chmod +x install_node_exporter.sh
 sudo systemctl status node_exporter.service
 ```
 
-Côté Prometheus (`saxfrc0154`), dans `prometheus.yml`, job `node_exporter` :
-```yaml
-- targets: ['hostname_de_la_cible:9100']
-```
+Activer les collecteurs additionnels (processus, adresses réseau) :
 ```bash
-sudo promtool check config /etc/prometheus/prometheus.yml
-sudo systemctl reload prometheus
-sudo systemctl status prometheus
-```
-Vérification : http://10.94.192.177:9090/targets — la nouvelle machine doit apparaître "UP". Elle est ensuite automatiquement visible sur les dashboards Grafana.
-
-### Collecteurs additionnels sur node_exporter (processus, adresses réseau)
-```bash
-sudo -v
 sudo sed -i '/^ExecStart=/{/--collector.processes/!s/$/ --collector.processes/}; /^ExecStart=/{/--collector.netdev.address-info/!s/$/ --collector.netdev.address-info/}' /etc/systemd/system/node_exporter.service
 sudo systemctl daemon-reload
 sudo systemctl restart node_exporter
-sudo systemctl status node_exporter --no-pager
+```
 
+Activer le textfile collector (nécessaire pour BogoMips et la résolution UID) :
+```bash
+sudo mkdir -p /var/lib/node_exporter/textfile_collector
+sudo chmod 755 /var/lib/node_exporter              # le dossier PARENT aussi, piège classique
+sudo chown node_exporter:node_exporter /var/lib/node_exporter/textfile_collector
+sudo chmod 755 /var/lib/node_exporter/textfile_collector
+
+sudo sed -i "/^ExecStart=/ s|\$| --collector.textfile.directory=/var/lib/node_exporter/textfile_collector|" /etc/systemd/system/node_exporter.service
+sudo systemctl daemon-reload
+sudo systemctl restart node_exporter    # OBLIGATOIRE meme si le flag existait deja dans le fichier
+```
+
+Vérification :
+```bash
 curl -s http://localhost:9100/metrics | grep -c node_processes_pids
 curl -s http://localhost:9100/metrics | grep -c node_network_address_info
 ```
 
-### process-exporter (détail CPU/RAM par processus et par utilisateur)
+## 2. process-exporter (détail CPU/RAM par processus)
+
 ```bash
 chmod +x install_process_exporter.sh
 sudo ./install_process_exporter.sh process-exporter-0.8.7.linux-amd64.tar.gz
 ```
-Résout aussi la correspondance UID → utilisateur AD via `generate_uid_map.sh` (nécessaire car les binaires Go statiques ne résolvent pas les comptes AD/SSSD, seulement les comptes locaux).
-
-### BogoMips (indicateur de puissance CPU approximatif)
+Utilise le compte système `node_exporter` déjà existant (aucun nouveau compte créé).
+Vérifier avant de généraliser :
 ```bash
-sudo -v
+findmnt /proc    # verifier l'absence de hidepid= qui bloquerait la visibilite inter-utilisateurs
+curl -s localhost:9256/metrics | grep namedprocess_namegroup_cpu | head -5
+```
+
+## 3. Résolution des noms d'utilisateurs AD
+
+```bash
+sudo cp generate_uid_map.sh /usr/local/bin/generate_uid_map.sh
+sudo chmod 755 /usr/local/bin/generate_uid_map.sh
+sudo -u node_exporter /usr/local/bin/generate_uid_map.sh   # sous node_exporter, jamais root
+
+sudo tee /etc/cron.d/uid_username_map > /dev/null << 'EOF'
+*/10 * * * * node_exporter /usr/local/bin/generate_uid_map.sh
+EOF
+```
+Nécessaire car les comptes AD (contrairement aux comptes locaux) ne sont pas résolus par
+le binaire Go statique de process-exporter — ce script fait des lookups ciblés `getent
+passwd <uid>` (jamais une énumération globale, que SSSD ne supporte pas pour l'AD).
+
+## 4. BogoMips
+
+```bash
 sudo cp install_bogomips.sh /usr/local/bin/
 sudo chmod +x /usr/local/bin/install_bogomips.sh
 sudo /usr/local/bin/install_bogomips.sh
 ```
-⚠️ Piège rencontré : si `node_exporter` tourne depuis longtemps sans redémarrage, le flag `--collector.textfile.directory` peut être présent dans le fichier de service sans être actif dans le process réel. Le script force désormais un redémarrage systématique pour éviter ce cas.
 
-### Relabeling Prometheus (label `host` uniforme)
-Ajouté aux jobs `node_exporter` et `process_exporter` dans `prometheus.yml`, pour disposer d'un identifiant machine unique indépendant du port de chaque exporter (a résolu plusieurs bugs de redirection entre dashboards) :
+## 5. Déclarer la machine côté Prometheus (`saxfrc0154`)
+
+Dans `/etc/prometheus/prometheus.yml`, ajouter la machine dans **les deux jobs** :
 ```yaml
-relabel_configs:
-  - source_labels: [__address__]
-    regex: '([^:]+):.*'
-    target_label: host
-    replacement: '${1}'
+- job_name: 'node_exporter'
+  relabel_configs:
+    - source_labels: [__address__]
+      regex: '([^:]+):.*'
+      target_label: host
+      replacement: '${1}'
+  static_configs:
+    - targets:
+      - 'nouvelle-machine.fr.airbusds.corp:9100'
+      # ... reste de la liste inchangee
+
+- job_name: 'process_exporter'
+  relabel_configs:
+    - source_labels: [__address__]
+      regex: '([^:]+):.*'
+      target_label: host
+      replacement: '${1}'
+  static_configs:
+    - targets:
+      - 'nouvelle-machine.fr.airbusds.corp:9256'
+      # ... reste de la liste inchangee
 ```
 
----
+```bash
+sudo promtool check config /etc/prometheus/prometheus.yml
+sudo systemctl reload prometheus
+```
 
-## État des demandes — Dashboards
+## 6. Vérification finale
 
-### ✅ Fait
-- Dashboard global : bug de redirection vers le mauvais serveur (retombait sur "arz") — **résolu** via le label `host` uniforme
-- Colonne "Etat" renommée **"Usage"**, avec mapping texte : Unused (0-10) / Normal (10-60) / High (60-85) / Critical (85-100)
-- Compteur de cibles Prometheus UP / configurées (panel dédié en haut du dashboard global)
-- Colonne adresse IP sur le dashboard détaillé (`node_network_address_info`, déjà disponible via le flag `--collector.netdev.address-info`, sans script supplémentaire)
-- BogoMips exporté et affiché (moyenne par cœur)
-- Bouton de redirection vers la vue FPGA depuis le dashboard global
-- Vue FPGA : CPU et RAM par utilisateur en graphique temporel empilé, RAM en valeur absolue (pas en %)
-- Vue FPGA : tableau stockage avec sélection de disques, présélectionné sur `/scratch`, `/tmp`, `/asic_tmp`
-- Vue FPGA : tableau licences FlexLM (Vivado/Xilinx, QuestaSim/Siemens, mentor_div) avec Used/Total et détail par famille
-- FlexLM : licences à 0 masquées sur le tableau détail vendeur
-- FlexLM : date d'expiration en date réelle (plus en "5.55 years"), "No expiration" pour les licences permanentes
-- Filesystems `/scratch`, `/tmp`, `/asic_tmp` toujours visibles quel que soit leur type
-- Dashboards compactés pour tenir sur un écran laptop (hauteur et largeur)
-- Dashboard global entièrement traduit en anglais
+```bash
+# Cote Prometheus - la machine doit apparaitre UP sur les deux jobs
+curl -s http://localhost:9090/api/v1/targets | grep -A2 "nouvelle-machine"
 
-### 🔧 En cours / partiellement fait
-- Traduction anglaise des dashboards **détaillé** et **FPGA** — pas encore fait, uniquement le global
-- Masquer le bandeau Partage/Export de Grafana — solution identifiée (rôle **Viewer** pour les utilisateurs lambda + URL `?kiosk` pour un écran d'affichage dédié), **pas encore appliqué** côté configuration des comptes Grafana
+# Le label host est bien present et propre (sans port)
+curl -s 'http://localhost:9090/api/v1/query?query=node_uname_info{host="nouvelle-machine.fr.airbusds.corp"}'
+```
+Ou visuellement : http://10.94.192.177:9090/targets
 
-### ❓ En attente de décision / precision
-- Scrape FlexLM toutes les 5 secondes : risque de surcharge des serveurs de licence identifié, à confirmer si c'est un vrai besoin métier (traçabilité d'usages très courts) avant de changer l'intervalle
-- Colonnes "Overused / Unused servers" : nécessite de définir des seuils précis (ex: >80% CPU pendant combien de temps = overused ?)
-- Quotas utilisateur sur `/projets` : source de données à identifier (pas encore une métrique existante)
-- Limite max de mémoire par machine : à définir (alerte ? simple affichage de la limite théorique ?)
-
-### 🏗️ Gros chantiers, pas commencés
-- Onglet dédié **Health** (Security : uptime/last reboot ; Performance : CPU/Mem/Disk/Network)
-- Onglets dédiés **Top CPU / Top Memory**
-- Onglet **issues communes** (process actifs depuis >XX jours, qui sature quoi et depuis combien de temps)
-- Regroupement des graphiques CPU en 3 vues (Global / Par CPU / Par User) — probablement via des lignes repliables Grafana, à maquetter
-- Collecte de logs applicatifs / event viewer — **architecture différente** requise (type Loki + Promtail), projet à part entière
-- Récupération des données FlexLM des serveurs de licence **internationaux** (pas seulement locaux) — faisabilité à étudier
-- Détection des rejets de licence FlexLM à 100% d'usage — à vérifier si l'info existe dans les métriques `flexlm_exporter` ou seulement dans les logs FlexLM natifs
-- Dashboard personnalisé "Concepteur Carte" — pas encore défini, contenu à préciser
-- Nombre d'utilisateurs par machine + liste — à construire (proche de ce qu'on a déjà sur le detail processus)
-
-### 🐛 Bug non résolu
-- Affichage d'une seule licence via le bouton en haut de l'écran (dashboard FlexLM) — signalé une fois, non reproduit depuis, à re-tester et documenter précisément si ça revient
-
----
-
-## Sources / documentation externe
-- https://grafana.com/docs/grafana/latest/fundamentals/getting-started/first-dashboards/get-started-grafana-prometheus/
-- https://blog.zwindler.fr/2019/11/12/tutoriel-installer-prometheus-grafana-sans-docker/
-- https://github.com/prometheus/node_exporter/blob/master/examples/systemd/README.md
+Une fois "UP" sur les deux jobs, la machine apparaît automatiquement sur les dashboards
+Grafana (dashboard global, dashboard détaillé via le menu déroulant serveur) — aucune
+action supplémentaire côté Grafana n'est nécessaire.
