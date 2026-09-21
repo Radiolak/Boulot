@@ -1,13 +1,25 @@
-[admin_BRG@smfidf5114 ~]$ getenforce
-Permissive
-[admin_BRG@smfidf5114 ~]$ sudo journalctl -u node_exporter -n 30 --no-pager | grep -i textfile
-[sudo] password for admin_BRG:
-Aug 25 09:19:38 smfidf5114 node_exporter[1818222]: time=2026-08-25T09:19:38.609+02:00 level=INFO source=node_exporter.go:142 msg=textfile
-[admin_BRG@smfidf5114 ~]$ ls -ld /var/lib/node_exporter /var/lib/node_exporter/textfile_collector
-drwxr-xr-x. 3 root          root          32 Aug 28 08:47 /var/lib/node_exporter
-drwxr-xr-x. 2 node_exporter node_exporter 60 Sep 15 11:45 /var/lib/node_exporter/textfile_collector
-[admin_BRG@smfidf5114 ~]$ ls -l /var/lib/node_exporter/textfile_collector/cpu_bogomips.prom
--rw-r--r--. 1 node_exporter node_exporter 276 Sep 15 11:45 /var/lib/node_exporter/textfile_collector/cpu_bogomips.prom
-[admin_BRG@smfidf5114 ~]$ ls -Zd /var/lib/node_exporter/textfile_collector 2>/dev/null
-unconfined_u:object_r:var_lib_t:s0 /var/lib/node_exporter/textfile_collector
-[admin_BRG@smfidf5114 ~]$
+
+Page blogale serveurs:
+
+
+ Page détail serveurs: 
+
+Pour tous les grafiques faire en sorte de retirer TOUS les comptes de roles et ne laisser dans les graf et tableaux UNIQUEMENT les utilisateurs, les utilisateurs utilisés seront les mêmes que deux présents dans le tableau Détail process by user.
+
+ 
+Pour le panel: 
+
+
+Storage - History by disk
+
+On devrait voir par défaut les memes disques qu'on à mis par défaut dans la page FPFA donc /tmp /asic_tmp et /scratch sélectionnées par défaut
+
+Panel Storage - Disks
+
+Il faudrait quon rajoute une colone %utilisé du disque par ligne
+
+Panel 
+CPU usage by user
+On doit renommer le 
+{instance="burga.fr.airbusds.corp:9100"}
+En FREE 
