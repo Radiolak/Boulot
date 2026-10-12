@@ -1,25 +1,13 @@
+Mise en place sur le serveur Prometheus :
 
-Page blogale serveurs:
+	1.	Copie alert_rules.yml dans /etc/prometheus/.
+	2.	Dans prometheus.yml, remplace le bloc rule_files commenté par :
 
-
- Page détail serveurs: 
-
-Pour tous les grafiques faire en sorte de retirer TOUS les comptes de roles et ne laisser dans les graf et tableaux UNIQUEMENT les utilisateurs, les utilisateurs utilisés seront les mêmes que deux présents dans le tableau Détail process by user.
-
- 
-Pour le panel: 
+rule_files:
+  - "/etc/prometheus/alert_rules.yml"
 
 
-Storage - History by disk
-
-On devrait voir par défaut les memes disques qu'on à mis par défaut dans la page FPFA donc /tmp /asic_tmp et /scratch sélectionnées par défaut
-
-Panel Storage - Disks
-
-Il faudrait quon rajoute une colone %utilisé du disque par ligne
-
-Panel 
-CPU usage by user
-On doit renommer le 
-{instance="burga.fr.airbusds.corp:9100"}
-En FREE 
+	3.	Valide la config : promtool check config /etc/prometheus/prometheus.yml
+	4.	Recharge Prometheus : sudo systemctl reload prometheus. Si le reload n'est pas pris en compte, fais un restart.
+	5.	Vérifie dans Prometheus, page Alerts (:9090/alerts), que les 3 règles apparaissent.
+	6.	Dans Grafana, supprime d'abord l'ancien dashboard s'il existe, puis importe le JSON.
