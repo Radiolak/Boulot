@@ -1,0 +1,157 @@
+{
+  "annotations": {"list": [{"builtIn": 1, "datasource": {"type": "datasource", "uid": "grafana"}, "enable": true, "hide": true, "iconColor": "rgba(0, 211, 255, 1)", "name": "Annotations & Alerts", "type": "dashboard"}]},
+  "description": "Alerts overview - firing alerts, history, servers DOWN and usage above 80%",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 1}]}}, "overrides": []},
+      "gridPos": {"h": 4, "w": 5, "x": 0, "y": 0},
+      "id": 1,
+      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value"},
+      "targets": [{"datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"}, "expr": "count(ALERTS{alertstate=\"firing\"}) or vector(0)", "instant": true, "legendFormat": "Firing alerts", "refId": "A"}],
+      "title": "Firing alerts",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 1}]}}, "overrides": []},
+      "gridPos": {"h": 4, "w": 5, "x": 5, "y": 0},
+      "id": 2,
+      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value"},
+      "targets": [{"datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"}, "expr": "count(ALERTS{alertstate=\"firing\",severity=\"critical\"}) or vector(0)", "instant": true, "legendFormat": "Critical", "refId": "A"}],
+      "title": "Critical",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "orange", "value": 1}]}}, "overrides": []},
+      "gridPos": {"h": 4, "w": 5, "x": 10, "y": 0},
+      "id": 3,
+      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value"},
+      "targets": [{"datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"}, "expr": "count(ALERTS{alertstate=\"firing\",severity=\"warning\"}) or vector(0)", "instant": true, "legendFormat": "Warning", "refId": "A"}],
+      "title": "Warning",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 1}]}}, "overrides": []},
+      "gridPos": {"h": 4, "w": 4, "x": 15, "y": 0},
+      "id": 4,
+      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value"},
+      "targets": [{"datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"}, "expr": "count(up{job=\"node_exporter\"} == 0) or vector(0)", "instant": true, "legendFormat": "Servers DOWN", "refId": "A"}],
+      "title": "Servers DOWN",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"color": {"mode": "fixed", "fixedColor": "blue"}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "blue", "value": null}]}}, "overrides": []},
+      "gridPos": {"h": 4, "w": 4, "x": 19, "y": 0},
+      "id": 5,
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name"},
+      "targets": [
+        {"datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"}, "expr": "count(up{job=\"node_exporter\"} == 1)", "instant": true, "legendFormat": "Online", "refId": "A"},
+        {"datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"}, "expr": "count(up{job=\"node_exporter\"})", "instant": true, "legendFormat": "Total", "refId": "B"}
+      ],
+      "title": "Servers",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {
+        "defaults": {"color": {"mode": "thresholds"}, "custom": {"align": "auto", "cellOptions": {"type": "auto"}, "filterable": true, "inspect": false}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}},
+        "overrides": [
+          {"matcher": {"id": "byName", "options": "Severity"}, "properties": [
+            {"id": "custom.cellOptions", "value": {"type": "color-background"}},
+            {"id": "custom.align", "value": "center"},
+            {"id": "mappings", "value": [{"type": "value", "options": {"critical": {"text": "CRITICAL", "color": "red"}, "warning": {"text": "WARNING", "color": "orange"}}}]}
+          ]},
+          {"matcher": {"id": "byName", "options": "Firing since"}, "properties": [{"id": "unit", "value": "dateTimeAsSystem"}]}
+        ]
+      },
+      "gridPos": {"h": 9, "w": 23, "x": 0, "y": 4},
+      "id": 6,
+      "options": {"cellHeight": "sm", "enablePagination": false, "showHeader": true, "sortBy": [{"desc": false, "displayName": "Severity"}]},
+      "targets": [{"datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"}, "expr": "ALERTS_FOR_STATE * 1000 and on(alertname, host) ALERTS{alertstate=\"firing\"}", "format": "table", "instant": true, "legendFormat": "", "refId": "A"}],
+      "title": "Currently firing alerts",
+      "transformations": [
+        {"id": "organize", "options": {
+          "excludeByName": {"Time": true, "__name__": true, "job": true, "instance": true, "alertstate": true},
+          "indexByName": {"severity": 0, "alertname": 1, "host": 2, "Value": 3},
+          "renameByName": {"severity": "Severity", "alertname": "Alert", "host": "Server", "Value": "Firing since"}
+        }}
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {
+        "defaults": {"color": {"mode": "thresholds"}, "custom": {"align": "auto", "cellOptions": {"type": "auto"}, "filterable": true, "inspect": false}, "decimals": 1, "mappings": [], "unit": "percent", "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "orange", "value": 60}, {"color": "red", "value": 80}]}},
+        "overrides": [
+          {"matcher": {"id": "byName", "options": "CPU %"}, "properties": [{"id": "custom.cellOptions", "value": {"type": "color-background"}}]},
+          {"matcher": {"id": "byName", "options": "RAM %"}, "properties": [{"id": "custom.cellOptions", "value": {"type": "color-background"}}]},
+          {"matcher": {"id": "byName", "options": "Server"}, "properties": [{"id": "unit", "value": "none"}]}
+        ]
+      },
+      "gridPos": {"h": 12, "w": 23, "x": 0, "y": 13},
+      "id": 7,
+      "options": {"cellHeight": "sm", "enablePagination": false, "showHeader": true, "sortBy": [{"desc": true, "displayName": "CPU %"}]},
+      "targets": [
+        {"datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"}, "expr": "100 - (avg by(host) (rate(node_cpu_seconds_total{job=\"node_exporter\", mode=\"idle\"}[5m])) * 100)", "format": "table", "instant": true, "legendFormat": "", "refId": "A"},
+        {"datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"}, "expr": "100 * (1 - sum by(host) (node_memory_MemAvailable_bytes{job=\"node_exporter\"}) / sum by(host) (node_memory_MemTotal_bytes{job=\"node_exporter\"}))", "format": "table", "instant": true, "legendFormat": "", "refId": "B"}
+      ],
+      "title": "Usage per server (red above 80%)",
+      "transformations": [
+        {"id": "joinByField", "options": {"byField": "host", "mode": "outer"}},
+        {"id": "organize", "options": {
+          "excludeByName": {"Time": true, "Time 1": true, "Time 2": true},
+          "indexByName": {"host": 0, "Value #A": 1, "Value #B": 2},
+          "renameByName": {"host": "Server", "Value #A": "CPU %", "Value #B": "RAM %"}
+        }}
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {
+        "defaults": {"color": {"mode": "thresholds"}, "custom": {"fillOpacity": 80, "lineWidth": 0}, "mappings": [{"type": "value", "options": {"1": {"text": "FIRING", "color": "red"}}}], "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}]}},
+        "overrides": []
+      },
+      "gridPos": {"h": 12, "w": 23, "x": 0, "y": 25},
+      "id": 8,
+      "options": {"alignValue": "left", "legend": {"displayMode": "list", "placement": "bottom", "showLegend": false}, "mergeValues": true, "rowHeight": 0.8, "showValue": "never", "tooltip": {"mode": "single", "sort": "none"}},
+      "targets": [{"datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"}, "expr": "ALERTS{alertstate=\"firing\"}", "interval": "1m", "legendFormat": "{{alertname}} - {{host}}", "range": true, "refId": "A"}],
+      "title": "Alert history (when each alert was firing)",
+      "type": "state-timeline"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "custom": {"drawStyle": "bars", "fillOpacity": 60, "lineWidth": 1, "stacking": {"mode": "normal", "group": "A"}}, "decimals": 0, "mappings": [], "min": 0, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}},
+        "overrides": [
+          {"matcher": {"id": "byName", "options": "critical"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "red"}}]},
+          {"matcher": {"id": "byName", "options": "warning"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "orange"}}]}
+        ]},
+      "gridPos": {"h": 8, "w": 23, "x": 0, "y": 37},
+      "id": 9,
+      "options": {"legend": {"displayMode": "list", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [{"datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"}, "expr": "count by(severity) (ALERTS{alertstate=\"firing\"})", "interval": "1m", "legendFormat": "{{severity}}", "range": true, "refId": "A"}],
+      "title": "Number of firing alerts over time",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "30s",
+  "schemaVersion": 42,
+  "tags": ["supervision", "airbus", "alerts"],
+  "templating": {"list": [{"current": {}, "includeAll": false, "name": "DS_PROMETHEUS", "options": [], "query": "prometheus", "refresh": 1, "regex": "", "type": "datasource"}]},
+  "time": {"from": "now-24h", "to": "now"},
+  "timepicker": {},
+  "timezone": "",
+  "title": "Supervision - Alerts",
+  "uid": "alerts-overview-dash",
+  "version": 1
+}
