@@ -1,13 +1,876 @@
-Mise en place sur le serveur Prometheus :
+Régler sur le dashboard gloval dans "Server Metrics Overview" la colone Network I/O là on est dans le rouge d-s qu'on utilise le réseau, faudrait que ça soit en absolu selon la puissance max théorique parce que la ça interpeller mes utilisateurs, et la dès le second point ça passe rouge faudrait un dégradé, vert, bleu, jaune rouge, avec différents seuils d'ugase de la puissance théorique max, trouve un moyen de faire ça correctement.
 
-	1.	Copie alert_rules.yml dans /etc/prometheus/.
-	2.	Dans prometheus.yml, remplace le bloc rule_files commenté par :
-
-rule_files:
-  - "/etc/prometheus/alert_rules.yml"
+Dans le tableau "Server Statuts" al colone Uptime, elle est intéressante mais pas parlante car on à des plan de redemmarrage des machines, ducoup ca serait bien qu'on puisse savoir uptime / uptime au prochain reboot exemple ma machine est allumée depuis 461h elle vas redemmarer quand ele sera à 940h voici mon tableau de plan de maintenance: 
 
 
-	3.	Valide la config : promtool check config /etc/prometheus/prometheus.yml
-	4.	Recharge Prometheus : sudo systemctl reload prometheus. Si le reload n'est pas pris en compte, fais un restart.
-	5.	Vérifie dans Prometheus, page Alerts (:9090/alerts), que les 3 règles apparaissent.
-	6.	Dans Grafana, supprime d'abord l'ancien dashboard s'il existe, puis importe le JSON.
+Mercredi - 6h du matin			Samedi - 6h du matin		
+Nom serveur FRMAIN	Nom serveur Alias	Rôle	Nom serveur FRMAIN	Nom serveur Alias	 Rôle
+SMFIDF5122	celeno.fr.airbusds.corp	Calcul	SMFIDF5125	coxa.fr.airbusds.corp	Calcul
+SMFIDF5114	baguio.fr.airbusds.corp	Calcul	SMFIDF5110	burle.fr.airbusds.corp	Calcul
+SMFIDF5115	arz.fr.airbusds.corp	Calcul	SMFIDF5119	wallis.fr.airbusds.corp	Calcul
+SMFIDF5108	zembra.fr.airbusds.corp	Calcul	SMFIDF5105	yuma.fr.airbusds.corp	Calcul
+SMFIDF5106	york.fr.airbusds.corp	Calcul	SMFIDF5102	phi.fr.airbusds.corp	Licences
+SMFIDF5112	binic.fr.airbusds.corp	Calcul	SMFIDF5126	chara.fr.airbusds.corp	Calcul
+					
+
+
+
+
+4ème semaine du mois
+Mercredi - 6h du matin			Samedi - 6h du matin		
+SMFIDF5123	cursa.fr.airbusds.corp	Calcul	SMFIDF5124	calx.fr.airbusds.corp	Calcul
+SMFIDF5109	bolon.fr.airbusds.corp	Calcul	SMFIDF5111	buran.fr.airbusds.corp	Calcul
+SMFIDF5116	taiwan.fr.airbusds.corp	Calcul	SMFIDF5118	vanilla.fr.airbusds.corp	Rebond X11
+SMFIDF5117	vanavana.fr.airbusds.corp	Rebond X11	SMFIDF5107	zealand.fr.airbusds.corp	Calcul
+SMFIDF5113	burga.fr.airbusds.corp	Calcul	SMFIDF5104	psi.fr.airbusds.corp	Licences / iCDB
+SMFIDF5103	khi.fr.airbusds.corp	Licences			
+
+Voit ce qu'on peut en faire
+
+Voici le json complet de ce dashboard: 
+
+
+
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Vue globale des serveurs - Etat OK/HIGH/CRITICAL",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 20,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 20
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 23,
+        "x": 0,
+        "y": 0
+      },
+      "id": 20,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.11",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum(up{job=\"node_exporter\"})",
+          "instant": true,
+          "legendFormat": "Servers UP",
+          "range": false,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "count(up{job=\"node_exporter\"})",
+          "instant": true,
+          "legendFormat": "Total configured",
+          "range": false,
+          "refId": "B"
+        }
+      ],
+      "title": "Prometheus Targets Status",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU Usage"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "gauge"
+                }
+              },
+              {
+                "id": "max",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Memory Usage"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "gauge"
+                }
+              },
+              {
+                "id": "max",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Disk Usage"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "gauge"
+                }
+              },
+              {
+                "id": "max",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Network I/O"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "Bps"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "lcd",
+                  "type": "gauge"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "host"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": false,
+                    "title": "Voir le detail",
+                    "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.host}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 23,
+        "x": 0,
+        "y": 5
+      },
+      "id": 3,
+      "options": {
+        "cellHeight": "sm",
+        "enablePagination": false,
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "CPU Usage"
+          }
+        ]
+      },
+      "pluginVersion": "12.3.11",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "100 - (avg by(host) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "__auto",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "100 * (1 - ((node_memory_MemAvailable_bytes or node_memory_Buffers_bytes + node_memory_Cached_bytes + node_memory_MemFree_bytes) / node_memory_MemTotal_bytes))",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "100 - avg by(host) (\n  (node_filesystem_avail_bytes{fstype=~\"ext4|xfs|btrfs\"} * 100) / node_filesystem_size_bytes{fstype=~\"ext4|xfs|btrfs\"}\n)",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum by(host) (rate(node_network_receive_bytes_total[5m]) + rate(node_network_transmit_bytes_total[5m]))",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "D"
+        }
+      ],
+      "title": "Server Metrics Overview",
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "host",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Time 1": true,
+              "Time 2": true,
+              "Time 3": true,
+              "__name__": true,
+              "device": true,
+              "fstype": true,
+              "host": false,
+              "instance": true,
+              "instance 1": true,
+              "instance 2": true,
+              "instance 3": true,
+              "job": true,
+              "job 1": true,
+              "job 2": true,
+              "job 3": true,
+              "mountpoint": false
+            },
+            "includeByName": {},
+            "indexByName": {
+              "Time 1": 6,
+              "Time 2": 7,
+              "Time 3": 9,
+              "Time 4": 10,
+              "Value #A": 2,
+              "Value #B": 3,
+              "Value #C": 4,
+              "Value #D": 5,
+              "host": 0,
+              "instance": 1,
+              "job": 8
+            },
+            "renameByName": {
+              "Value #A": "CPU Usage",
+              "Value #B": "Memory Usage",
+              "Value #C": "Disk Usage",
+              "Value #D": "Network I/O",
+              "mountpoint": ""
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Usage"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.width",
+                "value": 125
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "from": 80.01,
+                      "result": {
+                        "color": "red",
+                        "index": 0,
+                        "text": "OverUsed"
+                      },
+                      "to": 100
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 60.01,
+                      "result": {
+                        "color": "orange",
+                        "index": 1,
+                        "text": "High"
+                      },
+                      "to": 80
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 30.01,
+                      "result": {
+                        "color": "yellow",
+                        "index": 2,
+                        "text": "Medium"
+                      },
+                      "to": 60
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 10.01,
+                      "result": {
+                        "color": "green",
+                        "index": 3,
+                        "text": "Low"
+                      },
+                      "to": 30
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 0,
+                      "result": {
+                        "color": "blue",
+                        "index": 4,
+                        "text": "Unused"
+                      },
+                      "to": 10
+                    },
+                    "type": "range"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "name"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 238
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "os_complet"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 276
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Server"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 220
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "OS"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 309
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Uptime (h)"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 111
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Alias"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": false,
+                    "title": "Voir le detail",
+                    "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.fqdn}"
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 180
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Hostname"
+            },
+            "properties": []
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "FPGA View"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "match": "true",
+                      "result": {
+                        "text": "[FPGA View]"
+                      }
+                    },
+                    "type": "special"
+                  },
+                  {
+                    "options": {
+                      "1": {
+                        "text": "[FPGA View]"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": false,
+                    "title": "FPGA View",
+                    "url": "/d/fpga-vue-utilisateur/vue-fpga-utilisateur?var-server=${__data.fields.fqdn}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 23,
+        "x": 0,
+        "y": 13
+      },
+      "id": 2,
+      "options": {
+        "cellHeight": "sm",
+        "enablePagination": false,
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "CPU Count"
+          }
+        ]
+      },
+      "pluginVersion": "12.3.11",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "max by(host) (\n  100 - (avg by(host) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)\nor\n  100 * (1 - ((node_memory_MemAvailable_bytes or node_memory_Buffers_bytes + node_memory_Cached_bytes + node_memory_MemFree_bytes) / node_memory_MemTotal_bytes))\nor\n  (time() - node_boot_time_seconds < 300) * 100\n)",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "__auto",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "group by(host, OS) (\n  label_join(node_uname_info * on(instance, host) group_left(name, version) node_os_info, \"OS\", \" \", \"name\", \"version\")\n)",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "(time() - node_boot_time_seconds) / 3600",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "count by(host) (node_cpu_seconds_total{mode=\"idle\"})",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "label_replace(up{job=\"node_exporter\"}, \"alias\", \"$1\", \"instance\", \"([^.:]+).*\")",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "label_replace(up{job=\"node_exporter\"}, \"fqdn\", \"$1\", \"instance\", \"([^:]+).*\")",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "group by(host) (node_uname_info)",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "H"
+        }
+      ],
+      "title": "Servers Status",
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "host",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Time 1": true,
+              "Time 2": true,
+              "Value #B": true,
+              "Value #E": true,
+              "Value #F": true,
+              "__name__": true,
+              "__name__ 1": true,
+              "domainname": true,
+              "domainname 1": true,
+              "fqdn": false,
+              "host": true,
+              "instance": true,
+              "job": true,
+              "job 1": true,
+              "machine": true,
+              "machine 1": true,
+              "release": true,
+              "release 1": true,
+              "serverlink": true,
+              "serverlink 1": true,
+              "sysname": true,
+              "sysname 1": true,
+              "version": true,
+              "version 1": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "OS": 2,
+              "Value #A": 1,
+              "Value #C": 4,
+              "Value #D": 5,
+              "Value #H": 7,
+              "alias": 0,
+              "fqdn": 6,
+              "nodename": 3
+            },
+            "renameByName": {
+              "Value #A": "Usage",
+              "Value #C": "Uptime (h)",
+              "Value #D": "CPU Count",
+              "Value #H": "FPGA View",
+              "alias": "Alias",
+              "fqdn": "FQDN",
+              "nodename": "Hostname"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    }
+  ],
+  "preload": false,
+  "refresh": "30s",
+  "schemaVersion": 42,
+  "tags": [
+    "supervision",
+    "airbus",
+    "node-exporter"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "prometheus",
+          "value": "dfvnqurhin56oa"
+        },
+        "includeAll": false,
+        "name": "DS_PROMETHEUS",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "CAO Compute - Global Overview",
+  "uid": "global-overview-dash",
+  "version": 27
+}
