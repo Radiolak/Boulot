@@ -1,0 +1,26 @@
+groups:
+  - name: server-alerts
+    rules:
+      - alert: ServerDown
+        expr: up{job="node_exporter"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Server {{ $labels.host }} is DOWN"
+
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(host) (rate(node_cpu_seconds_total{job="node_exporter", mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU usage above 80% on {{ $labels.host }}"
+
+      - alert: HighMemoryUsage
+        expr: 100 * (1 - node_memory_MemAvailable_bytes{job="node_exporter"} / node_memory_MemTotal_bytes{job="node_exporter"}) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Memory usage above 80% on {{ $labels.host }}"
