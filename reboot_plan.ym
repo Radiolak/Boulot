@@ -1,0 +1,123 @@
+# Plan de redemarrage des serveurs - regles Prometheus (calcul de la prochaine date)
+# Mercredi / Samedi a 6h (heure de Paris).
+#   weekday : 0=dimanche ... 3=mercredi ... 6=samedi
+#   week    : Nieme mercredi / samedi du mois (1 a 4)
+groups:
+  - name: reboot-plan
+    rules:
+      - record: reboot_plan_weekday
+        expr: |
+          label_replace(label_replace(vector(3), "host", "celeno.fr.airbusds.corp", "", ""), "grp", "A", "", "") or
+          label_replace(label_replace(vector(3), "host", "baguio.fr.airbusds.corp", "", ""), "grp", "A", "", "") or
+          label_replace(label_replace(vector(3), "host", "arz.fr.airbusds.corp", "", ""), "grp", "A", "", "") or
+          label_replace(label_replace(vector(3), "host", "zembra.fr.airbusds.corp", "", ""), "grp", "A", "", "") or
+          label_replace(label_replace(vector(3), "host", "york.fr.airbusds.corp", "", ""), "grp", "A", "", "") or
+          label_replace(label_replace(vector(3), "host", "binic.fr.airbusds.corp", "", ""), "grp", "A", "", "") or
+          label_replace(label_replace(vector(6), "host", "coxa.fr.airbusds.corp", "", ""), "grp", "A", "", "") or
+          label_replace(label_replace(vector(6), "host", "burle.fr.airbusds.corp", "", ""), "grp", "A", "", "") or
+          label_replace(label_replace(vector(6), "host", "wallis.fr.airbusds.corp", "", ""), "grp", "A", "", "") or
+          label_replace(label_replace(vector(6), "host", "yuma.fr.airbusds.corp", "", ""), "grp", "A", "", "") or
+          label_replace(label_replace(vector(6), "host", "phi.fr.airbusds.corp", "", ""), "grp", "A", "", "") or
+          label_replace(label_replace(vector(6), "host", "chara.fr.airbusds.corp", "", ""), "grp", "A", "", "") or
+          label_replace(label_replace(vector(3), "host", "cursa.fr.airbusds.corp", "", ""), "grp", "B", "", "") or
+          label_replace(label_replace(vector(3), "host", "bolon.fr.airbusds.corp", "", ""), "grp", "B", "", "") or
+          label_replace(label_replace(vector(3), "host", "taiwan.fr.airbusds.corp", "", ""), "grp", "B", "", "") or
+          label_replace(label_replace(vector(3), "host", "vanavana.fr.airbusds.corp", "", ""), "grp", "B", "", "") or
+          label_replace(label_replace(vector(3), "host", "burga.fr.airbusds.corp", "", ""), "grp", "B", "", "") or
+          label_replace(label_replace(vector(3), "host", "khi.fr.airbusds.corp", "", ""), "grp", "B", "", "") or
+          label_replace(label_replace(vector(6), "host", "calx.fr.airbusds.corp", "", ""), "grp", "B", "", "") or
+          label_replace(label_replace(vector(6), "host", "buran.fr.airbusds.corp", "", ""), "grp", "B", "", "") or
+          label_replace(label_replace(vector(6), "host", "vanilla.fr.airbusds.corp", "", ""), "grp", "B", "", "") or
+          label_replace(label_replace(vector(6), "host", "zealand.fr.airbusds.corp", "", ""), "grp", "B", "", "") or
+          label_replace(label_replace(vector(6), "host", "psi.fr.airbusds.corp", "", ""), "grp", "B", "", "")
+      # >>> SEUL ENDROIT A MODIFIER : semaine du mois du groupe A (1er tableau) et du groupe B (4eme semaine) <<<
+      - record: reboot_plan_week
+        expr: (reboot_plan_weekday{grp="A"} * 0 + 2) or (reboot_plan_weekday{grp="B"} * 0 + 4)
+      - record: reboot_day_this_month
+        expr: (time() - (scalar(day_of_month(vector(time()))) - 1) * 86400 - (time() % 86400)) + (((reboot_plan_weekday - scalar(day_of_week(vector((time() - (scalar(day_of_month(vector(time()))) - 1) * 86400 - (time() % 86400))))) + 7) % 7) + 7 * (reboot_plan_week - 1)) * 86400
+      - record: reboot_day_next_month
+        expr: ((time() - (scalar(day_of_month(vector(time()))) - 1) * 86400 - (time() % 86400)) + scalar(days_in_month(vector((time() - (scalar(day_of_month(vector(time()))) - 1) * 86400 - (time() % 86400))))) * 86400) + (((reboot_plan_weekday - scalar(day_of_week(vector(((time() - (scalar(day_of_month(vector(time()))) - 1) * 86400 - (time() % 86400)) + scalar(days_in_month(vector((time() - (scalar(day_of_month(vector(time()))) - 1) * 86400 - (time() % 86400))))) * 86400)))) + 7) % 7) + 7 * (reboot_plan_week - 1)) * 86400
+      - record: reboot_at_this_month
+        expr: reboot_day_this_month + 21600 - 3600 * (1 + ((month(reboot_day_this_month) >= bool 4) * (month(reboot_day_this_month) <= bool 9) + (month(reboot_day_this_month) == bool 3) * ((day_of_month(reboot_day_this_month) - day_of_week(reboot_day_this_month)) >= bool 25) + (month(reboot_day_this_month) == bool 10) * ((day_of_month(reboot_day_this_month) - day_of_week(reboot_day_this_month)) < bool 25)))
+      - record: reboot_at_next_month
+        expr: reboot_day_next_month + 21600 - 3600 * (1 + ((month(reboot_day_next_month) >= bool 4) * (month(reboot_day_next_month) <= bool 9) + (month(reboot_day_next_month) == bool 3) * ((day_of_month(reboot_day_next_month) - day_of_week(reboot_day_next_month)) >= bool 25) + (month(reboot_day_next_month) == bool 10) * ((day_of_month(reboot_day_next_month) - day_of_week(reboot_day_next_month)) < bool 25)))
+      - record: reboot_next_timestamp_seconds
+        expr: max by (host) ((reboot_at_this_month > time()) or (reboot_at_next_month unless (reboot_at_this_month > time())))
+      # Date en francais (ex : mercredi 14 octobre 2026) pour l'affichage Grafana
+      - record: reboot_next_date_fr
+        expr: |
+          label_join(
+          (((max by (host, jour) (
+            label_replace((reboot_plan_weekday == 3) ^ 0, "jour", "mercredi", "", "") or
+            label_replace((reboot_plan_weekday == 6) ^ 0, "jour", "samedi", "", "")
+          ))
+          * on(host) group_left(mois) (max by (host, mois) (
+            label_replace((month(reboot_next_timestamp_seconds) == 1) ^ 0, "mois", "janvier", "", "") or
+            label_replace((month(reboot_next_timestamp_seconds) == 2) ^ 0, "mois", "février", "", "") or
+            label_replace((month(reboot_next_timestamp_seconds) == 3) ^ 0, "mois", "mars", "", "") or
+            label_replace((month(reboot_next_timestamp_seconds) == 4) ^ 0, "mois", "avril", "", "") or
+            label_replace((month(reboot_next_timestamp_seconds) == 5) ^ 0, "mois", "mai", "", "") or
+            label_replace((month(reboot_next_timestamp_seconds) == 6) ^ 0, "mois", "juin", "", "") or
+            label_replace((month(reboot_next_timestamp_seconds) == 7) ^ 0, "mois", "juillet", "", "") or
+            label_replace((month(reboot_next_timestamp_seconds) == 8) ^ 0, "mois", "août", "", "") or
+            label_replace((month(reboot_next_timestamp_seconds) == 9) ^ 0, "mois", "septembre", "", "") or
+            label_replace((month(reboot_next_timestamp_seconds) == 10) ^ 0, "mois", "octobre", "", "") or
+            label_replace((month(reboot_next_timestamp_seconds) == 11) ^ 0, "mois", "novembre", "", "") or
+            label_replace((month(reboot_next_timestamp_seconds) == 12) ^ 0, "mois", "décembre", "", "")
+          )))
+          * on(host) group_left(jnum) (max by (host, jnum) (
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 1) ^ 0, "jnum", "1", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 2) ^ 0, "jnum", "2", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 3) ^ 0, "jnum", "3", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 4) ^ 0, "jnum", "4", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 5) ^ 0, "jnum", "5", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 6) ^ 0, "jnum", "6", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 7) ^ 0, "jnum", "7", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 8) ^ 0, "jnum", "8", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 9) ^ 0, "jnum", "9", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 10) ^ 0, "jnum", "10", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 11) ^ 0, "jnum", "11", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 12) ^ 0, "jnum", "12", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 13) ^ 0, "jnum", "13", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 14) ^ 0, "jnum", "14", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 15) ^ 0, "jnum", "15", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 16) ^ 0, "jnum", "16", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 17) ^ 0, "jnum", "17", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 18) ^ 0, "jnum", "18", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 19) ^ 0, "jnum", "19", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 20) ^ 0, "jnum", "20", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 21) ^ 0, "jnum", "21", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 22) ^ 0, "jnum", "22", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 23) ^ 0, "jnum", "23", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 24) ^ 0, "jnum", "24", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 25) ^ 0, "jnum", "25", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 26) ^ 0, "jnum", "26", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 27) ^ 0, "jnum", "27", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 28) ^ 0, "jnum", "28", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 29) ^ 0, "jnum", "29", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 30) ^ 0, "jnum", "30", "", "") or
+            label_replace((day_of_month(reboot_next_timestamp_seconds) == 31) ^ 0, "jnum", "31", "", "")
+          )))
+          * on(host) group_left(annee) (max by (host, annee) (
+            label_replace((year(reboot_next_timestamp_seconds) == 2026) ^ 0, "annee", "2026", "", "") or
+            label_replace((year(reboot_next_timestamp_seconds) == 2027) ^ 0, "annee", "2027", "", "") or
+            label_replace((year(reboot_next_timestamp_seconds) == 2028) ^ 0, "annee", "2028", "", "") or
+            label_replace((year(reboot_next_timestamp_seconds) == 2029) ^ 0, "annee", "2029", "", "") or
+            label_replace((year(reboot_next_timestamp_seconds) == 2030) ^ 0, "annee", "2030", "", "") or
+            label_replace((year(reboot_next_timestamp_seconds) == 2031) ^ 0, "annee", "2031", "", "") or
+            label_replace((year(reboot_next_timestamp_seconds) == 2032) ^ 0, "annee", "2032", "", "") or
+            label_replace((year(reboot_next_timestamp_seconds) == 2033) ^ 0, "annee", "2033", "", "") or
+            label_replace((year(reboot_next_timestamp_seconds) == 2034) ^ 0, "annee", "2034", "", "") or
+            label_replace((year(reboot_next_timestamp_seconds) == 2035) ^ 0, "annee", "2035", "", "") or
+            label_replace((year(reboot_next_timestamp_seconds) == 2036) ^ 0, "annee", "2036", "", "") or
+            label_replace((year(reboot_next_timestamp_seconds) == 2037) ^ 0, "annee", "2037", "", "") or
+            label_replace((year(reboot_next_timestamp_seconds) == 2038) ^ 0, "annee", "2038", "", "") or
+            label_replace((year(reboot_next_timestamp_seconds) == 2039) ^ 0, "annee", "2039", "", "") or
+            label_replace((year(reboot_next_timestamp_seconds) == 2040) ^ 0, "annee", "2040", "", "") or
+            label_replace((year(reboot_next_timestamp_seconds) == 2041) ^ 0, "annee", "2041", "", "") or
+            label_replace((year(reboot_next_timestamp_seconds) == 2042) ^ 0, "annee", "2042", "", "") or
+            label_replace((year(reboot_next_timestamp_seconds) == 2043) ^ 0, "annee", "2043", "", "") or
+            label_replace((year(reboot_next_timestamp_seconds) == 2044) ^ 0, "annee", "2044", "", "") or
+            label_replace((year(reboot_next_timestamp_seconds) == 2045) ^ 0, "annee", "2045", "", "")
+          )),
+          "date_fr", " ", "jour", "jnum", "mois", "annee")
