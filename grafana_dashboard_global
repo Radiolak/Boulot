@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 0,
+  "id": 20,
   "links": [],
   "panels": [
     {
@@ -215,18 +215,54 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Network I/O"
+              "options": "Network I/O (% of link)"
             },
             "properties": [
               {
                 "id": "unit",
-                "value": "Bps"
+                "value": "percent"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
               },
               {
                 "id": "custom.cellOptions",
                 "value": {
-                  "mode": "lcd",
+                  "mode": "gradient",
                   "type": "gauge"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "blue",
+                      "value": 20
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 50
+                    },
+                    {
+                      "color": "red",
+                      "value": 80
+                    }
+                  ]
                 }
               }
             ]
@@ -246,6 +282,40 @@
                     "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.host}"
                   }
                 ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Link speed"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bps"
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "auto"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "text",
+                      "value": null
+                    }
+                  ]
+                }
               }
             ]
           }
@@ -315,12 +385,25 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "sum by(host) (rate(node_network_receive_bytes_total[5m]) + rate(node_network_transmit_bytes_total[5m]))",
+          "expr": "100 * max by(host) (((rate(node_network_receive_bytes_total[5m]) > rate(node_network_transmit_bytes_total[5m])) or (rate(node_network_transmit_bytes_total[5m]) >= rate(node_network_receive_bytes_total[5m]))) / on(host, device) (node_network_speed_bytes > 0))",
           "format": "table",
           "instant": true,
           "interval": "",
           "legendFormat": "",
           "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "max by(host) (node_network_speed_bytes > 0) * 8",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "E"
         }
       ],
       "title": "Server Metrics Overview",
@@ -352,22 +435,36 @@
               "job 1": true,
               "job 2": true,
               "job 3": true,
-              "mountpoint": false
+              "mountpoint": false,
+              "Time 4": true,
+              "Time 5": true,
+              "instance 4": true,
+              "instance 5": true,
+              "job 4": true,
+              "job 5": true
             },
             "includeByName": {},
             "indexByName": {
-              "Value #A": 1,
-              "Value #B": 2,
-              "Value #C": 3,
-              "Value #D": 4,
-              "instance": 0
+              "Time 1": 6,
+              "Time 2": 7,
+              "Time 3": 9,
+              "Time 4": 10,
+              "Value #A": 2,
+              "Value #B": 3,
+              "Value #C": 4,
+              "Value #D": 5,
+              "host": 0,
+              "instance": 1,
+              "job": 8,
+              "Value #E": 6
             },
             "renameByName": {
               "Value #A": "CPU Usage",
               "Value #B": "Memory Usage",
               "Value #C": "Disk Usage",
-              "Value #D": "Network I/O",
-              "mountpoint": ""
+              "Value #D": "Network I/O (% of link)",
+              "mountpoint": "",
+              "Value #E": "Link speed"
             }
           }
         }
@@ -425,7 +522,7 @@
               },
               {
                 "id": "custom.width",
-                "value": 72
+                "value": 125
               },
               {
                 "id": "mappings",
@@ -436,7 +533,7 @@
                       "result": {
                         "color": "red",
                         "index": 0,
-                        "text": "Critical"
+                        "text": "OverUsed"
                       },
                       "to": 100
                     },
@@ -444,9 +541,9 @@
                   },
                   {
                     "options": {
-                      "from": 50.01,
+                      "from": 60.01,
                       "result": {
-                        "color": "yellow",
+                        "color": "orange",
                         "index": 1,
                         "text": "High"
                       },
@@ -456,13 +553,25 @@
                   },
                   {
                     "options": {
-                      "from": 20.01,
+                      "from": 30.01,
+                      "result": {
+                        "color": "yellow",
+                        "index": 2,
+                        "text": "Medium"
+                      },
+                      "to": 60
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 10.01,
                       "result": {
                         "color": "green",
-                        "index": 2,
-                        "text": "Normal"
+                        "index": 3,
+                        "text": "Low"
                       },
-                      "to": 50
+                      "to": 30
                     },
                     "type": "range"
                   },
@@ -471,10 +580,10 @@
                       "from": 0,
                       "result": {
                         "color": "blue",
-                        "index": 3,
+                        "index": 4,
                         "text": "Unused"
                       },
-                      "to": 20
+                      "to": 10
                     },
                     "type": "range"
                   }
@@ -538,7 +647,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 50
+                "value": 111
               }
             ]
           },
@@ -610,6 +719,61 @@
                 ]
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Uptime / at reboot"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.width",
+                "value": 170
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "regex",
+                    "options": {
+                      "pattern": "/^(\\d+) h \\/ (null|undefined|NaN)$/",
+                      "result": {
+                        "text": "$1 h"
+                      }
+                    }
+                  },
+                  {
+                    "type": "regex",
+                    "options": {
+                      "pattern": "/^(\\d+ h \\/ \\d+)$/",
+                      "result": {
+                        "text": "$1 h"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Next reboot"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 230
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              }
+            ]
           }
         ]
       },
@@ -627,7 +791,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "Usage"
+            "displayName": "CPU Count"
           }
         ]
       },
@@ -665,7 +829,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "(time() - node_boot_time_seconds) / 3600",
+          "expr": "round((time() - node_boot_time_seconds) / 3600)",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -721,6 +885,45 @@
           "instant": true,
           "legendFormat": "",
           "refId": "H"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "reboot_next_date_fr and on(host) up{job=\"node_exporter\"}",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "I"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "round((reboot_next_timestamp_seconds - on(host) max by(host) (node_boot_time_seconds)) / 3600)",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "J"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "label_replace(max by(host) (node_boot_time_seconds), \"sep\", \" h / \", \"\", \"\")",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "K"
         }
       ],
       "title": "Servers Status",
@@ -730,6 +933,56 @@
           "options": {
             "byField": "host",
             "mode": "outer"
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "Value #C",
+                "destinationType": "string"
+              }
+            ]
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "Value #J",
+                "destinationType": "string"
+              }
+            ]
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "mode": "binary",
+            "binary": {
+              "left": "Value #C",
+              "operator": "+",
+              "right": "sep"
+            },
+            "alias": "up_sep",
+            "replaceFields": false,
+            "timeSeries": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "mode": "binary",
+            "binary": {
+              "left": "up_sep",
+              "operator": "+",
+              "right": "Value #J"
+            },
+            "alias": "Uptime_plan",
+            "replaceFields": false,
+            "timeSeries": false
           }
         },
         {
@@ -760,27 +1013,48 @@
               "sysname": true,
               "sysname 1": true,
               "version": true,
-              "version 1": true
+              "version 1": true,
+              "Time 3": true,
+              "Time 4": true,
+              "Time 5": true,
+              "Time 6": true,
+              "Time 7": true,
+              "Time 8": true,
+              "Value #C": true,
+              "Value #J": true,
+              "Value #K": true,
+              "sep": true,
+              "up_sep": true,
+              "Time 9": true,
+              "Time 10": true,
+              "Value #I": true,
+              "jour": true,
+              "mois": true,
+              "jnum": true,
+              "annee": true
             },
             "includeByName": {},
             "indexByName": {
-              "OS": 2,
-              "Value #A": 1,
-              "Value #C": 4,
-              "Value #D": 5,
-              "Value #H": 7,
               "alias": 0,
-              "fqdn": 6,
-              "nodename": 3
+              "Value #A": 1,
+              "OS": 2,
+              "nodename": 3,
+              "date_fr": 5,
+              "Value #D": 6,
+              "fqdn": 7,
+              "Value #H": 8,
+              "Uptime_plan": 4
             },
             "renameByName": {
               "Value #A": "Usage",
-              "Value #C": "Uptime (h)",
               "Value #D": "CPU Count",
               "Value #H": "FPGA View",
               "alias": "Alias",
               "fqdn": "FQDN",
-              "nodename": "Hostname"
+              "nodename": "Hostname",
+              "Value #I": "Next reboot",
+              "date_fr": "Next reboot",
+              "Uptime_plan": "Uptime / at reboot"
             }
           }
         }
@@ -814,12 +1088,12 @@
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-7d",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "CAO Compute - Global Overview",
   "uid": "global-overview-dash",
-  "version": 12
+  "version": 29
 }
