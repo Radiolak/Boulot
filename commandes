@@ -1,10 +1,4 @@
-1.	Copie reboot_plan.yml dans /etc/prometheus/.
-	2.	Dans prometheus.yml, ajoute-le à la liste des règles :
-
-rule_files:
-  - "/etc/prometheus/alert_rules.yml"
-  - "/etc/prometheus/reboot_plan.yml"
-
-
-3.	Lance promtool check config /etc/prometheus/prometheus.yml, puis sudo systemctl reload prometheus.
-	4.	Dans Grafana, supprime l'ancien dashboard global puis importe dashboard-1-global-v18-next-reboot.json. Il part de ton JSON actuel (version 27). La colonne arrive juste après « Uptime (h) » et affiche par exemple « mercredi 28 octobre 2026 ».
+sudo sed -i 's/grp="A"} \* 0 + 2)/grp="A"} * 0 + 3)/' /etc/prometheus/reboot_plan.yml
+grep 'grp="A"} \* 0' /etc/prometheus/reboot_plan.yml
+promtool check rules /etc/prometheus/reboot_plan.yml
+sudo systemctl reload prometheus
