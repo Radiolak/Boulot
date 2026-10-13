@@ -339,7 +339,7 @@
                   {
                     "type": "regex",
                     "options": {
-                      "pattern": "/^(\\d+) h \\/ (null|undefined|NaN)$/",
+                      "pattern": "/^(\\d+) h \\/ (-1|null|undefined|NaN)$/",
                       "result": {
                         "text": "$1 h"
                       }
@@ -479,7 +479,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "round((reboot_next_timestamp_seconds - on(host) max by(host) (node_boot_time_seconds)) / 3600)",
+          "expr": "round((reboot_next_timestamp_seconds - on(host) max by(host) (node_boot_time_seconds)) / 3600) or on(host) (max by(host) (node_boot_time_seconds) * 0 - 1)",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -920,7 +920,7 @@
                   {
                     "type": "regex",
                     "options": {
-                      "pattern": "/^(\\d+) h \\/ (null|undefined|NaN)$/",
+                      "pattern": "/^(\\d+) h \\/ (-1|null|undefined|NaN)$/",
                       "result": {
                         "text": "$1 h"
                       }
@@ -1085,7 +1085,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "round((reboot_next_timestamp_seconds - on(host) max by(host) (node_boot_time_seconds)) / 3600)",
+          "expr": "round((reboot_next_timestamp_seconds - on(host) max by(host) (node_boot_time_seconds)) / 3600) or on(host) (max by(host) (node_boot_time_seconds) * 0 - 1)",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -1275,5 +1275,5 @@
   "timezone": "",
   "title": "CAO Compute - Global Overview",
   "uid": "global-overview-dash",
-  "version": 30
+  "version": 31
 }
