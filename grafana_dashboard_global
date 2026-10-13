@@ -318,6 +318,61 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Uptime / at reboot"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.width",
+                "value": 170
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "regex",
+                    "options": {
+                      "pattern": "/^(\\d+) h \\/ (null|undefined|NaN)$/",
+                      "result": {
+                        "text": "$1 h"
+                      }
+                    }
+                  },
+                  {
+                    "type": "regex",
+                    "options": {
+                      "pattern": "/^(\\d+ h \\/ \\d+)$/",
+                      "result": {
+                        "text": "$1 h"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Next reboot"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.width",
+                "value": 230
+              }
+            ]
           }
         ]
       },
@@ -404,6 +459,58 @@
           "interval": "",
           "legendFormat": "",
           "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "round((time() - node_boot_time_seconds) / 3600)",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "U"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "round((reboot_next_timestamp_seconds - on(host) max by(host) (node_boot_time_seconds)) / 3600)",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "P"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "label_replace(max by(host) (node_boot_time_seconds), \"sep\", \" h / \", \"\", \"\")",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "S"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "reboot_next_date_fr and on(host) up{job=\"node_exporter\"}",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "N"
         }
       ],
       "title": "Server Metrics Overview",
@@ -413,6 +520,56 @@
           "options": {
             "byField": "host",
             "mode": "outer"
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "Value #U",
+                "destinationType": "string"
+              }
+            ]
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "Value #P",
+                "destinationType": "string"
+              }
+            ]
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "mode": "binary",
+            "binary": {
+              "left": "Value #U",
+              "operator": "+",
+              "right": "sep"
+            },
+            "alias": "up_sep",
+            "replaceFields": false,
+            "timeSeries": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "mode": "binary",
+            "binary": {
+              "left": "up_sep",
+              "operator": "+",
+              "right": "Value #P"
+            },
+            "alias": "Uptime_plan",
+            "replaceFields": false,
+            "timeSeries": false
           }
         },
         {
@@ -441,7 +598,38 @@
               "instance 4": true,
               "instance 5": true,
               "job 4": true,
-              "job 5": true
+              "job 5": true,
+              "Time 6": true,
+              "instance 6": true,
+              "job 6": true,
+              "Time 7": true,
+              "instance 7": true,
+              "job 7": true,
+              "Time 8": true,
+              "instance 8": true,
+              "job 8": true,
+              "Time 9": true,
+              "instance 9": true,
+              "job 9": true,
+              "Time 10": true,
+              "instance 10": true,
+              "job 10": true,
+              "Time 11": true,
+              "instance 11": true,
+              "job 11": true,
+              "Time 12": true,
+              "instance 12": true,
+              "job 12": true,
+              "Value #U": true,
+              "Value #P": true,
+              "Value #S": true,
+              "Value #N": true,
+              "sep": true,
+              "up_sep": true,
+              "jour": true,
+              "mois": true,
+              "jnum": true,
+              "annee": true
             },
             "includeByName": {},
             "indexByName": {
@@ -456,7 +644,9 @@
               "host": 0,
               "instance": 1,
               "job": 8,
-              "Value #E": 6
+              "Value #E": 6,
+              "Uptime_plan": 7,
+              "date_fr": 8
             },
             "renameByName": {
               "Value #A": "CPU Usage",
@@ -464,7 +654,9 @@
               "Value #C": "Disk Usage",
               "Value #D": "Network I/O (% of link)",
               "mountpoint": "",
-              "Value #E": "Link speed"
+              "Value #E": "Link speed",
+              "Uptime_plan": "Uptime / at reboot",
+              "date_fr": "Next reboot"
             }
           }
         }
@@ -636,18 +828,6 @@
               {
                 "id": "custom.width",
                 "value": 309
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Uptime (h)"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 111
               }
             ]
           },
@@ -1095,5 +1275,5 @@
   "timezone": "",
   "title": "CAO Compute - Global Overview",
   "uid": "global-overview-dash",
-  "version": 29
+  "version": 30
 }
