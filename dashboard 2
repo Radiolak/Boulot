@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 0,
+  "id": 16,
   "links": [
     {
       "asDropdown": false,
@@ -661,7 +661,7 @@
         ]
       },
       "gridPos": {
-        "h": 13,
+        "h": 10,
         "w": 11,
         "x": 0,
         "y": 12
@@ -690,8 +690,8 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "node_filesystem_avail_bytes{host=\"$server\", job=\"node_exporter\", mountpoint=~\"$mountpoint\"}",
-          "legendFormat": "{{mountpoint}}",
+          "expr": "node_filesystem_avail_bytes{host=\"$server\", job=\"node_exporter\", fstype=~\"ext2|ext3|ext4|xfs|btrfs|vfat|zfs\", mountpoint=~\"$mountpoint\"}",
+          "legendFormat": "{{mountpoint}} - free",
           "range": true,
           "refId": "A"
         },
@@ -701,14 +701,151 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "node_filesystem_size_bytes{host=\"$server\", job=\"node_exporter\", mountpoint=~\"$mountpoint\"}",
+          "expr": "node_filesystem_size_bytes{host=\"$server\", job=\"node_exporter\", fstype=~\"ext2|ext3|ext4|xfs|btrfs|vfat|zfs\", mountpoint=~\"$mountpoint\"}",
           "legendFormat": "{{mountpoint}} (Taille totale)",
           "range": true,
           "refId": "B"
         }
       ],
-      "title": "Storage - History by disk",
-      "type": "timeseries"
+      "title": "Local storage - Remaining free space per disk",
+      "type": "timeseries",
+      "description": "Free space LEFT on local disks (xfs, ext4...). The total size of each disk is shown in the legend."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "orange",
+                "value": 21474836480
+              },
+              {
+                "color": "green",
+                "value": 53687091200
+              }
+            ]
+          },
+          "unit": "bytes",
+          "noValue": "No remote mount on this server"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*Taille totale.*"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": true,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 11,
+        "y": 12
+      },
+      "id": 15,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.11",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "node_filesystem_avail_bytes{host=\"$server\", job=\"node_exporter\", fstype=~\"nfs|nfs4|cifs|smb3|smbfs|fuse.sshfs|ceph|glusterfs|lustre|gpfs|beegfs\", mountpoint=~\"$remote_mount\"}",
+          "legendFormat": "{{mountpoint}} - free",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "node_filesystem_size_bytes{host=\"$server\", job=\"node_exporter\", fstype=~\"nfs|nfs4|cifs|smb3|smbfs|fuse.sshfs|ceph|glusterfs|lustre|gpfs|beegfs\", mountpoint=~\"$remote_mount\"}",
+          "legendFormat": "{{mountpoint}} (Taille totale)",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Remote storage (NFS / CIFS) - Remaining free space per mount",
+      "type": "timeseries",
+      "description": "Free space LEFT on network mounts (NFS, CIFS...) seen by this server. Automounted shares only appear while they are mounted."
     },
     {
       "datasource": {
@@ -779,10 +916,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 7,
-        "w": 12,
-        "x": 11,
-        "y": 12
+        "h": 8,
+        "w": 11,
+        "x": 0,
+        "y": 22
       },
       "id": 3,
       "options": {
@@ -898,14 +1035,69 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/^fstype.*/"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Type"
+              },
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.width",
+                "value": 110
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "regex",
+                    "options": {
+                      "pattern": "/^(nfs|nfs4|cifs|smb3|smbfs|fuse.sshfs|ceph|glusterfs|lustre|gpfs|beegfs)$/",
+                      "result": {
+                        "text": "Remote ($1)",
+                        "color": "blue"
+                      }
+                    }
+                  },
+                  {
+                    "type": "regex",
+                    "options": {
+                      "pattern": "/^(ext2|ext3|ext4|xfs|btrfs|vfat|zfs)$/",
+                      "result": {
+                        "text": "Local ($1)",
+                        "color": "green"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
           }
         ]
       },
       "gridPos": {
-        "h": 6,
+        "h": 8,
         "w": 12,
         "x": 11,
-        "y": 19
+        "y": 22
       },
       "id": 14,
       "options": {
@@ -921,7 +1113,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "node_filesystem_avail_bytes{host=\"$server\", job=\"node_exporter\", mountpoint=~\"$mountpoint\"}",
+          "expr": "node_filesystem_avail_bytes{host=\"$server\", job=\"node_exporter\", fstype=~\"ext2|ext3|ext4|xfs|btrfs|vfat|zfs|nfs|nfs4|cifs|smb3|smbfs|fuse.sshfs|ceph|glusterfs|lustre|gpfs|beegfs\", mountpoint=~\"$mountpoint|$remote_mount\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -932,14 +1124,14 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "node_filesystem_size_bytes{host=\"$server\", job=\"node_exporter\", mountpoint=~\"$mountpoint\"}",
+          "expr": "node_filesystem_size_bytes{host=\"$server\", job=\"node_exporter\", fstype=~\"ext2|ext3|ext4|xfs|btrfs|vfat|zfs|nfs|nfs4|cifs|smb3|smbfs|fuse.sshfs|ceph|glusterfs|lustre|gpfs|beegfs\", mountpoint=~\"$mountpoint|$remote_mount\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "",
           "refId": "B"
         }
       ],
-      "title": "Storage - Disks",
+      "title": "Storage - Disks (local + remote)",
       "transformations": [
         {
           "id": "joinByField",
@@ -958,7 +1150,7 @@
               "__name__ 1": true,
               "device": true,
               "device 1": true,
-              "fstype": true,
+              "fstype": false,
               "fstype 1": true,
               "host 1": true,
               "host 2": true,
@@ -969,14 +1161,16 @@
             },
             "includeByName": {},
             "indexByName": {
-              "Value #A": 1,
-              "Value #B": 2,
-              "mountpoint": 0
+              "mountpoint": 0,
+              "fstype": 1,
+              "Value #A": 2,
+              "Value #B": 3
             },
             "renameByName": {
               "Value #A": "Espace disponible",
               "Value #B": "Taille totale",
-              "mountpoint": "Point de montage"
+              "mountpoint": "Point de montage",
+              "fstype": "Type"
             }
           }
         },
@@ -1123,7 +1317,7 @@
         "h": 8,
         "w": 11,
         "x": 0,
-        "y": 25
+        "y": 30
       },
       "id": 5,
       "options": {
@@ -1247,7 +1441,7 @@
         "h": 8,
         "w": 12,
         "x": 11,
-        "y": 25
+        "y": 30
       },
       "id": 6,
       "options": {
@@ -1362,10 +1556,10 @@
         ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 23,
+        "h": 9,
+        "w": 12,
         "x": 0,
-        "y": 33
+        "y": 38
       },
       "id": 10,
       "options": {
@@ -1411,14 +1605,95 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "clamp_max(\nsum by (utilisateur) ((\n  label_replace(\n    label_replace(label_replace(sum by (groupname, instance, job) (rate(namedprocess_namegroup_cpu_seconds_total{host=\"$server\", job=\"process_exporter\", groupname!~\".*:(root|node_exporter|sshd)\"}[5m])) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n    * on(utilisateur) group_left(username)\n    label_replace(node_uid_username{host=\"$server\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\"),\n    \"utilisateur\", \"$1\", \"username\", \"(.*)\"\n  )\n)\nor\n(\n  label_replace(label_replace(sum by (groupname, instance, job) (rate(namedprocess_namegroup_cpu_seconds_total{host=\"$server\", job=\"process_exporter\", groupname!~\".*:(root|node_exporter|sshd)\"}[5m])) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n  unless on(utilisateur)\n  label_replace(node_uid_username{host=\"$server\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")\n)) / scalar(count(node_cpu_seconds_total{host=\"$server\", job=\"node_exporter\", mode=\"idle\"})),\n100\n)",
+          "expr": "sort_desc(\nclamp_max(\nsum by (utilisateur) ((\n  label_replace(\n    label_replace(label_replace(sum by (groupname, instance, job) (rate(namedprocess_namegroup_cpu_seconds_total{host=\"$server\", job=\"process_exporter\", groupname=~\".*:[0-9]+\"}[5m])) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n    * on(utilisateur) group_left(username)\n    label_replace(node_uid_username{host=\"$server\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\"),\n    \"utilisateur\", \"$1\", \"username\", \"(.*)\"\n  )\n)\nor\n(\n  label_replace(label_replace(sum by (groupname, instance, job) (rate(namedprocess_namegroup_cpu_seconds_total{host=\"$server\", job=\"process_exporter\", groupname=~\".*:[0-9]+\"}[5m])) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n  unless on(utilisateur)\n  label_replace(node_uid_username{host=\"$server\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")\n)) / scalar(count(node_cpu_seconds_total{host=\"$server\", job=\"node_exporter\", mode=\"idle\"})),\n100\n)\n)",
           "instant": true,
           "legendFormat": "{{utilisateur}}",
           "refId": "B"
         }
       ],
-      "title": "CPU usage by user",
-      "type": "bargauge"
+      "title": "CPU usage by user (AD accounts)",
+      "type": "bargauge",
+      "description": "Real users (AD accounts). System and role accounts are in the panel on the right."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent",
+          "noValue": "No significant activity"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 11,
+        "x": 12,
+        "y": 38
+      },
+      "id": 16,
+      "options": {
+        "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "pluginVersion": "12.3.11",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "instant": true,
+          "legendFormat": "{{utilisateur}}",
+          "refId": "A",
+          "expr": "sort_desc(\n  clamp_max(\n    sum by (utilisateur) (\n      label_replace(sum by (groupname) (rate(namedprocess_namegroup_cpu_seconds_total{host=\"$server\", job=\"process_exporter\", groupname!~\".*:[0-9]+\"}[5m])), \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\")\n    ) * 100 / scalar(count(node_cpu_seconds_total{host=\"$server\", job=\"node_exporter\", mode=\"idle\"})),\n  100) > 0.05\n)"
+        }
+      ],
+      "title": "CPU usage by role / system accounts",
+      "type": "bargauge",
+      "description": "Local system and role accounts (root, sshd, dbus, ...). Only accounts using more than 0.05% of the server are shown."
     },
     {
       "datasource": {
@@ -1530,6 +1805,18 @@
                 ]
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Utilisateur"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "string"
+              }
+            ]
           }
         ]
       },
@@ -1537,7 +1824,7 @@
         "h": 21,
         "w": 23,
         "x": 0,
-        "y": 41
+        "y": 47
       },
       "id": 11,
       "options": {
@@ -1561,7 +1848,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "((\n  label_replace(\n    label_replace(label_replace(sum by (groupname, instance, job) (rate(namedprocess_namegroup_cpu_seconds_total{host=\"$server\", job=\"process_exporter\"}[5m])) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n    * on(utilisateur) group_left(username)\n    label_replace(node_uid_username{host=\"$server\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\"),\n    \"utilisateur\", \"$1\", \"username\", \"(.*)\"\n  )\n)\nor\n(\n  label_replace(label_replace(sum by (groupname, instance, job) (rate(namedprocess_namegroup_cpu_seconds_total{host=\"$server\", job=\"process_exporter\"}[5m])) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n  unless on(utilisateur)\n  label_replace(node_uid_username{host=\"$server\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")\n)) / scalar(count(node_cpu_seconds_total{host=\"$server\", job=\"node_exporter\", mode=\"idle\"}))",
+          "expr": "((\n  label_replace(\n    label_replace(label_replace(sum by (groupname, instance, job) (rate(namedprocess_namegroup_cpu_seconds_total{host=\"$server\", job=\"process_exporter\", groupname=~\".*:[0-9]+\"}[5m])) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n    * on(utilisateur) group_left(username)\n    label_replace(node_uid_username{host=\"$server\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\"),\n    \"utilisateur\", \"$1\", \"username\", \"(.*)\"\n  )\n)\nor\n(\n  label_replace(label_replace(sum by (groupname, instance, job) (rate(namedprocess_namegroup_cpu_seconds_total{host=\"$server\", job=\"process_exporter\", groupname=~\".*:[0-9]+\"}[5m])) * 100, \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\"), \"processus\", \"$1\", \"groupname\", \"(.+):([^:]+)\")\n  unless on(utilisateur)\n  label_replace(node_uid_username{host=\"$server\", job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")\n)) / scalar(count(node_cpu_seconds_total{host=\"$server\", job=\"node_exporter\", mode=\"idle\"}))",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -1572,7 +1859,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "namedprocess_namegroup_memory_bytes{host=\"$server\", job=\"process_exporter\", memtype=\"resident\"}",
+          "expr": "namedprocess_namegroup_memory_bytes{host=\"$server\", job=\"process_exporter\", groupname=~\".*:[0-9]+\", memtype=\"resident\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -1583,7 +1870,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "namedprocess_namegroup_num_procs{host=\"$server\", job=\"process_exporter\"}",
+          "expr": "namedprocess_namegroup_num_procs{host=\"$server\", job=\"process_exporter\", groupname=~\".*:[0-9]+\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -1594,14 +1881,14 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "namedprocess_namegroup_oldest_start_time_seconds{host=\"$server\", job=\"process_exporter\"} * 1000",
+          "expr": "namedprocess_namegroup_oldest_start_time_seconds{host=\"$server\", job=\"process_exporter\", groupname=~\".*:[0-9]+\"} * 1000",
           "format": "table",
           "instant": true,
           "legendFormat": "",
           "refId": "D"
         }
       ],
-      "title": "Detail processus par utilisateur",
+      "title": "Detail processus par utilisateur (AD accounts)",
       "transformations": [
         {
           "id": "joinByField",
@@ -1725,8 +2012,8 @@
       },
       {
         "current": {
-          "text": "arz.fr.airbusds.corp",
-          "value": "arz.fr.airbusds.corp"
+          "text": "zembra.fr.airbusds.corp",
+          "value": "zembra.fr.airbusds.corp"
         },
         "datasource": {
           "type": "prometheus",
@@ -1748,29 +2035,49 @@
       },
       {
         "current": {
-          "text": [
-            "/tmp",
-            "/asic_tmp",
-            "/scratch"
-          ],
+          "text": "All",
           "value": [
-            "/tmp",
-            "/asic_tmp",
-            "/scratch"
+            "$__all"
           ]
         },
         "datasource": {
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(node_filesystem_size_bytes, mountpoint)",
+        "definition": "label_values(node_filesystem_size_bytes{fstype=~\"ext2|ext3|ext4|xfs|btrfs|vfat|zfs\"}, mountpoint)",
         "includeAll": true,
-        "label": "Disks",
+        "label": "Local disks",
         "multi": true,
         "name": "mountpoint",
         "options": [],
         "query": {
-          "query": "label_values(node_filesystem_size_bytes, mountpoint)",
+          "query": "label_values(node_filesystem_size_bytes{fstype=~\"ext2|ext3|ext4|xfs|btrfs|vfat|zfs\"}, mountpoint)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(node_filesystem_size_bytes{fstype=~\"nfs|nfs4|cifs|smb3|smbfs|fuse.sshfs|ceph|glusterfs|lustre|gpfs|beegfs\"}, mountpoint)",
+        "includeAll": true,
+        "label": "Remote disks",
+        "multi": true,
+        "name": "remote_mount",
+        "options": [],
+        "query": {
+          "query": "label_values(node_filesystem_size_bytes{fstype=~\"nfs|nfs4|cifs|smb3|smbfs|fuse.sshfs|ceph|glusterfs|lustre|gpfs|beegfs\"}, mountpoint)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 2,
@@ -1781,7 +2088,7 @@
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-30d",
     "to": "now"
   },
   "timepicker": {
@@ -1797,5 +2104,5 @@
   "timezone": "browser",
   "title": "Detail serveur",
   "uid": "server-detail-dash",
-  "version": 58
+  "version": 59
 }
