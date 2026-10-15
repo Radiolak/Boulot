@@ -75,7 +75,7 @@
       "gridPos": {
         "x": 0,
         "y": 4,
-        "w": 4,
+        "w": 5,
         "h": 4
       },
       "targets": [
@@ -148,9 +148,9 @@
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
-        "x": 4,
+        "x": 5,
         "y": 4,
-        "w": 4,
+        "w": 6,
         "h": 4
       },
       "targets": [
@@ -223,9 +223,9 @@
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
-        "x": 8,
+        "x": 11,
         "y": 4,
-        "w": 4,
+        "w": 6,
         "h": 4
       },
       "targets": [
@@ -294,9 +294,9 @@
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
-        "x": 12,
+        "x": 17,
         "y": 4,
-        "w": 4,
+        "w": 6,
         "h": 4
       },
       "targets": [
@@ -352,135 +352,6 @@
     },
     {
       "id": 7,
-      "type": "stat",
-      "title": "Unused servers",
-      "description": "Servers whose average CPU AND average RAM stayed below 10% over the period (Usage = Unused in the table).",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "gridPos": {
-        "x": 16,
-        "y": 4,
-        "w": 3,
-        "h": 4
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "count((max by(host) (label_replace(avg_over_time((100 * (1 - sum by(host) (rate(node_cpu_seconds_total{job=\"node_exporter\", host=~\"$server\", mode=\"idle\"}[5m])) / count by(host) (node_cpu_seconds_total{job=\"node_exporter\", host=~\"$server\", mode=\"idle\"})))[$__range:30m]), \"m\", \"cpu\", \"\", \"\") or label_replace(avg_over_time((100 * (1 - max by(host) (node_memory_MemAvailable_bytes{job=\"node_exporter\", host=~\"$server\"}) / max by(host) (node_memory_MemTotal_bytes{job=\"node_exporter\", host=~\"$server\"})))[$__range:30m]), \"m\", \"ram\", \"\", \"\"))) < 10) or vector(0)",
-          "refId": "A",
-          "legendFormat": "",
-          "instant": true,
-          "range": false,
-          "format": "time_series"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "none",
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "blue",
-                "value": 1
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "center",
-        "textMode": "value",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        }
-      }
-    },
-    {
-      "id": 8,
-      "type": "stat",
-      "title": "Compute consumed (core-hours)",
-      "description": "Total CPU time actually used on the selected servers, in core-hours (1 core busy for 1 hour = 1 core-hour).",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "gridPos": {
-        "x": 19,
-        "y": 4,
-        "w": 4,
-        "h": 4
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "sum(avg_over_time((100 * (1 - sum by(host) (rate(node_cpu_seconds_total{job=\"node_exporter\", host=~\"$server\", mode=\"idle\"}[5m])) / count by(host) (node_cpu_seconds_total{job=\"node_exporter\", host=~\"$server\", mode=\"idle\"})))[$__range:30m]) / 100 * count by(host) (node_cpu_seconds_total{job=\"node_exporter\", host=~\"$server\", mode=\"idle\"}) * $__range_s / 3600)",
-          "refId": "A",
-          "legendFormat": "",
-          "instant": true,
-          "range": false,
-          "format": "time_series"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "none",
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "purple",
-                "value": null
-              }
-            ]
-          },
-          "decimals": 0
-        },
-        "overrides": []
-      },
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "center",
-        "textMode": "value",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        }
-      }
-    },
-    {
-      "id": 9,
       "type": "table",
       "title": "Server ranking over the period",
       "description": "Click a column header to sort. Peak values are 15-minute averages. Time overloaded = share of the period with CPU above 80%.",
@@ -579,19 +450,6 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "avg_over_time((100 * (1 - sum by(host) (rate(node_cpu_seconds_total{job=\"node_exporter\", host=~\"$server\", mode=\"idle\"}[5m])) / count by(host) (node_cpu_seconds_total{job=\"node_exporter\", host=~\"$server\", mode=\"idle\"})))[$__range:30m]) / 100 * count by(host) (node_cpu_seconds_total{job=\"node_exporter\", host=~\"$server\", mode=\"idle\"}) * $__range_s / 3600",
-          "refId": "G",
-          "legendFormat": "",
-          "instant": true,
-          "range": false,
-          "format": "table"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
           "expr": "100 * max by(host) (avg_over_time(up{job=\"node_exporter\", host=~\"$server\"}[$__range]))",
           "refId": "H",
           "legendFormat": "",
@@ -607,19 +465,6 @@
           "editorMode": "code",
           "expr": "max by(host) (changes(node_boot_time_seconds{job=\"node_exporter\", host=~\"$server\"}[$__range]))",
           "refId": "I",
-          "legendFormat": "",
-          "instant": true,
-          "range": false,
-          "format": "table"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "count by(host) (node_cpu_seconds_total{job=\"node_exporter\", host=~\"$server\", mode=\"idle\"})",
-          "refId": "J",
           "legendFormat": "",
           "instant": true,
           "range": false,
@@ -921,30 +766,6 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Core-hours used"
-            },
-            "properties": [
-              {
-                "id": "decimals",
-                "value": 0
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Cores"
-            },
-            "properties": [
-              {
-                "id": "decimals",
-                "value": 0
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
               "options": "Reboots"
             },
             "properties": [
@@ -1028,10 +849,8 @@
               "Value #D": 4,
               "Value #E": 5,
               "Value #F": 6,
-              "Value #G": 7,
-              "Value #J": 8,
-              "Value #H": 9,
-              "Value #I": 10
+              "Value #H": 7,
+              "Value #I": 8
             },
             "renameByName": {
               "host": "Server",
@@ -1041,17 +860,15 @@
               "Value #D": "Time overloaded",
               "Value #E": "Avg RAM",
               "Value #F": "Peak RAM",
-              "Value #G": "Core-hours used",
               "Value #H": "Availability",
-              "Value #I": "Reboots",
-              "Value #J": "Cores"
+              "Value #I": "Reboots"
             }
           }
         }
       ]
     },
     {
-      "id": 10,
+      "id": 8,
       "type": "row",
       "title": "Trends over time",
       "collapsed": false,
@@ -1064,78 +881,7 @@
       "panels": []
     },
     {
-      "id": 11,
-      "type": "timeseries",
-      "title": "Fleet usage over time (hourly average)",
-      "description": "Average CPU and memory usage of all selected servers, hour by hour. Shows working-hours peaks and weekends.",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "gridPos": {
-        "x": 0,
-        "y": 31,
-        "w": 23,
-        "h": 8
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "100 * (1 - sum(rate(node_cpu_seconds_total{job=\"node_exporter\", host=~\"$server\", mode=\"idle\"}[$__interval])) / count(node_cpu_seconds_total{job=\"node_exporter\", host=~\"$server\", mode=\"idle\"}))",
-          "refId": "A",
-          "legendFormat": "CPU",
-          "instant": false,
-          "range": true,
-          "interval": "1h"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "100 * (1 - sum(avg_over_time(node_memory_MemAvailable_bytes{job=\"node_exporter\", host=~\"$server\"}[$__interval])) / sum(avg_over_time(node_memory_MemTotal_bytes{job=\"node_exporter\", host=~\"$server\"}[$__interval])))",
-          "refId": "B",
-          "legendFormat": "RAM",
-          "instant": false,
-          "range": true,
-          "interval": "1h"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "min": 0,
-          "max": 100,
-          "custom": {
-            "fillOpacity": 15,
-            "lineWidth": 2,
-            "showPoints": "never"
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "right",
-          "calcs": [
-            "mean",
-            "max"
-          ]
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      }
-    },
-    {
-      "id": 12,
+      "id": 9,
       "type": "status-history",
       "title": "Daily CPU usage per server",
       "description": "One cell = average CPU usage of a server for one day. Blue = idle, red = saturated.",
@@ -1145,7 +891,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 39,
+        "y": 31,
         "w": 23,
         "h": 9
       },
@@ -1216,7 +962,7 @@
       }
     },
     {
-      "id": 13,
+      "id": 10,
       "type": "status-history",
       "title": "Daily RAM usage per server",
       "description": "One cell = average memory usage of a server for one day.",
@@ -1226,7 +972,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 48,
+        "y": 40,
         "w": 23,
         "h": 9
       },
@@ -1297,30 +1043,30 @@
       }
     },
     {
-      "id": 14,
+      "id": 11,
       "type": "row",
       "title": "Users and storage",
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 57,
+        "y": 49,
         "w": 23,
         "h": 1
       },
       "panels": []
     },
     {
-      "id": 15,
+      "id": 12,
       "type": "bargauge",
-      "title": "Top 15 users - CPU consumed (core-hours)",
-      "description": "CPU time consumed by each user's processes on the selected servers during the period (1 core busy for 1 hour = 1 core-hour). System accounts excluded.",
+      "title": "Top 15 users - share of the CPU consumed",
+      "description": "Share of all the CPU consumed by users on the selected servers during the period (100% = all user activity). System accounts excluded. Estimated from samples taken every 3 hours.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "x": 0,
-        "y": 58,
+        "y": 50,
         "w": 11,
         "h": 11
       },
@@ -1331,7 +1077,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "topk(15, sum by(utilisateur) (label_replace(sum by(utilisateur) (label_replace(sum_over_time((sum by(groupname) (rate(namedprocess_namegroup_cpu_seconds_total{job=\"process_exporter\", host=~\"$server\", groupname!~\".*:(root|node_exporter|sshd)\"}[5m])))[$__range:1h]), \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\")) * on(utilisateur) group_left(username) max by(utilisateur, username) (label_replace(node_uid_username{job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")), \"utilisateur\", \"$1\", \"username\", \"(.*)\") or (sum by(utilisateur) (label_replace(sum_over_time((sum by(groupname) (rate(namedprocess_namegroup_cpu_seconds_total{job=\"process_exporter\", host=~\"$server\", groupname!~\".*:(root|node_exporter|sshd)\"}[5m])))[$__range:1h]), \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\")) unless on(utilisateur) max by(utilisateur, username) (label_replace(node_uid_username{job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")))))",
+          "expr": "topk(15, 100 / scalar(avg_over_time((sum(rate(namedprocess_namegroup_cpu_seconds_total{job=\"process_exporter\", host=~\"$server\", groupname!~\".*:(root|node_exporter|sshd)\"}[5m])))[$__range:3h])) * sum by(utilisateur) (label_replace(sum by(utilisateur) (label_replace(avg_over_time((sum by(groupname) (rate(namedprocess_namegroup_cpu_seconds_total{job=\"process_exporter\", host=~\"$server\", groupname!~\".*:(root|node_exporter|sshd)\"}[5m])))[$__range:3h]), \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\")) * on(utilisateur) group_left(username) max by(utilisateur, username) (label_replace(node_uid_username{job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")), \"utilisateur\", \"$1\", \"username\", \"(.*)\") or (sum by(utilisateur) (label_replace(avg_over_time((sum by(groupname) (rate(namedprocess_namegroup_cpu_seconds_total{job=\"process_exporter\", host=~\"$server\", groupname!~\".*:(root|node_exporter|sshd)\"}[5m])))[$__range:3h]), \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\")) unless on(utilisateur) max by(utilisateur, username) (label_replace(node_uid_username{job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")))))",
           "refId": "A",
           "legendFormat": "{{utilisateur}}",
           "instant": true,
@@ -1341,9 +1087,10 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "none",
-          "decimals": 0,
+          "unit": "percent",
+          "decimals": 1,
           "min": 0,
+          "max": 100,
           "color": {
             "mode": "continuous-BlPu"
           }
@@ -1369,17 +1116,17 @@
       }
     },
     {
-      "id": 16,
+      "id": 13,
       "type": "table",
-      "title": "Local disks - capacity forecast",
-      "description": "Growth per day = average daily growth of used space over the period (negative = space freed). Days until full = estimate if the trend continues; empty = not filling up.",
+      "title": "Local disks - usage",
+      "description": "Current size and fill level of the local disks of the selected servers, fullest first.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "x": 11,
-        "y": 58,
+        "y": 50,
         "w": 12,
         "h": 11
       },
@@ -1405,32 +1152,6 @@
           "editorMode": "code",
           "expr": "label_join(max by(host, mountpoint) (100 * (1 - node_filesystem_avail_bytes{job=\"node_exporter\", host=~\"$server\", fstype=~\"ext2|ext3|ext4|xfs|btrfs|zfs\"} / node_filesystem_size_bytes{job=\"node_exporter\", host=~\"$server\", fstype=~\"ext2|ext3|ext4|xfs|btrfs|zfs\"})), \"disk\", \" : \", \"host\", \"mountpoint\")",
           "refId": "B",
-          "legendFormat": "",
-          "instant": true,
-          "range": false,
-          "format": "table"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "label_join(max by(host, mountpoint) (deriv(node_filesystem_avail_bytes{job=\"node_exporter\", host=~\"$server\", fstype=~\"ext2|ext3|ext4|xfs|btrfs|zfs\"}[$__range:1h])) * -86400, \"disk\", \" : \", \"host\", \"mountpoint\")",
-          "refId": "C",
-          "legendFormat": "",
-          "instant": true,
-          "range": false,
-          "format": "table"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "label_join(max by(host, mountpoint) (node_filesystem_avail_bytes{job=\"node_exporter\", host=~\"$server\", fstype=~\"ext2|ext3|ext4|xfs|btrfs|zfs\"} / -deriv(node_filesystem_avail_bytes{job=\"node_exporter\", host=~\"$server\", fstype=~\"ext2|ext3|ext4|xfs|btrfs|zfs\"}[$__range:1h]) / 86400 > 0), \"disk\", \" : \", \"host\", \"mountpoint\")",
-          "refId": "D",
           "legendFormat": "",
           "instant": true,
           "range": false,
@@ -1525,86 +1246,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Growth per day"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "bytes"
-              },
-              {
-                "id": "decimals",
-                "value": 1
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Days until full"
-            },
-            "properties": [
-              {
-                "id": "decimals",
-                "value": 0
-              },
-              {
-                "id": "unit",
-                "value": "none"
-              },
-              {
-                "id": "custom.cellOptions",
-                "value": {
-                  "type": "color-background"
-                }
-              },
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "red",
-                      "value": null
-                    },
-                    {
-                      "color": "orange",
-                      "value": 30
-                    },
-                    {
-                      "color": "green",
-                      "value": 90
-                    }
-                  ]
-                }
-              },
-              {
-                "id": "mappings",
-                "value": [
-                  {
-                    "type": "special",
-                    "options": {
-                      "match": "null",
-                      "result": {
-                        "text": "Not filling",
-                        "color": "green",
-                        "index": 0
-                      }
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
               "options": "Server : disk"
             },
             "properties": [
               {
                 "id": "custom.width",
-                "value": 260
+                "value": 300
               }
             ]
           }
@@ -1616,7 +1263,7 @@
         "enablePagination": false,
         "sortBy": [
           {
-            "displayName": "Growth per day",
+            "displayName": "Used",
             "desc": true
           }
         ]
@@ -1635,16 +1282,12 @@
             "indexByName": {
               "disk": 0,
               "Value #A": 1,
-              "Value #B": 2,
-              "Value #C": 3,
-              "Value #D": 4
+              "Value #B": 2
             },
             "renameByName": {
               "disk": "Server : disk",
               "Value #A": "Size",
-              "Value #B": "Used",
-              "Value #C": "Growth per day",
-              "Value #D": "Days until full"
+              "Value #B": "Used"
             }
           }
         },
@@ -1660,20 +1303,20 @@
       ]
     },
     {
-      "id": 17,
+      "id": 14,
       "type": "row",
       "title": "Licences (FlexLM)",
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 69,
+        "y": 61,
         "w": 23,
         "h": 1
       },
       "panels": []
     },
     {
-      "id": 18,
+      "id": 15,
       "type": "stat",
       "title": "Licence features tracked",
       "description": "Number of licence features (counted licences) reported by the FlexLM servers for the selected vendors.",
@@ -1683,7 +1326,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 70,
+        "y": 62,
         "w": 4,
         "h": 4
       },
@@ -1735,7 +1378,7 @@
       }
     },
     {
-      "id": 19,
+      "id": 16,
       "type": "stat",
       "title": "Avg fill rate (licences in use)",
       "description": "Average fill rate of the licence features that were used at least once in the period (never-used features are counted separately).",
@@ -1745,7 +1388,7 @@
       },
       "gridPos": {
         "x": 4,
-        "y": 70,
+        "y": 62,
         "w": 5,
         "h": 4
       },
@@ -1810,7 +1453,7 @@
       }
     },
     {
-      "id": 20,
+      "id": 17,
       "type": "stat",
       "title": "Never used in the period",
       "description": "Features that were never checked out during the whole period: candidates for a contract review.",
@@ -1820,7 +1463,7 @@
       },
       "gridPos": {
         "x": 9,
-        "y": 70,
+        "y": 62,
         "w": 5,
         "h": 4
       },
@@ -1876,7 +1519,7 @@
       }
     },
     {
-      "id": 21,
+      "id": 18,
       "type": "stat",
       "title": "Saturated features",
       "description": "Features where ALL the licences were in use more than 5% of the time: users probably had to wait.",
@@ -1886,7 +1529,7 @@
       },
       "gridPos": {
         "x": 14,
-        "y": 70,
+        "y": 62,
         "w": 5,
         "h": 4
       },
@@ -1942,7 +1585,7 @@
       }
     },
     {
-      "id": 22,
+      "id": 19,
       "type": "stat",
       "title": "Distinct licence users",
       "description": "Number of different people who used at least one licence during the period.",
@@ -1952,7 +1595,7 @@
       },
       "gridPos": {
         "x": 19,
-        "y": 70,
+        "y": 62,
         "w": 4,
         "h": 4
       },
@@ -2004,7 +1647,7 @@
       }
     },
     {
-      "id": 23,
+      "id": 20,
       "type": "table",
       "title": "Top 10 - most used licences",
       "description": "The 10 features with the highest average share of licences in use over the period.",
@@ -2014,7 +1657,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 74,
+        "y": 66,
         "w": 12,
         "h": 9
       },
@@ -2149,7 +1792,7 @@
       ]
     },
     {
-      "id": 24,
+      "id": 21,
       "type": "table",
       "title": "Top 10 - least used licences (used at least once)",
       "description": "Features that are used, but very little: the number of licences could probably be reduced.",
@@ -2159,7 +1802,7 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 74,
+        "y": 66,
         "w": 11,
         "h": 9
       },
@@ -2294,7 +1937,7 @@
       ]
     },
     {
-      "id": 25,
+      "id": 22,
       "type": "table",
       "title": "Licences never used in the period",
       "description": "Purchased licences with zero checkout during the whole period.",
@@ -2304,7 +1947,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 83,
+        "y": 75,
         "w": 8,
         "h": 8
       },
@@ -2394,7 +2037,7 @@
       ]
     },
     {
-      "id": 26,
+      "id": 23,
       "type": "table",
       "title": "Saturated licences (all tokens in use)",
       "description": "Share of the period during which every licence of the feature was taken. Above a few % users are likely blocked.",
@@ -2404,7 +2047,7 @@
       },
       "gridPos": {
         "x": 8,
-        "y": 83,
+        "y": 75,
         "w": 15,
         "h": 8
       },
@@ -2634,7 +2277,7 @@
       ]
     },
     {
-      "id": 27,
+      "id": 24,
       "type": "table",
       "title": "All licences - usage over the period",
       "description": "Status: Saturated = all licences taken more than 5% of the time / Never used = no checkout in the period / Under-used = less than 20% on average / Healthy = the rest.",
@@ -2644,7 +2287,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 91,
+        "y": 83,
         "w": 23,
         "h": 14
       },
@@ -3040,7 +2683,7 @@
       ]
     },
     {
-      "id": 28,
+      "id": 25,
       "type": "timeseries",
       "title": "Licence fill rate per vendor over time",
       "description": "Share of the licences of each vendor in use, hour by hour.",
@@ -3050,7 +2693,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 105,
+        "y": 97,
         "w": 14,
         "h": 9
       },
@@ -3098,7 +2741,7 @@
       }
     },
     {
-      "id": 29,
+      "id": 26,
       "type": "table",
       "title": "Top 15 licence users (licence-hours)",
       "description": "Approximate time each person held licences during the period (sum over all features, 1 licence for 1 hour = 1 licence-hour). Based on the 1-minute FlexLM polling.",
@@ -3108,7 +2751,7 @@
       },
       "gridPos": {
         "x": 14,
-        "y": 105,
+        "y": 97,
         "w": 9,
         "h": 9
       },
@@ -3304,5 +2947,5 @@
   "timezone": "browser",
   "title": "CAO Compute - Trends & Capacity",
   "uid": "cao-trends-dash",
-  "version": 1
+  "version": 3
 }
