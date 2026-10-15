@@ -1059,7 +1059,7 @@
       "id": 12,
       "type": "bargauge",
       "title": "Top 15 users - share of the CPU consumed",
-      "description": "Share of all the CPU consumed by users on the selected servers during the period (100% = all user activity). System accounts excluded. Estimated from samples taken every 3 hours.",
+      "description": "Share of all the CPU consumed by users on the selected servers during the period (100% = all user activity). System accounts excluded. Computed day by day from the CPU counters of process-exporter.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -1077,7 +1077,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "topk(15, 100 / scalar(avg_over_time((sum(rate(namedprocess_namegroup_cpu_seconds_total{job=\"process_exporter\", host=~\"$server\", groupname!~\".*:(root|node_exporter|sshd)\"}[5m])))[$__range:3h])) * sum by(utilisateur) (label_replace(sum by(utilisateur) (label_replace(avg_over_time((sum by(groupname) (rate(namedprocess_namegroup_cpu_seconds_total{job=\"process_exporter\", host=~\"$server\", groupname!~\".*:(root|node_exporter|sshd)\"}[5m])))[$__range:3h]), \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\")) * on(utilisateur) group_left(username) max by(utilisateur, username) (label_replace(node_uid_username{job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")), \"utilisateur\", \"$1\", \"username\", \"(.*)\") or (sum by(utilisateur) (label_replace(avg_over_time((sum by(groupname) (rate(namedprocess_namegroup_cpu_seconds_total{job=\"process_exporter\", host=~\"$server\", groupname!~\".*:(root|node_exporter|sshd)\"}[5m])))[$__range:3h]), \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\")) unless on(utilisateur) max by(utilisateur, username) (label_replace(node_uid_username{job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")))))",
+          "expr": "topk(15, 100 / scalar(sum_over_time((sum(((namedprocess_namegroup_cpu_seconds_total{job=\"process_exporter\", host=~\"$server\", groupname!~\".*:(root|node_exporter|sshd)\"} - namedprocess_namegroup_cpu_seconds_total{job=\"process_exporter\", host=~\"$server\", groupname!~\".*:(root|node_exporter|sshd)\"} offset 1d) >= 0 or namedprocess_namegroup_cpu_seconds_total{job=\"process_exporter\", host=~\"$server\", groupname!~\".*:(root|node_exporter|sshd)\"})))[$__range:1d])) * sum by(utilisateur) (label_replace(sum by(utilisateur) (label_replace(sum_over_time((sum by(groupname) (((namedprocess_namegroup_cpu_seconds_total{job=\"process_exporter\", host=~\"$server\", groupname!~\".*:(root|node_exporter|sshd)\"} - namedprocess_namegroup_cpu_seconds_total{job=\"process_exporter\", host=~\"$server\", groupname!~\".*:(root|node_exporter|sshd)\"} offset 1d) >= 0 or namedprocess_namegroup_cpu_seconds_total{job=\"process_exporter\", host=~\"$server\", groupname!~\".*:(root|node_exporter|sshd)\"})))[$__range:1d]), \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\")) * on(utilisateur) group_left(username) max by(utilisateur, username) (label_replace(node_uid_username{job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")), \"utilisateur\", \"$1\", \"username\", \"(.*)\") or (sum by(utilisateur) (label_replace(sum_over_time((sum by(groupname) (((namedprocess_namegroup_cpu_seconds_total{job=\"process_exporter\", host=~\"$server\", groupname!~\".*:(root|node_exporter|sshd)\"} - namedprocess_namegroup_cpu_seconds_total{job=\"process_exporter\", host=~\"$server\", groupname!~\".*:(root|node_exporter|sshd)\"} offset 1d) >= 0 or namedprocess_namegroup_cpu_seconds_total{job=\"process_exporter\", host=~\"$server\", groupname!~\".*:(root|node_exporter|sshd)\"})))[$__range:1d]), \"utilisateur\", \"$2\", \"groupname\", \"(.+):([^:]+)\")) unless on(utilisateur) max by(utilisateur, username) (label_replace(node_uid_username{job=\"node_exporter\"}, \"utilisateur\", \"$1\", \"uid\", \"(.*)\")))))",
           "refId": "A",
           "legendFormat": "{{utilisateur}}",
           "instant": true,
@@ -2947,5 +2947,5 @@
   "timezone": "browser",
   "title": "CAO Compute - Trends & Capacity",
   "uid": "cao-trends-dash",
-  "version": 3
+  "version": 5
 }
