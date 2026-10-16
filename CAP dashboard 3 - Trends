@@ -67,7 +67,7 @@
       "id": 3,
       "type": "stat",
       "title": "Average CPU usage (fleet)",
-      "description": "Average CPU usage of all selected servers over the period.",
+      "description": "**Average CPU usage of all selected servers.**\n\n- KPI: share of CPU time not idle, averaged over every core of every server.\n- Measured on 5-minute windows sampled every 30 minutes.\n- Colours: blue < 10% (idle) · green < 60% · yellow < 80% · red ≥ 80%.\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -142,7 +142,7 @@
       "id": 4,
       "type": "stat",
       "title": "Average RAM usage (fleet)",
-      "description": "Average memory usage of all selected servers over the period.",
+      "description": "**Average memory usage of all selected servers.**\n\n- KPI: 1 − (available memory / total memory). *Available* includes cache that Linux can free, so it is the memory really usable by new jobs.\n- Colours: blue < 10% · green < 60% · yellow < 80% · red ≥ 80%.\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -217,7 +217,7 @@
       "id": 5,
       "type": "stat",
       "title": "Availability",
-      "description": "Share of the period during which the servers answered the monitoring.",
+      "description": "**Share of the period during which the servers answered the monitoring** (node_exporter reachable every 15 s).\n\n- 100% = never down. 99% over 30 days ≈ 7 hours of unavailability.\n- Planned reboots also count as unavailability (a few minutes each).\n- Colours: red < 99% · orange < 99.9% · green ≥ 99.9%.\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -288,7 +288,7 @@
       "id": 6,
       "type": "stat",
       "title": "Often overloaded servers",
-      "description": "Servers whose CPU was above 80% more than 10% of the time: candidates for more capacity or load balancing.",
+      "description": "**Number of servers that were overloaded more than 10% of the time.**\n\n- Overloaded = CPU above 80% (5-minute average).\n- 10% of 30 days ≈ 3 days cumulated at more than 80% CPU.\n- These servers are candidates for more capacity or for moving jobs to quieter servers (see the pools table below).\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -354,7 +354,7 @@
       "id": 7,
       "type": "table",
       "title": "Server ranking over the period",
-      "description": "Click a column header to sort. Peak values are 15-minute averages. Time overloaded = share of the period with CPU above 80%.",
+      "description": "**One line per server, sorted by average CPU. Click a column header to sort differently.**\n\nHover a column title for its exact definition.\n\n- **Usage** summarises the server: highest of average CPU and average RAM → Unused < 10% · Low < 30% · Medium < 60% · High < 80% · OverUsed ≥ 80%.\n- CPU figures use 5-minute windows sampled every 30 minutes; very short spikes may not appear.\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -465,6 +465,45 @@
           "editorMode": "code",
           "expr": "max by(host) (changes(node_boot_time_seconds{job=\"node_exporter\", host=~\"$server\"}[$__range]))",
           "refId": "I",
+          "legendFormat": "",
+          "instant": true,
+          "range": false,
+          "format": "table"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "count by(host) (node_cpu_seconds_total{job=\"node_exporter\", host=~\"$server\", mode=\"idle\"})",
+          "refId": "J",
+          "legendFormat": "",
+          "instant": true,
+          "range": false,
+          "format": "table"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "round(max by(host) (node_memory_MemTotal_bytes{job=\"node_exporter\", host=~\"$server\"}) / 1073741824 / 4) * 4",
+          "refId": "K",
+          "legendFormat": "",
+          "instant": true,
+          "range": false,
+          "format": "table"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "round(max by(host) (node_cpu_bogomips_avg{job=\"node_exporter\", host=~\"$server\"}))",
+          "refId": "L",
           "legendFormat": "",
           "instant": true,
           "range": false,
@@ -592,6 +631,583 @@
               {
                 "id": "custom.width",
                 "value": 110
+              },
+              {
+                "id": "description",
+                "value": "Highest of Avg CPU and Avg RAM: Unused < 10% · Low < 30% · Medium < 60% · High < 80% · OverUsed ≥ 80%"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Avg CPU"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "gradient",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 60
+                    },
+                    {
+                      "color": "red",
+                      "value": 80
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "description",
+                "value": "Average CPU usage over the period (all cores)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Avg RAM"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "gradient",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 60
+                    },
+                    {
+                      "color": "red",
+                      "value": 80
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "description",
+                "value": "Average memory usage over the period"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Peak CPU"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "description",
+                "value": "Highest CPU usage seen (5-minute average, sampled every 30 min)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Peak RAM"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "description",
+                "value": "Highest memory usage seen"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time overloaded"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "gradient",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "orange",
+                      "value": 5
+                    },
+                    {
+                      "color": "red",
+                      "value": 10
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "description",
+                "value": "Share of the period with CPU above 80%. 10% of 30 days ≈ 3 days"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Reboots"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "description",
+                "value": "Number of reboots during the period (planned and unplanned)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Availability"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "orange",
+                      "value": 99
+                    },
+                    {
+                      "color": "green",
+                      "value": 99.9
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "description",
+                "value": "Share of the period during which the server answered the monitoring"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true,
+        "enablePagination": false,
+        "sortBy": [
+          {
+            "displayName": "Avg CPU",
+            "desc": true
+          }
+        ]
+      },
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value #J": true,
+              "Value #K": true,
+              "Value #L": true
+            },
+            "indexByName": {
+              "host": 0,
+              "Value #A": 1,
+              "Value #B": 2,
+              "Value #C": 3,
+              "Value #D": 4,
+              "Value #E": 5,
+              "Value #F": 6,
+              "Value #H": 7,
+              "Value #I": 8
+            },
+            "renameByName": {
+              "host": "Server",
+              "Value #A": "Usage",
+              "Value #B": "Avg CPU",
+              "Value #C": "Peak CPU",
+              "Value #D": "Time overloaded",
+              "Value #E": "Avg RAM",
+              "Value #F": "Peak RAM",
+              "Value #H": "Availability",
+              "Value #I": "Reboots"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "type": "row",
+      "title": "Identical server pools",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 30,
+        "w": 23,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 28,
+      "type": "table",
+      "title": "Pools of identical servers (same cores and RAM)",
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 31,
+        "w": 23,
+        "h": 14
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 7,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true,
+        "enablePagination": false,
+        "sortBy": [
+          {
+            "displayName": "Servers",
+            "desc": true
+          }
+        ]
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "filterable": false
+          },
+          "decimals": 1,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Cores"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.width",
+                "value": 90
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RAM (GiB)"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.width",
+                "value": 110
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cpu_pool (count)"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Servers"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "custom.width",
+                "value": 90
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cpu_pool (mean)"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Pool avg CPU"
+              },
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "gradient",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 60
+                    },
+                    {
+                      "color": "red",
+                      "value": 80
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cpu_pool (min)"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Least loaded"
+              },
+              {
+                "id": "unit",
+                "value": "percent"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cpu_pool (max)"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Most loaded"
+              },
+              {
+                "id": "unit",
+                "value": "percent"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ram_pool (mean)"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Pool avg RAM"
+              },
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "gradient",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 60
+                    },
+                    {
+                      "color": "red",
+                      "value": 80
+                    }
+                  ]
+                }
               }
             ]
           },
@@ -694,139 +1310,129 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Peak CPU"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "percent"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Peak RAM"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "percent"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
               "options": "Time overloaded"
             },
             "properties": [
               {
                 "id": "unit",
                 "value": "percent"
-              },
-              {
-                "id": "min",
-                "value": 0
-              },
-              {
-                "id": "max",
-                "value": 100
-              },
-              {
-                "id": "custom.cellOptions",
-                "value": {
-                  "type": "gauge",
-                  "mode": "gradient",
-                  "valueDisplayMode": "text"
-                }
-              },
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": null
-                    },
-                    {
-                      "color": "orange",
-                      "value": 5
-                    },
-                    {
-                      "color": "red",
-                      "value": 10
-                    }
-                  ]
-                }
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Reboots"
+              "options": "BogoMips"
             },
             "properties": [
               {
                 "id": "decimals",
                 "value": 0
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Availability"
-            },
-            "properties": [
+              },
               {
                 "id": "unit",
-                "value": "percent"
-              },
+                "value": "none"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Server"
+            },
+            "properties": [
               {
-                "id": "decimals",
-                "value": 2
+                "id": "custom.width",
+                "value": 240
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Usage"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "range",
+                    "options": {
+                      "from": 0,
+                      "to": 10,
+                      "result": {
+                        "text": "Unused",
+                        "color": "blue",
+                        "index": 0
+                      }
+                    }
+                  },
+                  {
+                    "type": "range",
+                    "options": {
+                      "from": 10.0001,
+                      "to": 30,
+                      "result": {
+                        "text": "Low",
+                        "color": "green",
+                        "index": 1
+                      }
+                    }
+                  },
+                  {
+                    "type": "range",
+                    "options": {
+                      "from": 30.0001,
+                      "to": 60,
+                      "result": {
+                        "text": "Medium",
+                        "color": "yellow",
+                        "index": 2
+                      }
+                    }
+                  },
+                  {
+                    "type": "range",
+                    "options": {
+                      "from": 60.0001,
+                      "to": 80,
+                      "result": {
+                        "text": "High",
+                        "color": "orange",
+                        "index": 3
+                      }
+                    }
+                  },
+                  {
+                    "type": "range",
+                    "options": {
+                      "from": 80.0001,
+                      "to": 1000,
+                      "result": {
+                        "text": "OverUsed",
+                        "color": "red",
+                        "index": 4
+                      }
+                    }
+                  }
+                ]
               },
               {
                 "id": "custom.cellOptions",
                 "value": {
-                  "type": "color-text"
+                  "type": "color-background"
                 }
               },
               {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "red",
-                      "value": null
-                    },
-                    {
-                      "color": "orange",
-                      "value": 99
-                    },
-                    {
-                      "color": "green",
-                      "value": 99.9
-                    }
-                  ]
-                }
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.width",
+                "value": 110
               }
             ]
-          }
-        ]
-      },
-      "options": {
-        "cellHeight": "sm",
-        "showHeader": true,
-        "enablePagination": false,
-        "sortBy": [
-          {
-            "displayName": "Avg CPU",
-            "desc": true
           }
         ]
       },
@@ -839,33 +1445,145 @@
           "id": "organize",
           "options": {
             "excludeByName": {
-              "Time": true
-            },
-            "indexByName": {
-              "host": 0,
-              "Value #A": 1,
-              "Value #B": 2,
-              "Value #C": 3,
-              "Value #D": 4,
-              "Value #E": 5,
-              "Value #F": 6,
-              "Value #H": 7,
-              "Value #I": 8
+              "Time": true,
+              "Value #C": true,
+              "Value #F": true,
+              "Value #H": true,
+              "Value #I": true
             },
             "renameByName": {
               "host": "Server",
               "Value #A": "Usage",
               "Value #B": "Avg CPU",
-              "Value #C": "Peak CPU",
               "Value #D": "Time overloaded",
               "Value #E": "Avg RAM",
-              "Value #F": "Peak RAM",
-              "Value #H": "Availability",
-              "Value #I": "Reboots"
+              "Value #J": "Cores",
+              "Value #K": "RAM (GiB)",
+              "Value #L": "BogoMips"
+            },
+            "indexByName": {
+              "host": 0,
+              "Value #L": 1,
+              "Value #A": 2,
+              "Value #B": 3,
+              "Value #D": 4,
+              "Value #E": 5
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "mode": "binary",
+            "binary": {
+              "left": "Avg CPU",
+              "operator": "*",
+              "right": "1"
+            },
+            "alias": "cpu_pool",
+            "replaceFields": false,
+            "timeSeries": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "mode": "binary",
+            "binary": {
+              "left": "Avg RAM",
+              "operator": "*",
+              "right": "1"
+            },
+            "alias": "ram_pool",
+            "replaceFields": false,
+            "timeSeries": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "mode": "unary",
+            "unary": {
+              "operator": "round",
+              "fieldName": "Avg CPU"
+            },
+            "alias": "Avg CPU (%)",
+            "replaceFields": false,
+            "timeSeries": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "mode": "unary",
+            "unary": {
+              "operator": "round",
+              "fieldName": "Avg RAM"
+            },
+            "alias": "Avg RAM (%)",
+            "replaceFields": false,
+            "timeSeries": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "mode": "unary",
+            "unary": {
+              "operator": "round",
+              "fieldName": "Time overloaded"
+            },
+            "alias": "Time overloaded (%)",
+            "replaceFields": false,
+            "timeSeries": false
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Avg CPU": true,
+              "Avg RAM": true,
+              "Time overloaded": true,
+              "Usage": true
+            },
+            "indexByName": {},
+            "renameByName": {}
+          }
+        },
+        {
+          "id": "groupToNestedTable",
+          "options": {
+            "showSubframeHeaders": true,
+            "fields": {
+              "Cores": {
+                "operation": "groupby",
+                "aggregations": []
+              },
+              "RAM (GiB)": {
+                "operation": "groupby",
+                "aggregations": []
+              },
+              "cpu_pool": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "count",
+                  "mean",
+                  "min",
+                  "max"
+                ]
+              },
+              "ram_pool": {
+                "operation": "aggregate",
+                "aggregations": [
+                  "mean"
+                ]
+              }
             }
           }
         }
-      ]
+      ],
+      "description": "**Servers are grouped when they have the same number of CPU cores and the same RAM** (rounded to 4 GiB). Click a line to unfold the servers of the pool.\n\n- **Pool avg CPU / RAM**: average of the servers of the pool.\n- **Least / Most loaded**: lowest and highest average CPU inside the pool. A big gap between identical servers means the load is badly spread: users could move from the busiest to the quietest one.\n- **BogoMips** (inside the pool): CPU speed indicator measured by Linux; identical servers should have close values.\n\nComputed over the period selected in the time picker (top right)."
     },
     {
       "id": 8,
@@ -874,7 +1592,7 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 30,
+        "y": 45,
         "w": 23,
         "h": 1
       },
@@ -884,14 +1602,14 @@
       "id": 9,
       "type": "status-history",
       "title": "Daily CPU usage per server",
-      "description": "One cell = average CPU usage of a server for one day. Blue = idle, red = saturated.",
+      "description": "**One cell = average CPU usage of one server for one day.**\n\n- Read it as a calendar: columns are days, lines are servers.\n- Colours: blue < 10% (idle) · green < 30% · yellow < 60% · orange < 80% · red ≥ 80%.\n- Useful to see weekly patterns (weekends), servers idle for weeks, or a server that became saturated.\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "x": 0,
-        "y": 31,
+        "y": 46,
         "w": 23,
         "h": 9
       },
@@ -965,14 +1683,14 @@
       "id": 10,
       "type": "status-history",
       "title": "Daily RAM usage per server",
-      "description": "One cell = average memory usage of a server for one day.",
+      "description": "**One cell = average memory usage of one server for one day.**\n\n- Same colours as the CPU calendar above.\n- A server constantly red needs more RAM or fewer jobs; constantly blue servers are oversized in memory.\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "x": 0,
-        "y": 40,
+        "y": 55,
         "w": 23,
         "h": 9
       },
@@ -1049,7 +1767,7 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 49,
+        "y": 64,
         "w": 23,
         "h": 1
       },
@@ -1059,14 +1777,14 @@
       "id": 12,
       "type": "bargauge",
       "title": "Top 15 users - share of the CPU consumed",
-      "description": "Share of all the CPU consumed by users on the selected servers during the period (100% = all user activity). System accounts excluded. Computed day by day from the CPU counters of process-exporter.",
+      "description": "**Which users consume the most CPU on the selected servers.**\n\n- KPI: CPU time used by all the processes of a user ÷ CPU time used by all users × 100. The total of all users is 100%.\n- Computed day by day from the CPU counters of process-exporter; system accounts (root, sshd, node_exporter) are excluded.\n- Numbers instead of names = accounts whose name could not be resolved from the AD.\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "x": 0,
-        "y": 50,
+        "y": 65,
         "w": 11,
         "h": 11
       },
@@ -1119,14 +1837,14 @@
       "id": 13,
       "type": "table",
       "title": "Local disks - usage",
-      "description": "Current size and fill level of the local disks of the selected servers, fullest first.",
+      "description": "**Current size and fill level of the local disks** (xfs, ext4…) of the selected servers, fullest first.\n\n- Used = (size − free space) / size.\n- Colours: green < 80% · orange < 90% · red ≥ 90%.\n- Network shares (NFS…) are not listed here: see the server detail dashboard.\n\nValue at the end of the selected period.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "x": 11,
-        "y": 50,
+        "y": 65,
         "w": 12,
         "h": 11
       },
@@ -1309,7 +2027,7 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 61,
+        "y": 76,
         "w": 23,
         "h": 1
       },
@@ -1319,14 +2037,14 @@
       "id": 15,
       "type": "stat",
       "title": "Licence features tracked",
-      "description": "Number of licence features (counted licences) reported by the FlexLM servers for the selected vendors.",
+      "description": "**Number of licence features followed by the FlexLM servers** for the selected vendors.\n\n- One feature = one licensed product/option (e.g. a simulator, a toolbox).\n- Uncounted / unlimited features are excluded.\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "x": 0,
-        "y": 62,
+        "y": 77,
         "w": 4,
         "h": 4
       },
@@ -1381,14 +2099,14 @@
       "id": 16,
       "type": "stat",
       "title": "Avg fill rate (licences in use)",
-      "description": "Average fill rate of the licence features that were used at least once in the period (never-used features are counted separately).",
+      "description": "**How full the licence pools are, on average.**\n\n- KPI: for each feature, average number of licences in use ÷ number of licences owned; then the average of all features that were used at least once.\n- Never-used features are counted separately (next tile), so they do not pull the average down.\n- Colours: blue < 20% · green < 70% · yellow < 90% · red ≥ 90%.\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "x": 4,
-        "y": 62,
+        "y": 77,
         "w": 5,
         "h": 4
       },
@@ -1456,14 +2174,14 @@
       "id": 17,
       "type": "stat",
       "title": "Never used in the period",
-      "description": "Features that were never checked out during the whole period: candidates for a contract review.",
+      "description": "**Licence features that nobody checked out during the whole period.**\n\n- These are the first candidates to reduce at the next contract renewal.\n- Check over a long period (30 days or more) before deciding: some tools are only used at project milestones.\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "x": 9,
-        "y": 62,
+        "y": 77,
         "w": 5,
         "h": 4
       },
@@ -1522,14 +2240,14 @@
       "id": 18,
       "type": "stat",
       "title": "Saturated features",
-      "description": "Features where ALL the licences were in use more than 5% of the time: users probably had to wait.",
+      "description": "**Licence features where ALL the licences were in use more than 5% of the time.**\n\n- 5% of 30 days ≈ 36 hours during which a new user could not get a licence.\n- Candidates for buying more licences, or for checking that idle sessions are released.\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "x": 14,
-        "y": 62,
+        "y": 77,
         "w": 5,
         "h": 4
       },
@@ -1588,14 +2306,14 @@
       "id": 19,
       "type": "stat",
       "title": "Distinct licence users",
-      "description": "Number of different people who used at least one licence during the period.",
+      "description": "**Number of different people who used at least one licence** of the selected vendors.\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "x": 19,
-        "y": 62,
+        "y": 77,
         "w": 4,
         "h": 4
       },
@@ -1650,14 +2368,14 @@
       "id": 20,
       "type": "table",
       "title": "Top 10 - most used licences",
-      "description": "The 10 features with the highest average share of licences in use over the period.",
+      "description": "**The 10 features with the highest average fill rate.**\n\n- Avg fill rate = average licences in use ÷ licences owned.\n- A feature close to 100% is fully used and probably blocks users at peak times.\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "x": 0,
-        "y": 66,
+        "y": 81,
         "w": 12,
         "h": 9
       },
@@ -1795,14 +2513,14 @@
       "id": 21,
       "type": "table",
       "title": "Top 10 - least used licences (used at least once)",
-      "description": "Features that are used, but very little: the number of licences could probably be reduced.",
+      "description": "**The 10 features with the lowest average fill rate, among those used at least once.**\n\n- Low fill rate = licences bought but rarely in use at the same time: the number of licences could be reduced.\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "x": 12,
-        "y": 66,
+        "y": 81,
         "w": 11,
         "h": 9
       },
@@ -1940,14 +2658,14 @@
       "id": 22,
       "type": "table",
       "title": "Licences never used in the period",
-      "description": "Purchased licences with zero checkout during the whole period.",
+      "description": "**Purchased licences with zero checkout during the whole period.**\n\n- Licences owned = number of tokens in the licence file.\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "x": 0,
-        "y": 75,
+        "y": 90,
         "w": 8,
         "h": 8
       },
@@ -2040,14 +2758,14 @@
       "id": 23,
       "type": "table",
       "title": "Saturated licences (all tokens in use)",
-      "description": "Share of the period during which every licence of the feature was taken. Above a few % users are likely blocked.",
+      "description": "**Features whose licences were all in use at some point.**\n\n- % of time saturated = share of the period during which every licence was taken (checked every 15 minutes).\n- Peak in use = highest number of licences used at the same time.\n- Distinct users = number of different people who used the feature.\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "x": 8,
-        "y": 75,
+        "y": 90,
         "w": 15,
         "h": 8
       },
@@ -2280,14 +2998,14 @@
       "id": 24,
       "type": "table",
       "title": "All licences - usage over the period",
-      "description": "Status: Saturated = all licences taken more than 5% of the time / Never used = no checkout in the period / Under-used = less than 20% on average / Healthy = the rest.",
+      "description": "**Complete view of every licence feature.**\n\nStatus rules, in this order:\n1. **Saturated** – all licences taken more than 5% of the time\n2. **Never used** – no checkout in the period\n3. **Under-used** – less than 20% of the licences in use on average\n4. **Healthy** – everything else\n\nHover a column title for its definition. Usage is sampled every minute by the FlexLM exporter: checkouts of a few seconds may be missed.\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "x": 0,
-        "y": 83,
+        "y": 98,
         "w": 23,
         "h": 14
       },
@@ -2471,6 +3189,10 @@
               {
                 "id": "custom.width",
                 "value": 120
+              },
+              {
+                "id": "description",
+                "value": "Saturated > Never used > Under-used (< 20%) > Healthy"
               }
             ]
           },
@@ -2483,6 +3205,10 @@
               {
                 "id": "decimals",
                 "value": 0
+              },
+              {
+                "id": "description",
+                "value": "Number of licences in the licence file"
               }
             ]
           },
@@ -2495,6 +3221,10 @@
               {
                 "id": "decimals",
                 "value": 0
+              },
+              {
+                "id": "description",
+                "value": "Highest number of licences in use at the same time"
               }
             ]
           },
@@ -2511,6 +3241,10 @@
               {
                 "id": "noValue",
                 "value": "0"
+              },
+              {
+                "id": "description",
+                "value": "Number of different users of this feature"
               }
             ]
           },
@@ -2563,6 +3297,10 @@
                     }
                   ]
                 }
+              },
+              {
+                "id": "description",
+                "value": "Avg in use ÷ Owned"
               }
             ]
           },
@@ -2615,6 +3353,10 @@
                     }
                   ]
                 }
+              },
+              {
+                "id": "description",
+                "value": "Peak in use ÷ Owned"
               }
             ]
           },
@@ -2627,6 +3369,22 @@
               {
                 "id": "unit",
                 "value": "percent"
+              },
+              {
+                "id": "description",
+                "value": "Share of the period with all licences in use"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Avg in use"
+            },
+            "properties": [
+              {
+                "id": "description",
+                "value": "Average number of licences in use at the same time"
               }
             ]
           }
@@ -2686,14 +3444,14 @@
       "id": 25,
       "type": "timeseries",
       "title": "Licence fill rate per vendor over time",
-      "description": "Share of the licences of each vendor in use, hour by hour.",
+      "description": "**Share of the licences of each vendor in use, hour by hour.**\n\n- KPI: licences in use ÷ licences owned, all features of the vendor together.\n- Shows working-hours peaks, weekends and holidays.\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "x": 0,
-        "y": 97,
+        "y": 112,
         "w": 14,
         "h": 9
       },
@@ -2744,14 +3502,14 @@
       "id": 26,
       "type": "table",
       "title": "Top 15 licence users (licence-hours)",
-      "description": "Approximate time each person held licences during the period (sum over all features, 1 licence for 1 hour = 1 licence-hour). Based on the 1-minute FlexLM polling.",
+      "description": "**Who holds licences the longest.**\n\n- 1 licence-hour = 1 licence held during 1 hour. Two licences held 3 hours = 6 licence-hours.\n- Sum over all features of the selected vendors; based on the 1-minute FlexLM polling, so it is an approximation.\n\nComputed over the period selected in the time picker (top right).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
       "gridPos": {
         "x": 14,
-        "y": 97,
+        "y": 112,
         "w": 9,
         "h": 9
       },
@@ -2860,6 +3618,35 @@
           }
         }
       ]
+    },
+    {
+      "id": 29,
+      "type": "row",
+      "title": "KPI definitions (click to open)",
+      "collapsed": true,
+      "gridPos": {
+        "x": 0,
+        "y": 121,
+        "w": 23,
+        "h": 1
+      },
+      "panels": [
+        {
+          "id": 30,
+          "type": "text",
+          "title": "KPI definitions",
+          "gridPos": {
+            "x": 0,
+            "y": 122,
+            "w": 23,
+            "h": 14
+          },
+          "options": {
+            "mode": "markdown",
+            "content": "| KPI | Definition | Thresholds |\n|---|---|---|\n| **Avg CPU** | Share of CPU time not idle, averaged over all cores and over the period | 🟦 < 10% · 🟩 < 60% · 🟨 < 80% · 🟥 ≥ 80% |\n| **Avg RAM** | 1 − available memory / total memory (cache that Linux can free counts as available) | same as CPU |\n| **Usage** | Highest of Avg CPU and Avg RAM | Unused < 10% · Low < 30% · Medium < 60% · High < 80% · OverUsed ≥ 80% |\n| **Time overloaded** | Share of the period with CPU above 80% (5-min average) | > 10% = often overloaded |\n| **Availability** | Share of the period during which the server answered the monitoring | 🟥 < 99% · 🟧 < 99.9% · 🟩 ≥ 99.9% |\n| **Pool** | Servers with the same number of cores and the same RAM | big gap between least/most loaded = load badly spread |\n| **User CPU share** | CPU time of a user's processes ÷ CPU time of all users | total = 100% |\n| **Licence fill rate** | Licences in use ÷ licences owned | 🟦 < 20% · 🟩 < 70% · 🟨 < 90% · 🟥 ≥ 90% |\n| **Saturated licence** | All licences in use more than 5% of the period | users probably had to wait |\n| **Never-used licence** | No checkout during the whole period | candidate for reduction |\n| **Licence-hour** | 1 licence held during 1 hour | |\n\n*Data: node_exporter (CPU, RAM, disks, availability), process-exporter (CPU per user), flexlm_exporter (licences, polled every minute). History kept 60 days.*"
+          }
+        }
+      ]
     }
   ],
   "refresh": "",
@@ -2947,5 +3734,5 @@
   "timezone": "browser",
   "title": "CAO Compute - Trends & Capacity",
   "uid": "cao-trends-dash",
-  "version": 5
+  "version": 6
 }
