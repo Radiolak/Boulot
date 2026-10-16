@@ -1,21 +1,3 @@
-Tout ce qu'on à là c'est super mais il me manque un dernier dashboard purement pour les managers, un dashboard avec des tendances, j'aimerais que tu me fasse un dashbpoard avec des listes, tableaux etc tout ce que tu veux en utilisant l'historique qu'on à pour pouvoir nous faire des tendances, cet a dire: 
-
-Par exemple un tableau pour montrer les machines les plus utilisées sur la période de temps mis en variable en haut du dashboard, avce quel pourcentage d'utilisation moyen sur la période, laquelle est le plus souvent surchargé 
-La plus utilisée au global ou par cpu ou par ram, 
-
-
-C'est un exemple de ce qui pourrait etre intéressant mais je suis sur que tu peux avoir de bien meilleures idées, à toi d'y réfléchir pour faire quelque chose de propre ;) 
-
-
-Et aussi j'aimerais qu'on puisse pour les licences dont sur le dashboard flexlm avoir un autre dashboard qui nous permettrais de faire un fichier pdf pour nous faire une sorte de synthèse d'utilisation des licences pour mettre en valeur 
-les licences les plus utilisées / Les moins, celles pas du tout utilisées et au contraite celles qui le sont le plus, d'ailleurs ça peut etre intéressant de rajouter ces tableaux également sur le dashboard de tendances car ça pourrait etre un vrais + pour mes utilisateurs
-
-
-D'ailleurs je t'ai dit ça sur les deux pages à construire mais ne t'arrête pas à mes idées soit créatif sur les dashboard grafana, j'aimerais quelque chose de complet et d'assez préci mais compréhansible pour mes utilisateurs 
-
-
-
-D'ailleurs, vois tu des pistes d'améliorations n'hésites pas car on à besoin de sérieusement bien faire ça car après je devrais présenter la solution à des équipes donc pas d'erreure possible pour moi à toi de t'assurer que ce qu'on à est viable 
 
 faire des listes pool de vms identiques pour comparer les caractéristiques 
 
