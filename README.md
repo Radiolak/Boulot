@@ -37,6 +37,7 @@ divers/            Fichiers hors projet supervision
 |---|---|
 | `documentation-utilisateurs.docx` | Salariés : dashboards Global, Détail serveur, Vue FPGA |
 | `documentation-managers.docx` | Managers : FlexLM, alertes, Trends & Capacity |
+| `documentation-licences-flexlm.docx` | Tous : dashboards Licences FlexLM (vue globale, détail éditeur, rapport) |
 | `glossaire.docx` | Tous : termes techniques du projet |
 | `documentation-de-service.docx` | Tous : présentation du service, accès, support, liens Confluence |
 | `mail-de-lancement.txt` | Mail d'annonce de l'outil aux utilisateurs |
