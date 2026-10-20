@@ -27,7 +27,7 @@
       "keepTime": true,
       "tags": [],
       "targetBlank": false,
-      "title": "Retour a la vue globale",
+      "title": "Retour à la vue globale",
       "tooltip": "",
       "type": "link",
       "url": "/d/global-overview-dash/supervision-vue-globale-des-serveurs"
@@ -70,7 +70,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Etat"
+              "options": "État"
             },
             "properties": [
               {
@@ -122,7 +122,7 @@
                       "from": 60.01,
                       "result": {
                         "color": "yellow",
-                        "text": "HIGH"
+                        "text": "ÉLEVÉ"
                       },
                       "to": 95
                     },
@@ -133,7 +133,7 @@
                       "from": 95.01,
                       "result": {
                         "color": "red",
-                        "text": "CRITICAL"
+                        "text": "CRITIQUE"
                       },
                       "to": 1000
                     },
@@ -352,22 +352,23 @@
               "version": 16
             },
             "renameByName": {
-              "Value #A": "Etat",
-              "Value #C": "Uptime (h)",
-              "Value #D": "Nb CPU",
+              "Value #A": "État",
+              "Value #C": "Allumé depuis (h)",
+              "Value #D": "Nb cœurs",
               "Value #F": "RAM totale",
-              "Value #I": "BogoMips (moyen/coeur)",
+              "Value #I": "BogoMips (par cœur)",
               "address": "Adresse IP",
-              "instance": "Server",
+              "instance": "Serveur",
               "ip": "Adresse IP",
-              "nodename": "Hostname",
-              "sysname": "OS"
+              "nodename": "Nom machine",
+              "sysname": "Système",
+              "host 5": "Serveur"
             }
           }
         }
       ],
       "type": "table",
-      "description": "Carte d'identité du serveur.\n\n- **Etat** : plus forte valeur entre CPU et RAM. OK < 60 %, HIGH < 95 %, CRITICAL au-delà.\n- **Uptime (h)** : heures depuis le dernier démarrage.\n- **Nb CPU** : nombre de cœurs. **RAM totale** : mémoire installée.\n- **BogoMips** : vitesse d'un cœur (plus c'est haut, plus c'est rapide)."
+      "description": "Carte d'identité du serveur.\n\n- **État** : plus forte valeur entre CPU et RAM. OK < 60 %, ÉLEVÉ < 95 %, CRITIQUE au-delà.\n- **Allumé depuis (h)** : heures depuis le dernier démarrage.\n- **Nb cœurs** : nombre de cœurs. **RAM totale** : mémoire installée.\n- **BogoMips** : vitesse d'un cœur (plus c'est haut, plus c'est rapide)."
     },
     {
       "datasource": {
@@ -570,12 +571,12 @@
           },
           "editorMode": "code",
           "expr": "100 - (avg by(cpu) (rate(node_cpu_seconds_total{host=\"$server\", mode=\"idle\", job=\"node_exporter\"}[5m])) * 100)",
-          "legendFormat": "CPU {{cpu}}",
+          "legendFormat": "Cœur {{cpu}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "CPU - Utilisation par CPU logique",
+      "title": "CPU - Utilisation par cœur",
       "type": "timeseries",
       "description": "Une courbe par cœur (moyenne sur 5 min).\n\nQuelques cœurs à 100 % et les autres bas : le calcul en cours n'utilise qu'une partie du serveur."
     },
@@ -694,7 +695,7 @@
           },
           "editorMode": "code",
           "expr": "node_filesystem_avail_bytes{host=\"$server\", job=\"node_exporter\", fstype=~\"ext2|ext3|ext4|xfs|btrfs|vfat|zfs\", mountpoint=~\"$mountpoint\"}",
-          "legendFormat": "{{mountpoint}} - free",
+          "legendFormat": "{{mountpoint}} - libre",
           "range": true,
           "refId": "A"
         },
@@ -710,9 +711,9 @@
           "refId": "B"
         }
       ],
-      "title": "Local storage - Remaining free space per disk",
+      "title": "Disques locaux - Espace libre restant",
       "type": "timeseries",
-      "description": "Espace **libre restant** sur chaque disque local. La taille totale est dans la légende.\n\nUne courbe qui descend = un disque qui se remplit. Orange sous 50 Go, rouge sous 20 Go.\nChoix des disques : liste **Local disks** en haut."
+      "description": "Espace **libre restant** sur chaque disque local. La taille totale est dans la légende.\n\nUne courbe qui descend = un disque qui se remplit. Orange sous 50 Go, rouge sous 20 Go.\nChoix des disques : liste **Disques locaux** en haut."
     },
     {
       "datasource": {
@@ -830,7 +831,7 @@
           },
           "editorMode": "code",
           "expr": "node_filesystem_avail_bytes{host=\"$server\", job=\"node_exporter\", fstype=~\"nfs|nfs4|cifs|smb3|smbfs|fuse.sshfs|ceph|glusterfs|lustre|gpfs|beegfs\", mountpoint=~\"$remote_mount\"}",
-          "legendFormat": "{{mountpoint}} - free",
+          "legendFormat": "{{mountpoint}} - libre",
           "range": true,
           "refId": "A"
         },
@@ -846,9 +847,9 @@
           "refId": "B"
         }
       ],
-      "title": "Remote storage (NFS / CIFS) - Remaining free space per mount",
+      "title": "Partages réseau (NFS / CIFS) - Espace libre restant",
       "type": "timeseries",
-      "description": "Espace **libre restant** sur les partages réseau (NFS…) montés sur ce serveur.\n\nUn partage automonté n'apparaît que lorsqu'il est utilisé.\nChoix des partages : liste **Remote disks** en haut."
+      "description": "Espace **libre restant** sur les partages réseau (NFS…) montés sur ce serveur.\n\nUn partage automonté n'apparaît que lorsqu'il est utilisé.\nChoix des partages : liste **Disques réseau** en haut."
     },
     {
       "datasource": {
@@ -951,12 +952,12 @@
           },
           "editorMode": "code",
           "expr": "100 * (1 - (node_memory_MemAvailable_bytes{host=\"$server\", job=\"node_exporter\"} / node_memory_MemTotal_bytes{host=\"$server\", job=\"node_exporter\"}))",
-          "legendFormat": "RAM utilisee",
+          "legendFormat": "RAM utilisée",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "RAM - Usage / Evolution",
+      "title": "RAM - Utilisation",
       "type": "timeseries",
       "description": "% de la mémoire utilisée par les programmes (le cache libérable n'est pas compté).\n\nOrange au-dessus de 70 %, rouge au-dessus de 90 % : les calculs ralentissent fortement."
     },
@@ -996,7 +997,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "% used"
+              "options": "% utilisé"
             },
             "properties": [
               {
@@ -1070,7 +1071,7 @@
                     "options": {
                       "pattern": "/^(nfs|nfs4|cifs|smb3|smbfs|fuse.sshfs|ceph|glusterfs|lustre|gpfs|beegfs)$/",
                       "result": {
-                        "text": "Remote ($1)",
+                        "text": "Réseau ($1)",
                         "color": "blue"
                       }
                     }
@@ -1135,7 +1136,7 @@
           "refId": "B"
         }
       ],
-      "title": "Storage - Disks (local + remote)",
+      "title": "Disques - Situation actuelle",
       "transformations": [
         {
           "id": "joinByField",
@@ -1181,7 +1182,7 @@
         {
           "id": "calculateField",
           "options": {
-            "alias": "Used bytes",
+            "alias": "Espace utilisé",
             "binary": {
               "left": {
                 "matcher": {
@@ -1206,12 +1207,12 @@
         {
           "id": "calculateField",
           "options": {
-            "alias": "% used",
+            "alias": "% utilisé",
             "binary": {
               "left": {
                 "matcher": {
                   "id": "byName",
-                  "options": "Used bytes"
+                  "options": "Espace utilisé"
                 }
               },
               "operator": "/",
@@ -1232,7 +1233,7 @@
           "id": "organize",
           "options": {
             "excludeByName": {
-              "Used bytes": true
+              "Espace utilisé": true
             },
             "indexByName": {},
             "renameByName": {}
@@ -1240,7 +1241,7 @@
         }
       ],
       "type": "table",
-      "description": "Situation **actuelle** de chaque disque : espace disponible, taille totale, type (Local ou Remote) et % used.\n\nVert < 80 %, orange < 90 %, rouge au-delà. À vérifier avant de lancer un calcul."
+      "description": "Situation **actuelle** de chaque disque : espace disponible, taille totale, type (Local ou Réseau) et % utilisé.\n\nVert < 80 %, orange < 90 %, rouge au-delà. À vérifier avant de lancer un calcul."
     },
     {
       "datasource": {
@@ -1372,12 +1373,12 @@
           },
           "editorMode": "code",
           "expr": "node_network_speed_bytes{host=\"$server\", job=\"node_exporter\"} * 8",
-          "legendFormat": "{{device}}{{interface}} - Vitesse max port (theorique)",
+          "legendFormat": "{{device}}{{interface}} - vitesse max de la carte",
           "range": true,
           "refId": "C"
         }
       ],
-      "title": "Reseau - Debit entrant / sortant",
+      "title": "Réseau - Débit entrant / sortant",
       "type": "timeseries",
       "description": "Trafic réseau en bits/s : reçu au-dessus de l'axe, envoyé en dessous. La vitesse maximale de la carte est aussi tracée.\n\nUtile pour repérer un gros transfert de fichiers."
     },
@@ -1496,7 +1497,7 @@
           },
           "editorMode": "code",
           "expr": "rate(node_network_receive_drop_total{host=\"$server\", job=\"node_exporter\"}[5m])",
-          "legendFormat": "{{device}} paquets perdus (in)",
+          "legendFormat": "{{device}} paquets perdus (entrée)",
           "range": true,
           "refId": "C"
         },
@@ -1507,12 +1508,12 @@
           },
           "editorMode": "code",
           "expr": "rate(node_network_transmit_drop_total{host=\"$server\", job=\"node_exporter\"}[5m])",
-          "legendFormat": "{{device}} paquets perdus (out)",
+          "legendFormat": "{{device}} paquets perdus (sortie)",
           "range": true,
           "refId": "D"
         }
       ],
-      "title": "Reseau - Erreurs et pertes de paquets",
+      "title": "Réseau - Erreurs et paquets perdus",
       "type": "timeseries",
       "description": "Erreurs et paquets perdus par seconde sur les cartes réseau.\n\nDoit rester à 0. Si des valeurs apparaissent de façon durable, prévenez l'équipe Supervision."
     },
@@ -1554,7 +1555,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "blue",
+                  "fixedColor": "green",
                   "mode": "fixed"
                 }
               }
@@ -1603,7 +1604,7 @@
           "editorMode": "code",
           "expr": "avg by(instance) (rate(node_cpu_seconds_total{host=\"$server\", job=\"node_exporter\", mode=\"idle\"}[5m])) * 100",
           "instant": true,
-          "legendFormat": "Free",
+          "legendFormat": "Libre",
           "refId": "A"
         },
         {
@@ -1618,9 +1619,9 @@
           "refId": "B"
         }
       ],
-      "title": "CPU usage by user",
+      "title": "CPU par utilisateur (en ce moment)",
       "type": "bargauge",
-      "description": "Part du serveur utilisée par chaque utilisateur **en ce moment** (100 % = tout le serveur).\n\n**Free** = capacité encore libre. Les comptes système ne sont pas comptés."
+      "description": "Part du serveur utilisée par chaque utilisateur **en ce moment** (100 % = tout le serveur).\n\n**Libre** = capacité encore disponible. Les comptes système ne sont pas comptés."
     },
     {
       "datasource": {
@@ -1710,7 +1711,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Depuis"
+              "options": "Lancé le"
             },
             "properties": [
               {
@@ -1724,7 +1725,7 @@
                     "options": {
                       "match": "null",
                       "result": {
-                        "text": "N/A"
+                        "text": "Inconnu"
                       }
                     },
                     "type": "special"
@@ -1803,7 +1804,7 @@
           "refId": "D"
         }
       ],
-      "title": "Detail processus par utilisateur",
+      "title": "Processus par utilisateur",
       "transformations": [
         {
           "id": "joinByField",
@@ -1856,8 +1857,8 @@
             "renameByName": {
               "Value #A": "CPU %",
               "Value #B": "RAM",
-              "Value #C": "Nb instances",
-              "Value #D": "Depuis",
+              "Value #C": "Nb processus",
+              "Value #D": "Lancé le",
               "processus": "Processus",
               "utilisateur": "Utilisateur"
             }
@@ -1892,7 +1893,7 @@
                     "value": 0
                   }
                 },
-                "fieldName": "Nb instances"
+                "fieldName": "Nb processus"
               }
             ],
             "match": "all",
@@ -1901,7 +1902,7 @@
         }
       ],
       "type": "table",
-      "description": "Programmes en cours, regroupés par utilisateur.\n\n- **CPU %** : part du serveur utilisée.\n- **RAM** : mémoire utilisée.\n- **Nb instances** : nombre de processus identiques.\n- **Depuis** : lancement du plus ancien.\n\nFiltrez la colonne Utilisateur (entonnoir) pour retrouver vos processus."
+      "description": "Programmes en cours, regroupés par utilisateur.\n\n- **CPU %** : part du serveur utilisée.\n- **RAM** : mémoire utilisée.\n- **Nb processus** : nombre de processus identiques.\n- **Lancé le** : date de lancement du plus ancien.\n\nFiltrez la colonne Utilisateur (entonnoir) pour retrouver vos processus."
     }
   ],
   "preload": false,
@@ -1962,7 +1963,7 @@
         },
         "definition": "label_values(node_filesystem_size_bytes{fstype=~\"ext2|ext3|ext4|xfs|btrfs|vfat|zfs\"}, mountpoint)",
         "includeAll": true,
-        "label": "Local disks",
+        "label": "Disques locaux",
         "multi": true,
         "name": "mountpoint",
         "options": [],
@@ -1988,7 +1989,7 @@
         },
         "definition": "label_values(node_filesystem_size_bytes{fstype=~\"nfs|nfs4|cifs|smb3|smbfs|fuse.sshfs|ceph|glusterfs|lustre|gpfs|beegfs\"}, mountpoint)",
         "includeAll": true,
-        "label": "Remote disks",
+        "label": "Disques réseau",
         "multi": true,
         "name": "remote_mount",
         "options": [],
@@ -2018,7 +2019,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "Detail serveur",
+  "title": "Détail serveur",
   "uid": "server-detail-dash",
   "version": 59
 }

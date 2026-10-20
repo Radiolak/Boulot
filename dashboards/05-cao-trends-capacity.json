@@ -2,13 +2,13 @@
   "annotations": {
     "list": []
   },
-  "description": "Management view: usage trends, capacity and licence consumption over a chosen period.",
+  "description": "Vue managers : tendances d'utilisation, capacité et consommation des licences sur une période.",
   "editable": true,
   "graphTooltip": 1,
   "id": null,
   "links": [
     {
-      "title": "Global overview",
+      "title": "Vue globale",
       "type": "link",
       "url": "/d/global-overview-dash",
       "icon": "dashboard",
@@ -16,7 +16,7 @@
       "targetBlank": false
     },
     {
-      "title": "Licence report",
+      "title": "Rapport licences",
       "type": "link",
       "url": "/d/flexlm-licence-report",
       "icon": "doc",
@@ -47,13 +47,13 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "**All figures are computed over the period selected in the time picker (top right)** — from ${__from:date:DD/MM/YYYY HH:mm} to ${__to:date:DD/MM/YYYY HH:mm}. Use *Last 7 days*, *Last 30 days*… to compare periods. History is kept 60 days. **Usage**: Unused < 10% · Low < 30% · Medium < 60% · High < 80% · OverUsed ≥ 80% (highest of average CPU and average RAM). **Overloaded time** = share of the period with CPU above 80%."
+        "content": "**Tous les chiffres portent sur la période choisie en haut à droite** : du ${__from:date:DD/MM/YYYY HH:mm} au ${__to:date:DD/MM/YYYY HH:mm}. Utilisez *Last 7 days*, *Last 30 days*… pour comparer des périodes. Historique conservé 60 jours. **Charge** : Libre < 10 % · Peu chargé < 30 % · Moyen < 60 % · Chargé < 80 % · Surchargé ≥ 80 % (plus forte valeur entre CPU moyen et RAM moyenne). **Temps en surcharge** = part de la période avec un CPU au-dessus de 80 %."
       }
     },
     {
       "id": 2,
       "type": "row",
-      "title": "Compute servers - key figures",
+      "title": "Serveurs de calcul - chiffres clés",
       "collapsed": false,
       "gridPos": {
         "x": 0,
@@ -66,8 +66,8 @@
     {
       "id": 3,
       "type": "stat",
-      "title": "Average CPU usage (fleet)",
-      "description": "**Average CPU usage of all selected servers.**\n\n- KPI: share of CPU time not idle, averaged over every core of every server.\n- Measured on 5-minute windows sampled every 30 minutes.\n- Colours: blue < 10% (idle) · green < 60% · yellow < 80% · red ≥ 80%.\n\nComputed over the period selected in the time picker (top right).",
+      "title": "CPU moyen (tous serveurs)",
+      "description": "**CPU moyen de tous les serveurs choisis.**\n\n- Part du temps où le processeur travaille, moyenne de tous les cœurs de tous les serveurs.\n- Mesuré sur 5 minutes, relevé toutes les 30 minutes.\n- Bleu < 10 % (inutilisé) · vert < 60 % · jaune < 80 % · rouge au-delà.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -141,8 +141,8 @@
     {
       "id": 4,
       "type": "stat",
-      "title": "Average RAM usage (fleet)",
-      "description": "**Average memory usage of all selected servers.**\n\n- KPI: 1 − (available memory / total memory). *Available* includes cache that Linux can free, so it is the memory really usable by new jobs.\n- Colours: blue < 10% · green < 60% · yellow < 80% · red ≥ 80%.\n\nComputed over the period selected in the time picker (top right).",
+      "title": "RAM moyenne (tous serveurs)",
+      "description": "**RAM moyenne de tous les serveurs choisis.**\n\n- 1 − (mémoire disponible ÷ mémoire totale). Le cache que Linux peut libérer compte comme disponible.\n- Bleu < 10 % · vert < 60 % · jaune < 80 % · rouge au-delà.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -216,8 +216,8 @@
     {
       "id": 5,
       "type": "stat",
-      "title": "Availability",
-      "description": "**Share of the period during which the servers answered the monitoring** (node_exporter reachable every 15 s).\n\n- 100% = never down. 99% over 30 days ≈ 7 hours of unavailability.\n- Planned reboots also count as unavailability (a few minutes each).\n- Colours: red < 99% · orange < 99.9% · green ≥ 99.9%.\n\nComputed over the period selected in the time picker (top right).",
+      "title": "Disponibilité",
+      "description": "**Part de la période où les serveurs répondaient à la supervision** (vérifié toutes les 15 s).\n\n- 100 % = jamais arrêté. 99 % sur 30 jours ≈ 7 heures d'arrêt.\n- Les redémarrages planifiés comptent aussi (quelques minutes chacun).\n- Rouge < 99 % · orange < 99,9 % · vert au-delà.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -287,8 +287,8 @@
     {
       "id": 6,
       "type": "stat",
-      "title": "Often overloaded servers",
-      "description": "**Number of servers that were overloaded more than 10% of the time.**\n\n- Overloaded = CPU above 80% (5-minute average).\n- 10% of 30 days ≈ 3 days cumulated at more than 80% CPU.\n- These servers are candidates for more capacity or for moving jobs to quieter servers (see the pools table below).\n\nComputed over the period selected in the time picker (top right).",
+      "title": "Serveurs souvent surchargés",
+      "description": "**Nombre de serveurs au-dessus de 80 % de CPU plus de 10 % du temps.**\n\n- 10 % de 30 jours ≈ 3 jours cumulés au-dessus de 80 %.\n- Ces serveurs manquent de capacité, ou leurs calculs peuvent être déplacés vers des serveurs moins chargés (voir les pools plus bas).\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -353,8 +353,8 @@
     {
       "id": 7,
       "type": "table",
-      "title": "Server ranking over the period",
-      "description": "**One line per server, sorted by average CPU. Click a column header to sort differently.**\n\nHover a column title for its exact definition.\n\n- **Usage** summarises the server: highest of average CPU and average RAM → Unused < 10% · Low < 30% · Medium < 60% · High < 80% · OverUsed ≥ 80%.\n- CPU figures use 5-minute windows sampled every 30 minutes; very short spikes may not appear.\n\nComputed over the period selected in the time picker (top right).",
+      "title": "Classement des serveurs sur la période",
+      "description": "**Une ligne par serveur, triée par CPU moyen.** Cliquez sur un titre de colonne pour trier autrement, survolez-le pour sa définition.\n\n- **Charge** : plus forte valeur entre CPU moyen et RAM moyenne → Libre < 10 % · Peu chargé < 30 % · Moyen < 60 % · Chargé < 80 % · Surchargé ≥ 80 %.\n- Le CPU est mesuré sur 5 minutes, relevé toutes les 30 minutes : les pics très courts peuvent ne pas apparaître.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -538,7 +538,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Server"
+              "options": "Serveur"
             },
             "properties": [
               {
@@ -550,7 +550,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Usage"
+              "options": "Charge"
             },
             "properties": [
               {
@@ -562,7 +562,7 @@
                       "from": 0,
                       "to": 10,
                       "result": {
-                        "text": "Unused",
+                        "text": "Libre",
                         "color": "blue",
                         "index": 0
                       }
@@ -574,7 +574,7 @@
                       "from": 10.0001,
                       "to": 30,
                       "result": {
-                        "text": "Low",
+                        "text": "Peu chargé",
                         "color": "green",
                         "index": 1
                       }
@@ -586,7 +586,7 @@
                       "from": 30.0001,
                       "to": 60,
                       "result": {
-                        "text": "Medium",
+                        "text": "Moyen",
                         "color": "yellow",
                         "index": 2
                       }
@@ -598,7 +598,7 @@
                       "from": 60.0001,
                       "to": 80,
                       "result": {
-                        "text": "High",
+                        "text": "Chargé",
                         "color": "orange",
                         "index": 3
                       }
@@ -610,7 +610,7 @@
                       "from": 80.0001,
                       "to": 1000,
                       "result": {
-                        "text": "OverUsed",
+                        "text": "Surchargé",
                         "color": "red",
                         "index": 4
                       }
@@ -634,14 +634,14 @@
               },
               {
                 "id": "description",
-                "value": "Highest of Avg CPU and Avg RAM: Unused < 10% · Low < 30% · Medium < 60% · High < 80% · OverUsed ≥ 80%"
+                "value": "Plus forte valeur entre CPU moyen et RAM moyenne : Libre < 10 % · Peu chargé < 30 % · Moyen < 60 % · Chargé < 80 % · Surchargé ≥ 80 %"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Avg CPU"
+              "options": "CPU moyen"
             },
             "properties": [
               {
@@ -686,14 +686,14 @@
               },
               {
                 "id": "description",
-                "value": "Average CPU usage over the period (all cores)"
+                "value": "CPU moyen sur la période (tous les cœurs)"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Avg RAM"
+              "options": "RAM moyenne"
             },
             "properties": [
               {
@@ -738,14 +738,14 @@
               },
               {
                 "id": "description",
-                "value": "Average memory usage over the period"
+                "value": "RAM moyenne sur la période"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Peak CPU"
+              "options": "CPU max"
             },
             "properties": [
               {
@@ -754,14 +754,14 @@
               },
               {
                 "id": "description",
-                "value": "Highest CPU usage seen (5-minute average, sampled every 30 min)"
+                "value": "CPU le plus haut observé (moyenne sur 5 min, relevé toutes les 30 min)"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Peak RAM"
+              "options": "RAM max"
             },
             "properties": [
               {
@@ -770,14 +770,14 @@
               },
               {
                 "id": "description",
-                "value": "Highest memory usage seen"
+                "value": "RAM la plus haute observée"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Time overloaded"
+              "options": "Temps en surcharge"
             },
             "properties": [
               {
@@ -822,14 +822,14 @@
               },
               {
                 "id": "description",
-                "value": "Share of the period with CPU above 80%. 10% of 30 days ≈ 3 days"
+                "value": "Part de la période avec un CPU au-dessus de 80 %. 10 % de 30 jours ≈ 3 jours"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Reboots"
+              "options": "Redémarrages"
             },
             "properties": [
               {
@@ -838,14 +838,14 @@
               },
               {
                 "id": "description",
-                "value": "Number of reboots during the period (planned and unplanned)"
+                "value": "Nombre de redémarrages sur la période (planifiés ou non)"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Availability"
+              "options": "Disponibilité"
             },
             "properties": [
               {
@@ -884,7 +884,7 @@
               },
               {
                 "id": "description",
-                "value": "Share of the period during which the server answered the monitoring"
+                "value": "Part de la période où le serveur répondait à la supervision"
               }
             ]
           }
@@ -896,7 +896,7 @@
         "enablePagination": false,
         "sortBy": [
           {
-            "displayName": "Avg CPU",
+            "displayName": "CPU moyen",
             "desc": true
           }
         ]
@@ -927,15 +927,15 @@
               "Value #I": 8
             },
             "renameByName": {
-              "host": "Server",
-              "Value #A": "Usage",
-              "Value #B": "Avg CPU",
-              "Value #C": "Peak CPU",
-              "Value #D": "Time overloaded",
-              "Value #E": "Avg RAM",
-              "Value #F": "Peak RAM",
-              "Value #H": "Availability",
-              "Value #I": "Reboots"
+              "host": "Serveur",
+              "Value #A": "Charge",
+              "Value #B": "CPU moyen",
+              "Value #C": "CPU max",
+              "Value #D": "Temps en surcharge",
+              "Value #E": "RAM moyenne",
+              "Value #F": "RAM max",
+              "Value #H": "Disponibilité",
+              "Value #I": "Redémarrages"
             }
           }
         }
@@ -944,7 +944,7 @@
     {
       "id": 27,
       "type": "row",
-      "title": "Identical server pools",
+      "title": "Pools de serveurs identiques",
       "collapsed": false,
       "gridPos": {
         "x": 0,
@@ -957,7 +957,7 @@
     {
       "id": 28,
       "type": "table",
-      "title": "Pools of identical servers (same cores and RAM)",
+      "title": "Pools de serveurs identiques (mêmes cœurs et RAM)",
       "datasource": {
         "type": "datasource",
         "uid": "-- Dashboard --"
@@ -985,7 +985,7 @@
         "enablePagination": false,
         "sortBy": [
           {
-            "displayName": "Servers",
+            "displayName": "Serveurs",
             "desc": true
           }
         ]
@@ -1018,7 +1018,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Cores"
+              "options": "Cœurs"
             },
             "properties": [
               {
@@ -1038,7 +1038,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "RAM (GiB)"
+              "options": "RAM (Gio)"
             },
             "properties": [
               {
@@ -1063,7 +1063,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Servers"
+                "value": "Serveurs"
               },
               {
                 "id": "decimals",
@@ -1083,7 +1083,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Pool avg CPU"
+                "value": "CPU moyen du pool"
               },
               {
                 "id": "unit",
@@ -1135,7 +1135,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Least loaded"
+                "value": "Le moins chargé"
               },
               {
                 "id": "unit",
@@ -1151,7 +1151,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Most loaded"
+                "value": "Le plus chargé"
               },
               {
                 "id": "unit",
@@ -1167,7 +1167,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Pool avg RAM"
+                "value": "RAM moyenne du pool"
               },
               {
                 "id": "unit",
@@ -1214,7 +1214,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Avg CPU"
+              "options": "CPU moyen"
             },
             "properties": [
               {
@@ -1262,7 +1262,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Avg RAM"
+              "options": "RAM moyenne"
             },
             "properties": [
               {
@@ -1310,7 +1310,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Time overloaded"
+              "options": "Temps en surcharge"
             },
             "properties": [
               {
@@ -1338,7 +1338,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Server"
+              "options": "Serveur"
             },
             "properties": [
               {
@@ -1350,7 +1350,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Usage"
+              "options": "Charge"
             },
             "properties": [
               {
@@ -1362,7 +1362,7 @@
                       "from": 0,
                       "to": 10,
                       "result": {
-                        "text": "Unused",
+                        "text": "Libre",
                         "color": "blue",
                         "index": 0
                       }
@@ -1374,7 +1374,7 @@
                       "from": 10.0001,
                       "to": 30,
                       "result": {
-                        "text": "Low",
+                        "text": "Peu chargé",
                         "color": "green",
                         "index": 1
                       }
@@ -1386,7 +1386,7 @@
                       "from": 30.0001,
                       "to": 60,
                       "result": {
-                        "text": "Medium",
+                        "text": "Moyen",
                         "color": "yellow",
                         "index": 2
                       }
@@ -1398,7 +1398,7 @@
                       "from": 60.0001,
                       "to": 80,
                       "result": {
-                        "text": "High",
+                        "text": "Chargé",
                         "color": "orange",
                         "index": 3
                       }
@@ -1410,7 +1410,7 @@
                       "from": 80.0001,
                       "to": 1000,
                       "result": {
-                        "text": "OverUsed",
+                        "text": "Surchargé",
                         "color": "red",
                         "index": 4
                       }
@@ -1452,13 +1452,13 @@
               "Value #I": true
             },
             "renameByName": {
-              "host": "Server",
-              "Value #A": "Usage",
-              "Value #B": "Avg CPU",
-              "Value #D": "Time overloaded",
-              "Value #E": "Avg RAM",
-              "Value #J": "Cores",
-              "Value #K": "RAM (GiB)",
+              "host": "Serveur",
+              "Value #A": "Charge",
+              "Value #B": "CPU moyen",
+              "Value #D": "Temps en surcharge",
+              "Value #E": "RAM moyenne",
+              "Value #J": "Cœurs",
+              "Value #K": "RAM (Gio)",
               "Value #L": "BogoMips"
             },
             "indexByName": {
@@ -1476,7 +1476,7 @@
           "options": {
             "mode": "binary",
             "binary": {
-              "left": "Avg CPU",
+              "left": "CPU moyen",
               "operator": "*",
               "right": "1"
             },
@@ -1490,7 +1490,7 @@
           "options": {
             "mode": "binary",
             "binary": {
-              "left": "Avg RAM",
+              "left": "RAM moyenne",
               "operator": "*",
               "right": "1"
             },
@@ -1505,9 +1505,9 @@
             "mode": "unary",
             "unary": {
               "operator": "round",
-              "fieldName": "Avg CPU"
+              "fieldName": "CPU moyen"
             },
-            "alias": "Avg CPU (%)",
+            "alias": "CPU moyen (%)",
             "replaceFields": false,
             "timeSeries": false
           }
@@ -1518,9 +1518,9 @@
             "mode": "unary",
             "unary": {
               "operator": "round",
-              "fieldName": "Avg RAM"
+              "fieldName": "RAM moyenne"
             },
-            "alias": "Avg RAM (%)",
+            "alias": "RAM moyenne (%)",
             "replaceFields": false,
             "timeSeries": false
           }
@@ -1531,9 +1531,9 @@
             "mode": "unary",
             "unary": {
               "operator": "round",
-              "fieldName": "Time overloaded"
+              "fieldName": "Temps en surcharge"
             },
-            "alias": "Time overloaded (%)",
+            "alias": "Temps en surcharge (%)",
             "replaceFields": false,
             "timeSeries": false
           }
@@ -1542,10 +1542,10 @@
           "id": "organize",
           "options": {
             "excludeByName": {
-              "Avg CPU": true,
-              "Avg RAM": true,
-              "Time overloaded": true,
-              "Usage": true
+              "CPU moyen": true,
+              "RAM moyenne": true,
+              "Temps en surcharge": true,
+              "Charge": true
             },
             "indexByName": {},
             "renameByName": {}
@@ -1556,11 +1556,11 @@
           "options": {
             "showSubframeHeaders": true,
             "fields": {
-              "Cores": {
+              "Cœurs": {
                 "operation": "groupby",
                 "aggregations": []
               },
-              "RAM (GiB)": {
+              "RAM (Gio)": {
                 "operation": "groupby",
                 "aggregations": []
               },
@@ -1583,12 +1583,12 @@
           }
         }
       ],
-      "description": "**Servers are grouped when they have the same number of CPU cores and the same RAM** (rounded to 4 GiB). Click a line to unfold the servers of the pool.\n\n- **Pool avg CPU / RAM**: average of the servers of the pool.\n- **Least / Most loaded**: lowest and highest average CPU inside the pool. A big gap between identical servers means the load is badly spread: users could move from the busiest to the quietest one.\n- **BogoMips** (inside the pool): CPU speed indicator measured by Linux; identical servers should have close values.\n\nComputed over the period selected in the time picker (top right)."
+      "description": "**Les serveurs qui ont le même nombre de cœurs et la même RAM** (arrondie à 4 Gio) forment un pool. Cliquez sur une ligne pour voir ses serveurs.\n\n- **CPU / RAM moyenne du pool** : moyenne des serveurs du pool.\n- **Le moins / le plus chargé** : CPU moyen du serveur le moins et le plus chargé du pool. Un grand écart = charge mal répartie entre des machines identiques.\n- **BogoMips** : vitesse CPU mesurée par Linux ; des serveurs identiques doivent avoir des valeurs proches.\n\nCalculé sur la période choisie en haut à droite."
     },
     {
       "id": 8,
       "type": "row",
-      "title": "Trends over time",
+      "title": "Évolution dans le temps",
       "collapsed": false,
       "gridPos": {
         "x": 0,
@@ -1601,8 +1601,8 @@
     {
       "id": 9,
       "type": "status-history",
-      "title": "Daily CPU usage per server",
-      "description": "**One cell = average CPU usage of one server for one day.**\n\n- Read it as a calendar: columns are days, lines are servers.\n- Colours: blue < 10% (idle) · green < 30% · yellow < 60% · orange < 80% · red ≥ 80%.\n- Useful to see weekly patterns (weekends), servers idle for weeks, or a server that became saturated.\n\nComputed over the period selected in the time picker (top right).",
+      "title": "CPU moyen par jour et par serveur",
+      "description": "**Une case = CPU moyen d'un serveur sur une journée.**\n\n- Se lit comme un calendrier : les colonnes sont les jours, les lignes les serveurs.\n- Bleu < 10 % (inutilisé) · vert < 30 % · jaune < 60 % · orange < 80 % · rouge au-delà.\n- Montre les week-ends, les serveurs inutilisés depuis des semaines ou un serveur devenu saturé.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -1682,8 +1682,8 @@
     {
       "id": 10,
       "type": "status-history",
-      "title": "Daily RAM usage per server",
-      "description": "**One cell = average memory usage of one server for one day.**\n\n- Same colours as the CPU calendar above.\n- A server constantly red needs more RAM or fewer jobs; constantly blue servers are oversized in memory.\n\nComputed over the period selected in the time picker (top right).",
+      "title": "RAM moyenne par jour et par serveur",
+      "description": "**Une case = RAM moyenne d'un serveur sur une journée.**\n\n- Mêmes couleurs que le calendrier CPU.\n- Toujours rouge : le serveur manque de RAM. Toujours bleu : la RAM est surdimensionnée.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -1763,7 +1763,7 @@
     {
       "id": 11,
       "type": "row",
-      "title": "Users and storage",
+      "title": "Utilisateurs et disques",
       "collapsed": false,
       "gridPos": {
         "x": 0,
@@ -1776,8 +1776,8 @@
     {
       "id": 12,
       "type": "bargauge",
-      "title": "Top 15 users - share of the CPU consumed",
-      "description": "**Which users consume the most CPU on the selected servers.**\n\n- KPI: CPU time used by all the processes of a user ÷ CPU time used by all users × 100. The total of all users is 100%.\n- Computed day by day from the CPU counters of process-exporter; system accounts (root, sshd, node_exporter) are excluded.\n- Numbers instead of names = accounts whose name could not be resolved from the AD.\n\nComputed over the period selected in the time picker (top right).",
+      "title": "Top 15 utilisateurs - part du CPU consommé",
+      "description": "**Qui consomme le plus de CPU sur les serveurs choisis.**\n\n- Temps CPU des processus d'un utilisateur ÷ temps CPU de tous les utilisateurs × 100. Le total fait 100 %.\n- Les comptes système (root, sshd, node_exporter) sont exclus.\n- Un numéro à la place d'un nom = compte non reconnu dans l'annuaire.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -1836,8 +1836,8 @@
     {
       "id": 13,
       "type": "table",
-      "title": "Local disks - usage",
-      "description": "**Current size and fill level of the local disks** (xfs, ext4…) of the selected servers, fullest first.\n\n- Used = (size − free space) / size.\n- Colours: green < 80% · orange < 90% · red ≥ 90%.\n- Network shares (NFS…) are not listed here: see the server detail dashboard.\n\nValue at the end of the selected period.",
+      "title": "Disques locaux - remplissage",
+      "description": "**Taille et remplissage actuels des disques locaux** (xfs, ext4…) des serveurs choisis, les plus pleins en premier.\n\n- Utilisé = (taille − espace libre) ÷ taille.\n- Vert < 80 % · orange < 90 % · rouge au-delà.\n- Les partages réseau (NFS…) ne sont pas listés : voir le dashboard Détail serveur.\n\nValeur à la fin de la période choisie.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -1904,7 +1904,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Size"
+              "options": "Taille"
             },
             "properties": [
               {
@@ -1916,7 +1916,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Used"
+              "options": "Utilisé"
             },
             "properties": [
               {
@@ -1964,7 +1964,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Server : disk"
+              "options": "Serveur : disque"
             },
             "properties": [
               {
@@ -1981,7 +1981,7 @@
         "enablePagination": false,
         "sortBy": [
           {
-            "displayName": "Used",
+            "displayName": "Utilisé",
             "desc": true
           }
         ]
@@ -2003,9 +2003,9 @@
               "Value #B": 2
             },
             "renameByName": {
-              "disk": "Server : disk",
-              "Value #A": "Size",
-              "Value #B": "Used"
+              "disk": "Serveur : disque",
+              "Value #A": "Taille",
+              "Value #B": "Utilisé"
             }
           }
         },
@@ -2023,7 +2023,7 @@
     {
       "id": 14,
       "type": "row",
-      "title": "Licences (FlexLM)",
+      "title": "Licences FlexLM",
       "collapsed": false,
       "gridPos": {
         "x": 0,
@@ -2036,8 +2036,8 @@
     {
       "id": 15,
       "type": "stat",
-      "title": "Licence features tracked",
-      "description": "**Number of licence features followed by the FlexLM servers** for the selected vendors.\n\n- One feature = one licensed product/option (e.g. a simulator, a toolbox).\n- Uncounted / unlimited features are excluded.\n\nComputed over the period selected in the time picker (top right).",
+      "title": "Licences suivies",
+      "description": "**Nombre de licences suivies** par les serveurs FlexLM pour les éditeurs choisis.\n\n- Une licence (feature) = un produit ou une option (un simulateur, une boîte à outils…).\n- Les licences illimitées ne sont pas comptées.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -2098,8 +2098,8 @@
     {
       "id": 16,
       "type": "stat",
-      "title": "Avg fill rate (licences in use)",
-      "description": "**How full the licence pools are, on average.**\n\n- KPI: for each feature, average number of licences in use ÷ number of licences owned; then the average of all features that were used at least once.\n- Never-used features are counted separately (next tile), so they do not pull the average down.\n- Colours: blue < 20% · green < 70% · yellow < 90% · red ≥ 90%.\n\nComputed over the period selected in the time picker (top right).",
+      "title": "Taux de remplissage moyen",
+      "description": "**Remplissage moyen des licences.**\n\n- Pour chaque licence : nombre moyen de licences prises ÷ nombre possédé, puis moyenne de toutes les licences utilisées au moins une fois.\n- Les licences jamais utilisées sont comptées à part (case suivante).\n- Bleu < 20 % · vert < 70 % · jaune < 90 % · rouge au-delà.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -2173,8 +2173,8 @@
     {
       "id": 17,
       "type": "stat",
-      "title": "Never used in the period",
-      "description": "**Licence features that nobody checked out during the whole period.**\n\n- These are the first candidates to reduce at the next contract renewal.\n- Check over a long period (30 days or more) before deciding: some tools are only used at project milestones.\n\nComputed over the period selected in the time picker (top right).",
+      "title": "Jamais utilisées sur la période",
+      "description": "**Licences que personne n'a prises sur toute la période.**\n\n- Premières candidates à une réduction au prochain renouvellement.\n- Vérifier sur 30 jours ou plus : certains outils ne servent qu'aux jalons de projet.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -2239,8 +2239,8 @@
     {
       "id": 18,
       "type": "stat",
-      "title": "Saturated features",
-      "description": "**Licence features where ALL the licences were in use more than 5% of the time.**\n\n- 5% of 30 days ≈ 36 hours during which a new user could not get a licence.\n- Candidates for buying more licences, or for checking that idle sessions are released.\n\nComputed over the period selected in the time picker (top right).",
+      "title": "Licences saturées",
+      "description": "**Licences dont TOUS les jetons ont été pris plus de 5 % du temps.**\n\n- 5 % de 30 jours ≈ 36 heures pendant lesquelles un nouvel utilisateur n'a pas pu avoir de licence.\n- À acheter en plus, ou vérifier que les sessions inactives sont bien libérées.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -2305,8 +2305,8 @@
     {
       "id": 19,
       "type": "stat",
-      "title": "Distinct licence users",
-      "description": "**Number of different people who used at least one licence** of the selected vendors.\n\nComputed over the period selected in the time picker (top right).",
+      "title": "Utilisateurs de licences",
+      "description": "**Nombre de personnes différentes** ayant pris au moins une licence des éditeurs choisis.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -2367,8 +2367,8 @@
     {
       "id": 20,
       "type": "table",
-      "title": "Top 10 - most used licences",
-      "description": "**The 10 features with the highest average fill rate.**\n\n- Avg fill rate = average licences in use ÷ licences owned.\n- A feature close to 100% is fully used and probably blocks users at peak times.\n\nComputed over the period selected in the time picker (top right).",
+      "title": "Top 10 - licences les plus utilisées",
+      "description": "**Les 10 licences les plus remplies en moyenne.**\n\n- Remplissage moyen = licences prises en moyenne ÷ licences possédées.\n- Proche de 100 % : la licence bloque probablement des utilisateurs aux heures de pointe.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -2422,7 +2422,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Avg fill rate"
+              "options": "Remplissage moyen"
             },
             "properties": [
               {
@@ -2479,7 +2479,7 @@
         "enablePagination": false,
         "sortBy": [
           {
-            "displayName": "Avg fill rate",
+            "displayName": "Remplissage moyen",
             "desc": true
           }
         ]
@@ -2501,9 +2501,9 @@
               "Value": 2
             },
             "renameByName": {
-              "app": "Vendor",
+              "app": "Éditeur",
               "name": "Licence",
-              "Value": "Avg fill rate"
+              "Value": "Remplissage moyen"
             }
           }
         }
@@ -2512,8 +2512,8 @@
     {
       "id": 21,
       "type": "table",
-      "title": "Top 10 - least used licences (used at least once)",
-      "description": "**The 10 features with the lowest average fill rate, among those used at least once.**\n\n- Low fill rate = licences bought but rarely in use at the same time: the number of licences could be reduced.\n\nComputed over the period selected in the time picker (top right).",
+      "title": "Top 10 - licences les moins utilisées (utilisées au moins une fois)",
+      "description": "**Les 10 licences les moins remplies, parmi celles utilisées au moins une fois.**\n\n- Peu remplie = licences achetées mais rarement prises en même temps : leur nombre peut être réduit.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -2567,7 +2567,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Avg fill rate"
+              "options": "Remplissage moyen"
             },
             "properties": [
               {
@@ -2624,7 +2624,7 @@
         "enablePagination": false,
         "sortBy": [
           {
-            "displayName": "Avg fill rate",
+            "displayName": "Remplissage moyen",
             "desc": false
           }
         ]
@@ -2646,9 +2646,9 @@
               "Value": 2
             },
             "renameByName": {
-              "app": "Vendor",
+              "app": "Éditeur",
               "name": "Licence",
-              "Value": "Avg fill rate"
+              "Value": "Remplissage moyen"
             }
           }
         }
@@ -2657,8 +2657,8 @@
     {
       "id": 22,
       "type": "table",
-      "title": "Licences never used in the period",
-      "description": "**Purchased licences with zero checkout during the whole period.**\n\n- Licences owned = number of tokens in the licence file.\n\nComputed over the period selected in the time picker (top right).",
+      "title": "Licences jamais utilisées sur la période",
+      "description": "**Licences achetées que personne n'a prises sur toute la période.**\n\n- Licences possédées = nombre de jetons dans le fichier de licences.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -2712,7 +2712,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Licences owned"
+              "options": "Licences possédées"
             },
             "properties": [
               {
@@ -2746,9 +2746,9 @@
               "Value": 2
             },
             "renameByName": {
-              "app": "Vendor",
+              "app": "Éditeur",
               "name": "Licence",
-              "Value": "Licences owned"
+              "Value": "Licences possédées"
             }
           }
         }
@@ -2757,8 +2757,8 @@
     {
       "id": 23,
       "type": "table",
-      "title": "Saturated licences (all tokens in use)",
-      "description": "**Features whose licences were all in use at some point.**\n\n- % of time saturated = share of the period during which every licence was taken (checked every 15 minutes).\n- Peak in use = highest number of licences used at the same time.\n- Distinct users = number of different people who used the feature.\n\nComputed over the period selected in the time picker (top right).",
+      "title": "Licences saturées (tous les jetons pris)",
+      "description": "**Licences dont tous les jetons ont été pris à un moment.**\n\n- % du temps saturé = part de la période où toutes les licences étaient prises.\n- Pic d'utilisation = plus grand nombre de licences prises en même temps.\n- Utilisateurs différents = nombre de personnes ayant utilisé la licence.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -2851,7 +2851,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "% of time saturated"
+              "options": "% du temps saturé"
             },
             "properties": [
               {
@@ -2899,7 +2899,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Licences owned"
+              "options": "Licences possédées"
             },
             "properties": [
               {
@@ -2911,7 +2911,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Peak in use"
+              "options": "Pic d'utilisation"
             },
             "properties": [
               {
@@ -2923,7 +2923,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Distinct users"
+              "options": "Utilisateurs différents"
             },
             "properties": [
               {
@@ -2940,7 +2940,7 @@
         "enablePagination": false,
         "sortBy": [
           {
-            "displayName": "% of time saturated",
+            "displayName": "% du temps saturé",
             "desc": true
           }
         ]
@@ -2965,12 +2965,12 @@
               "Value #D": 5
             },
             "renameByName": {
-              "app": "Vendor",
+              "app": "Éditeur",
               "name": "Licence",
-              "Value #A": "% of time saturated",
-              "Value #B": "Licences owned",
-              "Value #C": "Peak in use",
-              "Value #D": "Distinct users"
+              "Value #A": "% du temps saturé",
+              "Value #B": "Licences possédées",
+              "Value #C": "Pic d'utilisation",
+              "Value #D": "Utilisateurs différents"
             }
           }
         },
@@ -2979,7 +2979,7 @@
           "options": {
             "filters": [
               {
-                "fieldName": "% of time saturated",
+                "fieldName": "% du temps saturé",
                 "config": {
                   "id": "greater",
                   "options": {
@@ -2997,8 +2997,8 @@
     {
       "id": 24,
       "type": "table",
-      "title": "All licences - usage over the period",
-      "description": "**Complete view of every licence feature.**\n\nStatus rules, in this order:\n1. **Saturated** – all licences taken more than 5% of the time\n2. **Never used** – no checkout in the period\n3. **Under-used** – less than 20% of the licences in use on average\n4. **Healthy** – everything else\n\nHover a column title for its definition. Usage is sampled every minute by the FlexLM exporter: checkouts of a few seconds may be missed.\n\nComputed over the period selected in the time picker (top right).",
+      "title": "Toutes les licences - utilisation sur la période",
+      "description": "**Vue complète de toutes les licences.**\n\nStatut, dans cet ordre :\n1. **Saturée** : toutes les licences prises plus de 5 % du temps\n2. **Jamais utilisée** : aucune prise sur la période\n3. **Sous-utilisée** : moins de 20 % des licences prises en moyenne\n4. **Normale** : tous les autres cas\n\nSurvolez un titre de colonne pour sa définition. Les licences sont relevées toutes les minutes : une prise de quelques secondes peut ne pas être vue.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -3143,7 +3143,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Status"
+              "options": "Statut"
             },
             "properties": [
               {
@@ -3153,22 +3153,22 @@
                     "type": "value",
                     "options": {
                       "0": {
-                        "text": "Never used",
+                        "text": "Jamais utilisée",
                         "color": "#8e8e8e",
                         "index": 0
                       },
                       "1": {
-                        "text": "Under-used",
+                        "text": "Sous-utilisée",
                         "color": "blue",
                         "index": 1
                       },
                       "2": {
-                        "text": "Healthy",
+                        "text": "Normale",
                         "color": "green",
                         "index": 2
                       },
                       "3": {
-                        "text": "Saturated",
+                        "text": "Saturée",
                         "color": "red",
                         "index": 3
                       }
@@ -3192,14 +3192,14 @@
               },
               {
                 "id": "description",
-                "value": "Saturated > Never used > Under-used (< 20%) > Healthy"
+                "value": "Saturée > Jamais utilisée > Sous-utilisée (< 20 %) > Normale"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Owned"
+              "options": "Possédées"
             },
             "properties": [
               {
@@ -3208,14 +3208,14 @@
               },
               {
                 "id": "description",
-                "value": "Number of licences in the licence file"
+                "value": "Nombre de licences dans le fichier de licences"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Peak in use"
+              "options": "Pic d'utilisation"
             },
             "properties": [
               {
@@ -3224,14 +3224,14 @@
               },
               {
                 "id": "description",
-                "value": "Highest number of licences in use at the same time"
+                "value": "Plus grand nombre de licences prises en même temps"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Distinct users"
+              "options": "Utilisateurs différents"
             },
             "properties": [
               {
@@ -3244,14 +3244,14 @@
               },
               {
                 "id": "description",
-                "value": "Number of different users of this feature"
+                "value": "Nombre de personnes différentes ayant utilisé cette licence"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Avg fill rate"
+              "options": "Remplissage moyen"
             },
             "properties": [
               {
@@ -3300,14 +3300,14 @@
               },
               {
                 "id": "description",
-                "value": "Avg in use ÷ Owned"
+                "value": "Utilisées en moyenne ÷ Possédées"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Peak fill rate"
+              "options": "Remplissage max"
             },
             "properties": [
               {
@@ -3356,14 +3356,14 @@
               },
               {
                 "id": "description",
-                "value": "Peak in use ÷ Owned"
+                "value": "Pic d'utilisation ÷ Possédées"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "% time saturated"
+              "options": "% du temps saturé"
             },
             "properties": [
               {
@@ -3372,19 +3372,19 @@
               },
               {
                 "id": "description",
-                "value": "Share of the period with all licences in use"
+                "value": "Part de la période où toutes les licences étaient prises"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Avg in use"
+              "options": "Utilisées en moyenne"
             },
             "properties": [
               {
                 "id": "description",
-                "value": "Average number of licences in use at the same time"
+                "value": "Nombre moyen de licences prises en même temps"
               }
             ]
           }
@@ -3396,7 +3396,7 @@
         "enablePagination": false,
         "sortBy": [
           {
-            "displayName": "Avg fill rate",
+            "displayName": "Remplissage moyen",
             "desc": true
           }
         ]
@@ -3425,16 +3425,16 @@
               "Value #H": 9
             },
             "renameByName": {
-              "app": "Vendor",
+              "app": "Éditeur",
               "name": "Licence",
-              "Value #A": "Status",
-              "Value #B": "Owned",
-              "Value #C": "Avg in use",
-              "Value #D": "Peak in use",
-              "Value #E": "Avg fill rate",
-              "Value #F": "Peak fill rate",
-              "Value #G": "% time saturated",
-              "Value #H": "Distinct users"
+              "Value #A": "Statut",
+              "Value #B": "Possédées",
+              "Value #C": "Utilisées en moyenne",
+              "Value #D": "Pic d'utilisation",
+              "Value #E": "Remplissage moyen",
+              "Value #F": "Remplissage max",
+              "Value #G": "% du temps saturé",
+              "Value #H": "Utilisateurs différents"
             }
           }
         }
@@ -3443,8 +3443,8 @@
     {
       "id": 25,
       "type": "timeseries",
-      "title": "Licence fill rate per vendor over time",
-      "description": "**Share of the licences of each vendor in use, hour by hour.**\n\n- KPI: licences in use ÷ licences owned, all features of the vendor together.\n- Shows working-hours peaks, weekends and holidays.\n\nComputed over the period selected in the time picker (top right).",
+      "title": "Remplissage des licences par éditeur",
+      "description": "**Part des licences de chaque éditeur prises, heure par heure.**\n\n- Licences prises ÷ licences possédées, toutes licences de l'éditeur ensemble.\n- Montre les pics en journée, les week-ends et les congés.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -3501,8 +3501,8 @@
     {
       "id": 26,
       "type": "table",
-      "title": "Top 15 licence users (licence-hours)",
-      "description": "**Who holds licences the longest.**\n\n- 1 licence-hour = 1 licence held during 1 hour. Two licences held 3 hours = 6 licence-hours.\n- Sum over all features of the selected vendors; based on the 1-minute FlexLM polling, so it is an approximation.\n\nComputed over the period selected in the time picker (top right).",
+      "title": "Top 15 utilisateurs de licences (licences-heures)",
+      "description": "**Qui garde des licences le plus longtemps.**\n\n- 1 licence-heure = 1 licence gardée pendant 1 heure. 2 licences pendant 3 heures = 6 licences-heures.\n- Total sur toutes les licences des éditeurs choisis. Valeur approchée (relevé toutes les minutes).\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -3556,7 +3556,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Licence-hours"
+              "options": "Licences-heures"
             },
             "properties": [
               {
@@ -3591,7 +3591,7 @@
         "enablePagination": false,
         "sortBy": [
           {
-            "displayName": "Licence-hours",
+            "displayName": "Licences-heures",
             "desc": true
           }
         ]
@@ -3612,8 +3612,8 @@
               "Value": 1
             },
             "renameByName": {
-              "user": "User",
-              "Value": "Licence-hours"
+              "user": "Utilisateur",
+              "Value": "Licences-heures"
             }
           }
         }
@@ -3622,7 +3622,7 @@
     {
       "id": 29,
       "type": "row",
-      "title": "KPI definitions (click to open)",
+      "title": "Définitions des indicateurs (cliquer pour ouvrir)",
       "collapsed": true,
       "gridPos": {
         "x": 0,
@@ -3634,7 +3634,7 @@
         {
           "id": 30,
           "type": "text",
-          "title": "KPI definitions",
+          "title": "Définitions des indicateurs",
           "gridPos": {
             "x": 0,
             "y": 122,
@@ -3643,7 +3643,7 @@
           },
           "options": {
             "mode": "markdown",
-            "content": "| KPI | Definition | Thresholds |\n|---|---|---|\n| **Avg CPU** | Share of CPU time not idle, averaged over all cores and over the period | 🟦 < 10% · 🟩 < 60% · 🟨 < 80% · 🟥 ≥ 80% |\n| **Avg RAM** | 1 − available memory / total memory (cache that Linux can free counts as available) | same as CPU |\n| **Usage** | Highest of Avg CPU and Avg RAM | Unused < 10% · Low < 30% · Medium < 60% · High < 80% · OverUsed ≥ 80% |\n| **Time overloaded** | Share of the period with CPU above 80% (5-min average) | > 10% = often overloaded |\n| **Availability** | Share of the period during which the server answered the monitoring | 🟥 < 99% · 🟧 < 99.9% · 🟩 ≥ 99.9% |\n| **Pool** | Servers with the same number of cores and the same RAM | big gap between least/most loaded = load badly spread |\n| **User CPU share** | CPU time of a user's processes ÷ CPU time of all users | total = 100% |\n| **Licence fill rate** | Licences in use ÷ licences owned | 🟦 < 20% · 🟩 < 70% · 🟨 < 90% · 🟥 ≥ 90% |\n| **Saturated licence** | All licences in use more than 5% of the period | users probably had to wait |\n| **Never-used licence** | No checkout during the whole period | candidate for reduction |\n| **Licence-hour** | 1 licence held during 1 hour | |\n\n*Data: node_exporter (CPU, RAM, disks, availability), process-exporter (CPU per user), flexlm_exporter (licences, polled every minute). History kept 60 days.*"
+            "content": "| Indicateur | Définition | Seuils |\n|---|---|---|\n| **CPU moyen** | Part du temps où le processeur travaille, moyenne de tous les cœurs sur la période | 🟦 < 10 % · 🟩 < 60 % · 🟨 < 80 % · 🟥 ≥ 80 % |\n| **RAM moyenne** | 1 − mémoire disponible ÷ mémoire totale (le cache libérable compte comme disponible) | comme le CPU |\n| **Charge** | Plus forte valeur entre CPU moyen et RAM moyenne | Libre < 10 % · Peu chargé < 30 % · Moyen < 60 % · Chargé < 80 % · Surchargé ≥ 80 % |\n| **Temps en surcharge** | Part de la période avec un CPU au-dessus de 80 % (moyenne sur 5 min) | > 10 % = souvent surchargé |\n| **Disponibilité** | Part de la période où le serveur répondait à la supervision | 🟥 < 99 % · 🟧 < 99,9 % · 🟩 ≥ 99,9 % |\n| **Pool** | Serveurs avec le même nombre de cœurs et la même RAM | grand écart entre le moins et le plus chargé = charge mal répartie |\n| **Part CPU d'un utilisateur** | Temps CPU de ses processus ÷ temps CPU de tous les utilisateurs | total = 100 % |\n| **Remplissage d'une licence** | Licences prises ÷ licences possédées | 🟦 < 20 % · 🟩 < 70 % · 🟨 < 90 % · 🟥 ≥ 90 % |\n| **Licence saturée** | Toutes les licences prises plus de 5 % de la période | des utilisateurs ont probablement attendu |\n| **Licence jamais utilisée** | Aucune prise sur toute la période | à réduire au renouvellement |\n| **Licence-heure** | 1 licence gardée pendant 1 heure | |\n\n*Données : node_exporter (CPU, RAM, disques, disponibilité), process-exporter (CPU par utilisateur), flexlm_exporter (licences, relevé toutes les minutes). Historique conservé 60 jours.*"
           }
         }
       ]
@@ -3663,7 +3663,7 @@
         "current": {},
         "includeAll": false,
         "name": "DS_PROMETHEUS",
-        "label": "Datasource",
+        "label": "Source de données",
         "options": [],
         "query": "prometheus",
         "refresh": 1,
@@ -3684,7 +3684,7 @@
         "definition": "label_values(node_uname_info, host)",
         "includeAll": true,
         "multi": true,
-        "label": "Servers",
+        "label": "Serveurs",
         "name": "server",
         "options": [],
         "query": {
@@ -3710,7 +3710,7 @@
         "definition": "label_values(flexlm_feature_issued, app)",
         "includeAll": true,
         "multi": true,
-        "label": "Licence vendors",
+        "label": "Éditeurs de licences",
         "name": "vendor",
         "options": [],
         "query": {
@@ -3732,7 +3732,7 @@
     "refresh_intervals": []
   },
   "timezone": "browser",
-  "title": "CAO Compute - Trends & Capacity",
+  "title": "Serveurs CAO - Tendances et capacité",
   "uid": "cao-trends-dash",
   "version": 6
 }

@@ -2,13 +2,13 @@
   "annotations": {
     "list": []
   },
-  "description": "Printable synthesis of licence usage over a period (most / least / never used, saturation, top users).",
+  "description": "Synthèse imprimable de l'utilisation des licences sur une période (plus / moins / jamais utilisées, saturation, principaux utilisateurs).",
   "editable": true,
   "graphTooltip": 1,
   "id": null,
   "links": [
     {
-      "title": "Global overview",
+      "title": "Vue globale",
       "type": "link",
       "url": "/d/global-overview-dash",
       "icon": "dashboard",
@@ -16,7 +16,7 @@
       "targetBlank": false
     },
     {
-      "title": "Licence report",
+      "title": "Rapport licences",
       "type": "link",
       "url": "/d/flexlm-licence-report",
       "icon": "doc",
@@ -47,14 +47,14 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "## FlexLM licence usage report\n**Period:** ${__from:date:DD/MM/YYYY} → ${__to:date:DD/MM/YYYY}  ·  **Vendors:** ${vendor:text}\n\nStatus: **Saturated** = all licences taken > 5% of the time · **Healthy** · **Under-used** = < 20% on average · **Never used** = no checkout in the period. Usage is sampled every minute: very short checkouts (a few seconds) may not be counted."
+        "content": "## Rapport d'utilisation des licences FlexLM\n**Période :** du ${__from:date:DD/MM/YYYY} au ${__to:date:DD/MM/YYYY}  ·  **Éditeurs :** ${vendor:text}\n\nStatut : **Saturée** = toutes les licences prises > 5 % du temps · **Normale** · **Sous-utilisée** = < 20 % en moyenne · **Jamais utilisée** = aucune prise sur la période. Les licences sont relevées toutes les minutes : une prise de quelques secondes peut ne pas être comptée."
       }
     },
     {
       "id": 2,
       "type": "stat",
-      "title": "Licence features tracked",
-      "description": "Number of licence features (counted licences) reported by the FlexLM servers for the selected vendors.",
+      "title": "Licences suivies",
+      "description": "**Nombre de licences suivies** par les serveurs FlexLM pour les éditeurs choisis.\n\n- Une licence (feature) = un produit ou une option (un simulateur, une boîte à outils…).\n- Les licences illimitées ne sont pas comptées.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -115,8 +115,8 @@
     {
       "id": 3,
       "type": "stat",
-      "title": "Avg fill rate (licences in use)",
-      "description": "Average fill rate of the licence features that were used at least once in the period (never-used features are counted separately).",
+      "title": "Taux de remplissage moyen",
+      "description": "**Remplissage moyen des licences.**\n\n- Pour chaque licence : nombre moyen de licences prises ÷ nombre possédé, puis moyenne de toutes les licences utilisées au moins une fois.\n- Les licences jamais utilisées sont comptées à part (case suivante).\n- Bleu < 20 % · vert < 70 % · jaune < 90 % · rouge au-delà.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -190,8 +190,8 @@
     {
       "id": 4,
       "type": "stat",
-      "title": "Never used in the period",
-      "description": "Features that were never checked out during the whole period: candidates for a contract review.",
+      "title": "Jamais utilisées sur la période",
+      "description": "**Licences que personne n'a prises sur toute la période.**\n\n- Premières candidates à une réduction au prochain renouvellement.\n- Vérifier sur 30 jours ou plus : certains outils ne servent qu'aux jalons de projet.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -256,8 +256,8 @@
     {
       "id": 5,
       "type": "stat",
-      "title": "Saturated features",
-      "description": "Features where ALL the licences were in use more than 5% of the time: users probably had to wait.",
+      "title": "Licences saturées",
+      "description": "**Licences dont TOUS les jetons ont été pris plus de 5 % du temps.**\n\n- 5 % de 30 jours ≈ 36 heures pendant lesquelles un nouvel utilisateur n'a pas pu avoir de licence.\n- À acheter en plus, ou vérifier que les sessions inactives sont bien libérées.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -322,8 +322,8 @@
     {
       "id": 6,
       "type": "stat",
-      "title": "Distinct licence users",
-      "description": "Number of different people who used at least one licence during the period.",
+      "title": "Utilisateurs de licences",
+      "description": "**Nombre de personnes différentes** ayant pris au moins une licence des éditeurs choisis.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -384,8 +384,8 @@
     {
       "id": 7,
       "type": "table",
-      "title": "Top 10 - most used licences",
-      "description": "The 10 features with the highest average share of licences in use over the period.",
+      "title": "Top 10 - licences les plus utilisées",
+      "description": "**Les 10 licences les plus remplies en moyenne.**\n\n- Remplissage moyen = licences prises en moyenne ÷ licences possédées.\n- Proche de 100 % : la licence bloque probablement des utilisateurs aux heures de pointe.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -439,7 +439,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Avg fill rate"
+              "options": "Remplissage moyen"
             },
             "properties": [
               {
@@ -496,7 +496,7 @@
         "enablePagination": false,
         "sortBy": [
           {
-            "displayName": "Avg fill rate",
+            "displayName": "Remplissage moyen",
             "desc": true
           }
         ]
@@ -518,9 +518,9 @@
               "Value": 2
             },
             "renameByName": {
-              "app": "Vendor",
+              "app": "Éditeur",
               "name": "Licence",
-              "Value": "Avg fill rate"
+              "Value": "Remplissage moyen"
             }
           }
         }
@@ -529,8 +529,8 @@
     {
       "id": 8,
       "type": "table",
-      "title": "Top 10 - least used licences (used at least once)",
-      "description": "Features that are used, but very little: the number of licences could probably be reduced.",
+      "title": "Top 10 - licences les moins utilisées (utilisées au moins une fois)",
+      "description": "**Les 10 licences les moins remplies, parmi celles utilisées au moins une fois.**\n\n- Peu remplie = licences achetées mais rarement prises en même temps : leur nombre peut être réduit.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -584,7 +584,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Avg fill rate"
+              "options": "Remplissage moyen"
             },
             "properties": [
               {
@@ -641,7 +641,7 @@
         "enablePagination": false,
         "sortBy": [
           {
-            "displayName": "Avg fill rate",
+            "displayName": "Remplissage moyen",
             "desc": false
           }
         ]
@@ -663,9 +663,9 @@
               "Value": 2
             },
             "renameByName": {
-              "app": "Vendor",
+              "app": "Éditeur",
               "name": "Licence",
-              "Value": "Avg fill rate"
+              "Value": "Remplissage moyen"
             }
           }
         }
@@ -674,8 +674,8 @@
     {
       "id": 9,
       "type": "table",
-      "title": "Licences never used in the period",
-      "description": "Purchased licences with zero checkout during the whole period.",
+      "title": "Licences jamais utilisées sur la période",
+      "description": "**Licences achetées que personne n'a prises sur toute la période.**\n\n- Licences possédées = nombre de jetons dans le fichier de licences.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -729,7 +729,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Licences owned"
+              "options": "Licences possédées"
             },
             "properties": [
               {
@@ -763,9 +763,9 @@
               "Value": 2
             },
             "renameByName": {
-              "app": "Vendor",
+              "app": "Éditeur",
               "name": "Licence",
-              "Value": "Licences owned"
+              "Value": "Licences possédées"
             }
           }
         }
@@ -774,8 +774,8 @@
     {
       "id": 10,
       "type": "table",
-      "title": "Saturated licences (all tokens in use)",
-      "description": "Share of the period during which every licence of the feature was taken. Above a few % users are likely blocked.",
+      "title": "Licences saturées (tous les jetons pris)",
+      "description": "**Licences dont tous les jetons ont été pris à un moment.**\n\n- % du temps saturé = part de la période où toutes les licences étaient prises.\n- Pic d'utilisation = plus grand nombre de licences prises en même temps.\n- Utilisateurs différents = nombre de personnes ayant utilisé la licence.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -868,7 +868,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "% of time saturated"
+              "options": "% du temps saturé"
             },
             "properties": [
               {
@@ -916,7 +916,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Licences owned"
+              "options": "Licences possédées"
             },
             "properties": [
               {
@@ -928,7 +928,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Peak in use"
+              "options": "Pic d'utilisation"
             },
             "properties": [
               {
@@ -940,7 +940,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Distinct users"
+              "options": "Utilisateurs différents"
             },
             "properties": [
               {
@@ -957,7 +957,7 @@
         "enablePagination": false,
         "sortBy": [
           {
-            "displayName": "% of time saturated",
+            "displayName": "% du temps saturé",
             "desc": true
           }
         ]
@@ -982,12 +982,12 @@
               "Value #D": 5
             },
             "renameByName": {
-              "app": "Vendor",
+              "app": "Éditeur",
               "name": "Licence",
-              "Value #A": "% of time saturated",
-              "Value #B": "Licences owned",
-              "Value #C": "Peak in use",
-              "Value #D": "Distinct users"
+              "Value #A": "% du temps saturé",
+              "Value #B": "Licences possédées",
+              "Value #C": "Pic d'utilisation",
+              "Value #D": "Utilisateurs différents"
             }
           }
         },
@@ -996,7 +996,7 @@
           "options": {
             "filters": [
               {
-                "fieldName": "% of time saturated",
+                "fieldName": "% du temps saturé",
                 "config": {
                   "id": "greater",
                   "options": {
@@ -1014,8 +1014,8 @@
     {
       "id": 11,
       "type": "table",
-      "title": "All licences - usage over the period",
-      "description": "Status: Saturated = all licences taken more than 5% of the time / Never used = no checkout in the period / Under-used = less than 20% on average / Healthy = the rest.",
+      "title": "Toutes les licences - utilisation sur la période",
+      "description": "**Vue complète de toutes les licences.**\n\nStatut, dans cet ordre :\n1. **Saturée** : toutes les licences prises plus de 5 % du temps\n2. **Jamais utilisée** : aucune prise sur la période\n3. **Sous-utilisée** : moins de 20 % des licences prises en moyenne\n4. **Normale** : tous les autres cas\n\nSurvolez un titre de colonne pour sa définition. Les licences sont relevées toutes les minutes : une prise de quelques secondes peut ne pas être vue.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -1160,7 +1160,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Status"
+              "options": "Statut"
             },
             "properties": [
               {
@@ -1170,22 +1170,22 @@
                     "type": "value",
                     "options": {
                       "0": {
-                        "text": "Never used",
+                        "text": "Jamais utilisée",
                         "color": "#8e8e8e",
                         "index": 0
                       },
                       "1": {
-                        "text": "Under-used",
+                        "text": "Sous-utilisée",
                         "color": "blue",
                         "index": 1
                       },
                       "2": {
-                        "text": "Healthy",
+                        "text": "Normale",
                         "color": "green",
                         "index": 2
                       },
                       "3": {
-                        "text": "Saturated",
+                        "text": "Saturée",
                         "color": "red",
                         "index": 3
                       }
@@ -1212,7 +1212,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Owned"
+              "options": "Possédées"
             },
             "properties": [
               {
@@ -1224,7 +1224,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Peak in use"
+              "options": "Pic d'utilisation"
             },
             "properties": [
               {
@@ -1236,7 +1236,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Distinct users"
+              "options": "Utilisateurs différents"
             },
             "properties": [
               {
@@ -1252,7 +1252,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Avg fill rate"
+              "options": "Remplissage moyen"
             },
             "properties": [
               {
@@ -1304,7 +1304,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Peak fill rate"
+              "options": "Remplissage max"
             },
             "properties": [
               {
@@ -1356,7 +1356,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "% time saturated"
+              "options": "% du temps saturé"
             },
             "properties": [
               {
@@ -1373,7 +1373,7 @@
         "enablePagination": false,
         "sortBy": [
           {
-            "displayName": "Avg fill rate",
+            "displayName": "Remplissage moyen",
             "desc": true
           }
         ]
@@ -1402,16 +1402,16 @@
               "Value #H": 9
             },
             "renameByName": {
-              "app": "Vendor",
+              "app": "Éditeur",
               "name": "Licence",
-              "Value #A": "Status",
-              "Value #B": "Owned",
-              "Value #C": "Avg in use",
-              "Value #D": "Peak in use",
-              "Value #E": "Avg fill rate",
-              "Value #F": "Peak fill rate",
-              "Value #G": "% time saturated",
-              "Value #H": "Distinct users"
+              "Value #A": "Statut",
+              "Value #B": "Possédées",
+              "Value #C": "Utilisées en moyenne",
+              "Value #D": "Pic d'utilisation",
+              "Value #E": "Remplissage moyen",
+              "Value #F": "Remplissage max",
+              "Value #G": "% du temps saturé",
+              "Value #H": "Utilisateurs différents"
             }
           }
         }
@@ -1420,8 +1420,8 @@
     {
       "id": 12,
       "type": "timeseries",
-      "title": "Licence fill rate per vendor over time",
-      "description": "Share of the licences of each vendor in use, hour by hour.",
+      "title": "Remplissage des licences par éditeur",
+      "description": "**Part des licences de chaque éditeur prises, heure par heure.**\n\n- Licences prises ÷ licences possédées, toutes licences de l'éditeur ensemble.\n- Montre les pics en journée, les week-ends et les congés.\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -1478,8 +1478,8 @@
     {
       "id": 13,
       "type": "table",
-      "title": "Top 15 licence users (licence-hours)",
-      "description": "Approximate time each person held licences during the period (sum over all features, 1 licence for 1 hour = 1 licence-hour). Based on the 1-minute FlexLM polling.",
+      "title": "Top 15 utilisateurs de licences (licences-heures)",
+      "description": "**Qui garde des licences le plus longtemps.**\n\n- 1 licence-heure = 1 licence gardée pendant 1 heure. 2 licences pendant 3 heures = 6 licences-heures.\n- Total sur toutes les licences des éditeurs choisis. Valeur approchée (relevé toutes les minutes).\n\nCalculé sur la période choisie en haut à droite.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -1533,7 +1533,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Licence-hours"
+              "options": "Licences-heures"
             },
             "properties": [
               {
@@ -1568,7 +1568,7 @@
         "enablePagination": false,
         "sortBy": [
           {
-            "displayName": "Licence-hours",
+            "displayName": "Licences-heures",
             "desc": true
           }
         ]
@@ -1589,8 +1589,8 @@
               "Value": 1
             },
             "renameByName": {
-              "user": "User",
-              "Value": "Licence-hours"
+              "user": "Utilisateur",
+              "Value": "Licences-heures"
             }
           }
         }
@@ -1610,7 +1610,7 @@
         "current": {},
         "includeAll": false,
         "name": "DS_PROMETHEUS",
-        "label": "Datasource",
+        "label": "Source de données",
         "options": [],
         "query": "prometheus",
         "refresh": 1,
@@ -1631,7 +1631,7 @@
         "definition": "label_values(flexlm_feature_issued, app)",
         "includeAll": true,
         "multi": true,
-        "label": "Vendors",
+        "label": "Éditeurs",
         "name": "vendor",
         "options": [],
         "query": {
@@ -1653,7 +1653,7 @@
     "refresh_intervals": []
   },
   "timezone": "browser",
-  "title": "FlexLM - Licence usage report",
+  "title": "Licences FlexLM - Rapport d'utilisation",
   "uid": "flexlm-licence-report",
   "version": 1
 }

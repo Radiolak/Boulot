@@ -13,7 +13,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Retour a la vue globale",
+      "title": "Retour à la vue globale",
       "tooltip": "",
       "type": "link",
       "url": "/d/global-overview-dash/calcul-cao-global"
@@ -52,7 +52,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "% used"
+              "options": "% utilisé"
             },
             "properties": [
               {
@@ -136,7 +136,7 @@
           "refId": "B"
         }
       ],
-      "title": "Storage - Available vs Total",
+      "title": "Disques - Espace disponible / total",
       "transformations": [
         {
           "id": "joinByField",
@@ -170,8 +170,8 @@
               "Value #B": 2
             },
             "renameByName": {
-              "mountpoint": "Mount point",
-              "Value #A": "Available",
+              "mountpoint": "Point de montage",
+              "Value #A": "Disponible",
               "Value #B": "Total"
             }
           }
@@ -179,22 +179,22 @@
         {
           "id": "calculateField",
           "options": {
-            "alias": "Used bytes",
+            "alias": "Espace utilisé",
             "mode": "binary",
             "binary": {
               "left": "Total",
               "operator": "-",
-              "right": "Available"
+              "right": "Disponible"
             }
           }
         },
         {
           "id": "calculateField",
           "options": {
-            "alias": "% used",
+            "alias": "% utilisé",
             "mode": "binary",
             "binary": {
-              "left": "Used bytes",
+              "left": "Espace utilisé",
               "operator": "/",
               "right": "Total"
             }
@@ -204,7 +204,7 @@
           "id": "organize",
           "options": {
             "excludeByName": {
-              "Used bytes": true
+              "Espace utilisé": true
             },
             "indexByName": {},
             "renameByName": {}
@@ -245,7 +245,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "% used"
+              "options": "% utilisé"
             },
             "properties": [
               {
@@ -260,8 +260,12 @@
                 }
               },
               {
+                "id": "min",
+                "value": 0
+              },
+              {
                 "id": "max",
-                "value": 100
+                "value": 1
               },
               {
                 "id": "thresholds",
@@ -274,11 +278,11 @@
                     },
                     {
                       "color": "orange",
-                      "value": 70
+                      "value": 0.7
                     },
                     {
                       "color": "red",
-                      "value": 90
+                      "value": 0.9
                     }
                   ]
                 }
@@ -288,7 +292,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Used"
+              "options": "Utilisées"
             },
             "properties": [
               {
@@ -357,7 +361,7 @@
           "refId": "B"
         }
       ],
-      "title": "FlexLM Licenses - Vivado / QuestaSim",
+      "title": "Licences FlexLM - Vivado / QuestaSim",
       "transformations": [
         {
           "id": "joinByField",
@@ -381,8 +385,8 @@
               "Value #A": 2
             },
             "renameByName": {
-              "app": "Application",
-              "Value #B": "Used",
+              "app": "Éditeur",
+              "Value #B": "Utilisées",
               "Value #A": "Total"
             }
           }
@@ -390,10 +394,10 @@
         {
           "id": "calculateField",
           "options": {
-            "alias": "% used",
+            "alias": "% utilisé",
             "mode": "binary",
             "binary": {
-              "left": "Used",
+              "left": "Utilisées",
               "operator": "/",
               "right": "Total"
             },
@@ -438,7 +442,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Used"
+              "options": "Utilisées"
             },
             "properties": [
               {
@@ -475,7 +479,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "Used"
+            "displayName": "Utilisées"
           }
         ]
       },
@@ -504,7 +508,7 @@
           "refId": "B"
         }
       ],
-      "title": "License detail by family ($vendor)",
+      "title": "Détail des licences ($vendor)",
       "transformations": [
         {
           "id": "joinByField",
@@ -534,8 +538,8 @@
               "Value #A": 2
             },
             "renameByName": {
-              "name": "License",
-              "Value #B": "Used",
+              "name": "Licence",
+              "Value #B": "Utilisées",
               "Value #A": "Total"
             }
           }
@@ -651,7 +655,7 @@
           "refId": "B"
         }
       ],
-      "title": "CPU par utilisateur - evolution dans le temps",
+      "title": "CPU par utilisateur - évolution",
       "type": "timeseries"
     },
     {
@@ -718,7 +722,7 @@
           "refId": "A"
         }
       ],
-      "title": "RAM par utilisateur - evolution dans le temps (valeur absolue)",
+      "title": "RAM par utilisateur - évolution (quantité utilisée)",
       "type": "timeseries"
     }
   ],
@@ -805,7 +809,7 @@
         },
         "definition": "label_values(flexlm_feature_issued{app=~\"xilinx|siemens|mentor_div\"}, app)",
         "includeAll": false,
-        "label": "License family",
+        "label": "Famille de licences",
         "multi": false,
         "name": "vendor",
         "options": [],

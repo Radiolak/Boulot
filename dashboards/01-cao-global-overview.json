@@ -15,7 +15,7 @@
       }
     ]
   },
-  "description": "Vue globale des serveurs - Etat OK/HIGH/CRITICAL",
+  "description": "Vue globale des serveurs de calcul CAO",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
@@ -83,7 +83,7 @@
           },
           "expr": "sum(up{job=\"node_exporter\"})",
           "instant": true,
-          "legendFormat": "Servers UP",
+          "legendFormat": "Serveurs en ligne",
           "range": false,
           "refId": "A"
         },
@@ -94,14 +94,14 @@
           },
           "expr": "count(up{job=\"node_exporter\"})",
           "instant": true,
-          "legendFormat": "Total configured",
+          "legendFormat": "Serveurs surveillés",
           "range": false,
           "refId": "B"
         }
       ],
-      "title": "Prometheus Targets Status",
+      "title": "Serveurs supervisés",
       "type": "stat",
-      "description": "**Servers UP** : serveurs qui répondent à la supervision.\n**Total configured** : serveurs surveillés.\n\nSi les deux chiffres sont différents, au moins un serveur est arrêté ou injoignable."
+      "description": "**Serveurs en ligne** : serveurs qui répondent à la supervision.\n**Serveurs surveillés** : nombre total de serveurs suivis.\n\nSi les deux chiffres sont différents, au moins un serveur est arrêté ou injoignable."
     },
     {
       "datasource": {
@@ -147,7 +147,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "CPU Usage"
+              "options": "CPU"
             },
             "properties": [
               {
@@ -170,7 +170,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Memory Usage"
+              "options": "RAM"
             },
             "properties": [
               {
@@ -193,7 +193,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Disk Usage"
+              "options": "Disque"
             },
             "properties": [
               {
@@ -216,7 +216,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Network I/O (% of link)"
+              "options": "Réseau (% du lien)"
             },
             "properties": [
               {
@@ -271,7 +271,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "host"
+              "options": "Serveur"
             },
             "properties": [
               {
@@ -279,7 +279,7 @@
                 "value": [
                   {
                     "targetBlank": false,
-                    "title": "Voir le detail",
+                    "title": "Voir le détail",
                     "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.host}"
                   }
                 ]
@@ -289,7 +289,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Link speed"
+              "options": "Vitesse réseau"
             },
             "properties": [
               {
@@ -323,7 +323,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Uptime / at reboot"
+              "options": "Allumé / au redémarrage"
             },
             "properties": [
               {
@@ -362,7 +362,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Next reboot"
+              "options": "Prochain redémarrage"
             },
             "properties": [
               {
@@ -391,7 +391,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "CPU Usage"
+            "displayName": "CPU"
           }
         ]
       },
@@ -514,7 +514,7 @@
           "refId": "N"
         }
       ],
-      "title": "Server Metrics Overview",
+      "title": "Consommation des serveurs",
       "transformations": [
         {
           "id": "joinByField",
@@ -650,20 +650,21 @@
               "date_fr": 8
             },
             "renameByName": {
-              "Value #A": "CPU Usage",
-              "Value #B": "Memory Usage",
-              "Value #C": "Disk Usage",
-              "Value #D": "Network I/O (% of link)",
+              "Value #A": "CPU",
+              "Value #B": "RAM",
+              "Value #C": "Disque",
+              "Value #D": "Réseau (% du lien)",
               "mountpoint": "",
-              "Value #E": "Link speed",
-              "Uptime_plan": "Uptime / at reboot",
-              "date_fr": "Next reboot"
+              "Value #E": "Vitesse réseau",
+              "Uptime_plan": "Allumé / au redémarrage",
+              "date_fr": "Prochain redémarrage",
+              "host": "Serveur"
             }
           }
         }
       ],
       "type": "table",
-      "description": "Consommation **actuelle** de chaque serveur (moyenne des 5 dernières minutes).\n\n- **CPU / Memory / Disk Usage** : % du processeur, de la RAM et des disques locaux utilisés. Vert < 70 %, jaune < 85 %, rouge au-delà.\n- **Network I/O** : trafic réseau en % de la vitesse de la carte (**Link speed**).\n- **Uptime / at reboot** : heures depuis le démarrage / heures au prochain redémarrage planifié.\n- **Next reboot** : date du prochain redémarrage de maintenance (6 h du matin).\n\nCliquez sur un serveur pour ouvrir son détail."
+      "description": "Consommation **actuelle** de chaque serveur (moyenne des 5 dernières minutes).\n\n- **CPU / RAM / Disque** : % du processeur, de la mémoire et des disques locaux utilisés. Vert < 70 %, jaune < 85 %, rouge au-delà.\n- **Réseau** : trafic réseau en % de la vitesse de la carte (**Vitesse réseau**).\n- **Allumé / au redémarrage** : heures depuis le démarrage / heures au prochain redémarrage planifié.\n- **Prochain redémarrage** : date du prochain redémarrage de maintenance (6 h du matin).\n\nCliquez sur un serveur pour ouvrir son détail."
     },
     {
       "datasource": {
@@ -701,7 +702,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Usage"
+              "options": "Charge"
             },
             "properties": [
               {
@@ -727,7 +728,7 @@
                       "result": {
                         "color": "red",
                         "index": 0,
-                        "text": "OverUsed"
+                        "text": "Surchargé"
                       },
                       "to": 100
                     },
@@ -739,7 +740,7 @@
                       "result": {
                         "color": "orange",
                         "index": 1,
-                        "text": "High"
+                        "text": "Chargé"
                       },
                       "to": 80
                     },
@@ -751,7 +752,7 @@
                       "result": {
                         "color": "yellow",
                         "index": 2,
-                        "text": "Medium"
+                        "text": "Moyen"
                       },
                       "to": 60
                     },
@@ -763,7 +764,7 @@
                       "result": {
                         "color": "green",
                         "index": 3,
-                        "text": "Low"
+                        "text": "Peu chargé"
                       },
                       "to": 30
                     },
@@ -775,7 +776,7 @@
                       "result": {
                         "color": "blue",
                         "index": 4,
-                        "text": "Unused"
+                        "text": "Libre"
                       },
                       "to": 10
                     },
@@ -824,7 +825,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "OS"
+              "options": "Système"
             },
             "properties": [
               {
@@ -836,7 +837,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Alias"
+              "options": "Serveur"
             },
             "properties": [
               {
@@ -844,7 +845,7 @@
                 "value": [
                   {
                     "targetBlank": false,
-                    "title": "Voir le detail",
+                    "title": "Voir le détail",
                     "url": "/d/server-detail-dash/detail-serveur?var-server=${__data.fields.fqdn}"
                   }
                 ]
@@ -858,14 +859,14 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Hostname"
+              "options": "Nom machine"
             },
             "properties": []
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "FPGA View"
+              "options": "Vue FPGA"
             },
             "properties": [
               {
@@ -875,7 +876,7 @@
                     "options": {
                       "match": "true",
                       "result": {
-                        "text": "[FPGA View]"
+                        "text": "[Vue FPGA]"
                       }
                     },
                     "type": "special"
@@ -883,7 +884,7 @@
                   {
                     "options": {
                       "1": {
-                        "text": "[FPGA View]"
+                        "text": "[Vue FPGA]"
                       }
                     },
                     "type": "value"
@@ -895,7 +896,7 @@
                 "value": [
                   {
                     "targetBlank": false,
-                    "title": "FPGA View",
+                    "title": "Vue FPGA",
                     "url": "/d/fpga-vue-utilisateur/vue-fpga-utilisateur?var-server=${__data.fields.fqdn}"
                   }
                 ]
@@ -905,7 +906,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Uptime / at reboot"
+              "options": "Allumé / au redémarrage"
             },
             "properties": [
               {
@@ -944,7 +945,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Next reboot"
+              "options": "Prochain redémarrage"
             },
             "properties": [
               {
@@ -973,7 +974,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "CPU Count"
+            "displayName": "Nb cœurs"
           }
         ]
       },
@@ -1108,7 +1109,7 @@
           "refId": "K"
         }
       ],
-      "title": "Servers Status",
+      "title": "État des serveurs",
       "transformations": [
         {
           "id": "joinByField",
@@ -1228,21 +1229,22 @@
               "Uptime_plan": 4
             },
             "renameByName": {
-              "Value #A": "Usage",
-              "Value #D": "CPU Count",
-              "Value #H": "FPGA View",
-              "alias": "Alias",
-              "fqdn": "FQDN",
-              "nodename": "Hostname",
-              "Value #I": "Next reboot",
-              "date_fr": "Next reboot",
-              "Uptime_plan": "Uptime / at reboot"
+              "Value #A": "Charge",
+              "Value #D": "Nb cœurs",
+              "Value #H": "Vue FPGA",
+              "alias": "Serveur",
+              "fqdn": "Nom complet (FQDN)",
+              "nodename": "Nom machine",
+              "Value #I": "Prochain redémarrage",
+              "date_fr": "Prochain redémarrage",
+              "Uptime_plan": "Allumé / au redémarrage",
+              "OS": "Système"
             }
           }
         }
       ],
       "type": "table",
-      "description": "Fiche de chaque serveur, pour choisir où lancer un calcul.\n\n- **Usage** : plus forte valeur entre CPU et RAM. Unused < 10 % · Low < 30 % · Medium < 60 % · High < 80 % · OverUsed au-delà (et 5 min après un redémarrage).\n- **CPU Count** : nombre de cœurs.\n- **FQDN** : nom à utiliser pour se connecter (ssh).\n- **[FPGA View]** : ouvre la vue FPGA du serveur.\n\nCliquez sur l'Alias pour ouvrir le détail du serveur."
+      "description": "Fiche de chaque serveur, pour choisir où lancer un calcul.\n\n- **Charge** : plus forte valeur entre CPU et RAM. Libre < 10 % · Peu chargé < 30 % · Moyen < 60 % · Chargé < 80 % · Surchargé au-delà (et 5 min après un redémarrage).\n- **Nb cœurs** : nombre de cœurs du processeur.\n- **Nom complet (FQDN)** : nom à utiliser pour se connecter (ssh).\n- **[Vue FPGA]** : ouvre la vue FPGA du serveur.\n\nCliquez sur le nom du serveur pour ouvrir son détail."
     }
   ],
   "preload": false,
@@ -1276,7 +1278,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "CAO Compute - Global Overview",
+  "title": "Serveurs CAO - Vue globale",
   "uid": "global-overview-dash",
   "version": 31
 }

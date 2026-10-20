@@ -15,7 +15,7 @@
       }
     ]
   },
-  "description": "Detail par vendeur FlexLM - licences, utilisateurs, expiration, historique",
+  "description": "Détail d'un éditeur FlexLM : licences, utilisateurs connectés, historique",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -28,7 +28,7 @@
       "keepTime": true,
       "tags": [],
       "targetBlank": false,
-      "title": "Retour a la vue globale",
+      "title": "Retour à la vue globale",
       "tooltip": "",
       "type": "link",
       "url": "/d/flexlm-supervision-dash/supervision-flexlm-vue-globale"
@@ -85,7 +85,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Utilisees"
+              "options": "Utilisées"
             },
             "properties": [
               {
@@ -190,19 +190,8 @@
           "refId": "C"
         }
       ],
-      "title": "Licences du vendeur",
+      "title": "Licences de l'éditeur",
       "transformations": [
-        {
-          "id": "convertFieldType",
-          "options": {
-            "conversions": [
-              {
-                "targetField": "name",
-                "destinationType": "string"
-              }
-            ]
-          }
-        },
         {
           "id": "joinByField",
           "options": {
@@ -243,7 +232,7 @@
               "app": "Vendeur",
               "name": "Licence",
               "Value #A": "Total",
-              "Value #B": "Utilisees",
+              "Value #B": "Utilisées",
               "Value #C": "Expiration_raw"
             }
           }
@@ -288,7 +277,8 @@
           }
         }
       ],
-      "type": "table"
+      "type": "table",
+      "description": "Toutes les licences de l'éditeur choisi.\n\n- **Total** : licences possédées.\n- **Utilisées** : licences prises en ce moment.\n- **Expiration** : date de fin de validité (« Pas d'expiration » = licence permanente)."
     },
     {
       "datasource": {
@@ -326,7 +316,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Connecte depuis"
+              "options": "Connecté depuis"
             },
             "properties": [
               {
@@ -364,7 +354,7 @@
           "refId": "A"
         }
       ],
-      "title": "Utilisateurs connectes",
+      "title": "Utilisateurs connectés",
       "transformations": [
         {
           "id": "organize",
@@ -435,12 +425,14 @@
               "since_ms": 2
             },
             "renameByName": {
-              "since_ms": "Connecte depuis"
+              "since_ms": "Connecté depuis",
+              "host": "Machine"
             }
           }
         }
       ],
-      "type": "table"
+      "type": "table",
+      "description": "Qui utilise quelle licence en ce moment, depuis quand et depuis quelle machine.\n\nUne licence prise depuis plusieurs jours est souvent une session oubliée qui bloque un jeton.\nLes licences sont relevées toutes les minutes."
     },
     {
       "datasource": {
@@ -450,7 +442,7 @@
       "fieldConfig": {
         "defaults": {
           "custom": {
-            "axisLabel": "Licences utilisees",
+            "axisLabel": "Licences utilisées",
             "drawStyle": "line",
             "fillOpacity": 10,
             "lineWidth": 2,
@@ -500,7 +492,8 @@
         }
       ],
       "title": "Historique d'utilisation par licence",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "% des licences prises, licence par licence, sur la période choisie.\n\nUne courbe qui touche souvent 100 % = licence saturée : des utilisateurs ont pu attendre.\nSous le graphique : Mean = moyenne, Max = maximum, Last = valeur actuelle.\nChoix des licences : liste **Licences à afficher** en haut."
     }
   ],
   "refresh": "60s",
@@ -531,7 +524,7 @@
         "definition": "label_values(flexlm_vendor_status, app)",
         "hide": 0,
         "includeAll": false,
-        "label": "Vendeur",
+        "label": "Éditeur",
         "multi": false,
         "name": "vendor",
         "options": [],
@@ -554,7 +547,7 @@
         "definition": "label_values(flexlm_feature_used{app=\"$vendor\"}, name)",
         "hide": 0,
         "includeAll": true,
-        "label": "Licences a afficher",
+        "label": "Licences à afficher",
         "multi": true,
         "name": "license",
         "options": [],
@@ -591,7 +584,7 @@
     ]
   },
   "timezone": "Europe/Paris",
-  "title": "Detail vendeur FlexLM",
+  "title": "Licences FlexLM - Détail éditeur",
   "uid": "flexlm-vendor-detail",
   "version": 1
 }

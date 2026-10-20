@@ -20,14 +20,14 @@ divers/            Fichiers hors projet supervision
 
 | Fichier | Titre dans Grafana | UID |
 |---|---|---|
-| `01-cao-global-overview.json` | CAO Compute - Global Overview | `global-overview-dash` |
-| `02-cao-detail-serveur.json` | Detail serveur | `server-detail-dash` |
+| `01-cao-global-overview.json` | Serveurs CAO - Vue globale | `global-overview-dash` |
+| `02-cao-detail-serveur.json` | Détail serveur | `server-detail-dash` |
 | `03-cao-vue-fpga.json` | Vue FPGA - Utilisateur | `fpga-vue-utilisateur` |
-| `04-alertes.json` | Supervision - Alerts | `alerts-overview-dash` |
-| `05-cao-trends-capacity.json` | CAO Compute - Trends & Capacity | `cao-trends-dash` |
-| `06-flexlm-vue-globale.json` | Supervision FlexLM - Vue globale | `flexlm-supervision-dash` |
-| `07-flexlm-detail-vendeur.json` | Detail vendeur FlexLM | `flexlm-vendor-detail` |
-| `08-flexlm-rapport-licences.json` | FlexLM - Licence usage report | `flexlm-licence-report` |
+| `04-alertes.json` | Supervision - Alertes | `alerts-overview-dash` |
+| `05-cao-trends-capacity.json` | Serveurs CAO - Tendances et capacité | `cao-trends-dash` |
+| `06-flexlm-vue-globale.json` | Licences FlexLM - Vue globale | `flexlm-supervision-dash` |
+| `07-flexlm-detail-vendeur.json` | Licences FlexLM - Détail éditeur | `flexlm-vendor-detail` |
+| `08-flexlm-rapport-licences.json` | Licences FlexLM - Rapport d'utilisation | `flexlm-licence-report` |
 
 **Importer ou mettre à jour un dashboard :** Grafana → Dashboards → New → Import → coller le JSON ou charger le fichier → Import. Le dashboard existant est remplacé grâce à son UID.
 

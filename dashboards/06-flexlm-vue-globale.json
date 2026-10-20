@@ -15,7 +15,7 @@
       }
     ]
   },
-  "description": "Supervision FlexLM - vue globale par vendeur",
+  "description": "Licences FlexLM : état par éditeur, serveurs de licences, expiration",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
@@ -58,15 +58,15 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Vendeur"
+              "options": "Éditeur"
             },
             "properties": [
               {
                 "id": "links",
                 "value": [
                   {
-                    "title": "Voir le detail",
-                    "url": "/d/flexlm-vendor-detail/detail-vendeur-flexlm?var-vendor=${__data.fields.Vendeur}",
+                    "title": "Voir le détail",
+                    "url": "/d/flexlm-vendor-detail/detail-vendeur-flexlm?var-vendor=${__value.raw}",
                     "targetBlank": false
                   }
                 ]
@@ -76,7 +76,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Etat"
+              "options": "État"
             },
             "properties": [
               {
@@ -112,7 +112,7 @@
                     "type": "value",
                     "options": {
                       "0": {
-                        "text": "DOWN",
+                        "text": "ARRÊTÉ",
                         "color": "red"
                       }
                     }
@@ -121,7 +121,7 @@
                     "type": "value",
                     "options": {
                       "1": {
-                        "text": "UP",
+                        "text": "OK",
                         "color": "green"
                       }
                     }
@@ -146,7 +146,7 @@
         "sortBy": [
           {
             "desc": false,
-            "displayName": "Vendeur"
+            "displayName": "Éditeur"
           }
         ]
       },
@@ -186,7 +186,7 @@
           "refId": "C"
         }
       ],
-      "title": "Licences par vendeur",
+      "title": "Licences par éditeur",
       "transformations": [
         {
           "id": "joinByField",
@@ -215,15 +215,18 @@
               "Value #A": 5
             },
             "renameByName": {
-              "app": "Vendeur",
-              "Value #C": "Etat",
-              "Value #B": "Utilisees",
-              "Value #A": "Total"
+              "app": "Éditeur",
+              "Value #C": "État",
+              "Value #B": "Utilisées",
+              "Value #A": "Total",
+              "version": "Version",
+              "vendor": "Démon"
             }
           }
         }
       ],
-      "type": "table"
+      "type": "table",
+      "description": "Une ligne par éditeur.\n\n- **État** : OK = le démon de licences de l'éditeur fonctionne. ARRÊTÉ = plus personne ne peut prendre de licence de cet éditeur.\n- **Utilisées / Total** : licences prises en ce moment / licences possédées.\n\nCliquez sur un éditeur pour ouvrir son détail."
     },
     {
       "datasource": {
@@ -297,7 +300,7 @@
                     "type": "value",
                     "options": {
                       "0": {
-                        "text": "DOWN",
+                        "text": "ARRÊTÉ",
                         "color": "red"
                       }
                     }
@@ -306,7 +309,7 @@
                     "type": "value",
                     "options": {
                       "1": {
-                        "text": "UP",
+                        "text": "OK",
                         "color": "green"
                       }
                     }
@@ -331,7 +334,7 @@
         "sortBy": [
           {
             "desc": false,
-            "displayName": "app"
+            "displayName": "Éditeur"
           }
         ]
       },
@@ -349,7 +352,7 @@
           "refId": "A"
         }
       ],
-      "title": "Etat des serveurs de licences",
+      "title": "État des serveurs de licences",
       "transformations": [
         {
           "id": "organize",
@@ -368,12 +371,18 @@
               "Value": 4
             },
             "renameByName": {
-              "Value": "Statut"
+              "Value": "Statut",
+              "app": "Éditeur",
+              "fqdn": "Serveur",
+              "port": "Port",
+              "master": "Principal",
+              "version": "Version"
             }
           }
         }
       ],
-      "type": "table"
+      "type": "table",
+      "description": "Serveurs FlexLM qui distribuent les licences.\n\n- **Statut** : OK = serveur joignable. ARRÊTÉ = les licences de l'éditeur ne sont plus distribuées.\n- **Principal** : true = serveur principal pour cet éditeur."
     },
     {
       "datasource": {
@@ -447,7 +456,7 @@
                     "type": "value",
                     "options": {
                       "0": {
-                        "text": "DOWN",
+                        "text": "ARRÊTÉ",
                         "color": "red"
                       }
                     }
@@ -456,7 +465,7 @@
                     "type": "value",
                     "options": {
                       "1": {
-                        "text": "UP",
+                        "text": "OK",
                         "color": "green"
                       }
                     }
@@ -481,7 +490,7 @@
         "sortBy": [
           {
             "desc": false,
-            "displayName": "app"
+            "displayName": "Éditeur"
           }
         ]
       },
@@ -499,7 +508,7 @@
           "refId": "A"
         }
       ],
-      "title": "Etat des daemons vendeurs",
+      "title": "État des démons des éditeurs",
       "transformations": [
         {
           "id": "organize",
@@ -517,12 +526,16 @@
               "Value": 3
             },
             "renameByName": {
-              "Value": "Statut"
+              "Value": "Statut",
+              "app": "Éditeur",
+              "version": "Version",
+              "vendor": "Démon"
             }
           }
         }
       ],
-      "type": "table"
+      "type": "table",
+      "description": "Programme de licences de chaque éditeur.\n\n**Statut** : OK = actif. ARRÊTÉ = plus personne ne peut prendre de licence de cet éditeur, même si le serveur est OK."
     },
     {
       "datasource": {
@@ -554,8 +567,7 @@
                 "value": 0
               }
             ]
-          },
-          "unit": "d"
+          }
         },
         "overrides": [
           {
@@ -593,6 +605,14 @@
                     }
                   ]
                 }
+              },
+              {
+                "id": "unit",
+                "value": "suffix: jours"
+              },
+              {
+                "id": "decimals",
+                "value": 0
               }
             ]
           }
@@ -651,12 +671,18 @@
               "Value": 5
             },
             "renameByName": {
-              "Value": "Jours restants"
+              "Value": "Jours restants",
+              "app": "Éditeur",
+              "name": "Licence",
+              "vendor": "Démon",
+              "version": "Version",
+              "licenses": "Nb licences"
             }
           }
         }
       ],
-      "type": "table"
+      "type": "table",
+      "description": "Nombre de jours avant l'expiration de chaque licence, les plus proches en haut.\n\nRouge < 30 jours · jaune < 90 jours · vert au-delà. À surveiller pour anticiper les renouvellements."
     }
   ],
   "preload": false,
@@ -687,7 +713,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Supervision FlexLM - Vue globale",
+  "title": "Licences FlexLM - Vue globale",
   "uid": "flexlm-supervision-dash",
   "version": 1
 }
