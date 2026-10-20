@@ -1,0 +1,35 @@
+Objet : Nouveau – Suivez en temps réel l'état des serveurs de calcul CAO
+
+Bonjour à tous,
+
+Un nouvel outil est disponible pour vous aider au quotidien : la supervision des serveurs de calcul CAO.
+
+Il affiche en temps réel l'état des machines CAO, leur disponibilité et des statistiques d'utilisation. Vous pouvez notamment :
+  • choisir un serveur peu chargé avant de lancer un calcul ;
+  • vérifier l'espace disque disponible (/tmp, /scratch, /asic_tmp…) ;
+  • connaître la date du prochain redémarrage de maintenance ;
+  • retrouver vos processus en cours et ce qu'ils consomment ;
+  • vérifier qu'une licence (Vivado, QuestaSim…) est disponible.
+
+Comment y accéder ?
+  1. Ouvrez Chrome ou Edge : https://saxfrc0155.ux.main.fr.ds.corp
+  2. Connectez-vous : [mode de connexion / identifiant]
+  3. Ouvrez le dashboard « Serveurs CAO - Vue globale » : c'est la page d'accueil. Cliquez sur un serveur pour voir son détail.
+
+Astuce : survolez l'icône ⓘ à côté du titre d'un panneau pour savoir ce qu'il affiche.
+
+Documentation (Confluence) :
+  • Présentation du service : [lien Confluence]
+  • Guide d'utilisation : [lien Confluence]
+  • Glossaire : [lien Confluence]
+
+Managers : une vue « Tendances et capacité » et un suivi des licences FlexLM sont également disponibles. Voir la documentation managers : [lien Confluence]
+
+L'accès est en lecture seule : vous ne pouvez rien modifier ni casser, n'hésitez pas à explorer.
+
+Une question, une anomalie ou une idée d'amélioration ? Contactez [contact].
+
+Bonne utilisation,
+
+Alexis
+Administrateur système – TSAEM Cross-Program Digitization & Improvement
