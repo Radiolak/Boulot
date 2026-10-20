@@ -61,6 +61,7 @@ Si le fichier a été copié depuis le home : `sudo restorecon -v <fichier>` (co
 | `02-installation-grafana.txt` | Installation de Grafana |
 | `03-installation-node-exporter.txt` | Installation de node_exporter |
 | `04-installation-flexlm-exporter.md` | Installation de flexlm_exporter |
+| `05-sauvegarde-grafana.md` | Sauvegarde et restauration de la base Grafana |
 | `installation-complete.html` | Procédure d'installation complète |
 | `scripts/install_node_exporter.sh` | Installation de node_exporter sur un serveur |
 | `scripts/ajout_machine_node_exporter.sh` | Commandes pour ajouter une machine |
@@ -68,4 +69,5 @@ Si le fichier a été copié depuis le home : `sudo restorecon -v <fichier>` (co
 | `scripts/install_bogomips.sh` | Collecte des BogoMips (textfile collector) |
 | `scripts/generate_uid_map.sh` | Correspondance UID → nom d'utilisateur |
 | `scripts/migration_grafana.sh` | Migration vers Grafana 12.3.11 |
+| `scripts/backup_grafana.sh` | Sauvegarde quotidienne de la base et de la configuration Grafana |
 | `binaires/node_exporter-1.12.1.linux-amd64.tar.gz` | Binaire node_exporter (serveurs sans accès Internet) |
