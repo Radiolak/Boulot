@@ -32,7 +32,7 @@ groups:
           label_replace(label_replace(vector(6), "host", "psi.fr.airbusds.corp", "", ""), "grp", "B", "", "")
       # >>> SEUL ENDROIT A MODIFIER : semaine du mois du groupe A (1er tableau) et du groupe B (4eme semaine) <<<
       - record: reboot_plan_week
-        expr: (reboot_plan_weekday{grp="A"} * 0 + 2) or (reboot_plan_weekday{grp="B"} * 0 + 4)
+        expr: (reboot_plan_weekday{grp="A"} * 0 + 3) or (reboot_plan_weekday{grp="B"} * 0 + 4)
       - record: reboot_day_this_month
         expr: (time() - (scalar(day_of_month(vector(time()))) - 1) * 86400 - (time() % 86400)) + (((reboot_plan_weekday - scalar(day_of_week(vector((time() - (scalar(day_of_month(vector(time()))) - 1) * 86400 - (time() % 86400))))) + 7) % 7) + 7 * (reboot_plan_week - 1)) * 86400
       - record: reboot_day_next_month

@@ -100,7 +100,8 @@
         }
       ],
       "title": "Prometheus Targets Status",
-      "type": "stat"
+      "type": "stat",
+      "description": "**Servers UP** : serveurs qui répondent à la supervision.\n**Total configured** : serveurs surveillés.\n\nSi les deux chiffres sont différents, au moins un serveur est arrêté ou injoignable."
     },
     {
       "datasource": {
@@ -661,7 +662,8 @@
           }
         }
       ],
-      "type": "table"
+      "type": "table",
+      "description": "Consommation **actuelle** de chaque serveur (moyenne des 5 dernières minutes).\n\n- **CPU / Memory / Disk Usage** : % du processeur, de la RAM et des disques locaux utilisés. Vert < 70 %, jaune < 85 %, rouge au-delà.\n- **Network I/O** : trafic réseau en % de la vitesse de la carte (**Link speed**).\n- **Uptime / at reboot** : heures depuis le démarrage / heures au prochain redémarrage planifié.\n- **Next reboot** : date du prochain redémarrage de maintenance (6 h du matin).\n\nCliquez sur un serveur pour ouvrir son détail."
     },
     {
       "datasource": {
@@ -1239,7 +1241,8 @@
           }
         }
       ],
-      "type": "table"
+      "type": "table",
+      "description": "Fiche de chaque serveur, pour choisir où lancer un calcul.\n\n- **Usage** : plus forte valeur entre CPU et RAM. Unused < 10 % · Low < 30 % · Medium < 60 % · High < 80 % · OverUsed au-delà (et 5 min après un redémarrage).\n- **CPU Count** : nombre de cœurs.\n- **FQDN** : nom à utiliser pour se connecter (ssh).\n- **[FPGA View]** : ouvre la vue FPGA du serveur.\n\nCliquez sur l'Alias pour ouvrir le détail du serveur."
     }
   ],
   "preload": false,

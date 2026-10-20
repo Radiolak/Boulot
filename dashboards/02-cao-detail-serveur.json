@@ -366,7 +366,8 @@
           }
         }
       ],
-      "type": "table"
+      "type": "table",
+      "description": "Carte d'identité du serveur.\n\n- **Etat** : plus forte valeur entre CPU et RAM. OK < 60 %, HIGH < 95 %, CRITICAL au-delà.\n- **Uptime (h)** : heures depuis le dernier démarrage.\n- **Nb CPU** : nombre de cœurs. **RAM totale** : mémoire installée.\n- **BogoMips** : vitesse d'un cœur (plus c'est haut, plus c'est rapide)."
     },
     {
       "datasource": {
@@ -470,7 +471,8 @@
         }
       ],
       "title": "CPU - Utilisation globale",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "% du processeur utilisé, tous cœurs confondus (moyenne sur 5 min). Rouge au-dessus de 80 %.\n\nMontre quand le serveur est chargé. Les creux le soir et le week-end sont normaux."
     },
     {
       "datasource": {
@@ -574,7 +576,8 @@
         }
       ],
       "title": "CPU - Utilisation par CPU logique",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Une courbe par cœur (moyenne sur 5 min).\n\nQuelques cœurs à 100 % et les autres bas : le calcul en cours n'utilise qu'une partie du serveur."
     },
     {
       "datasource": {
@@ -709,7 +712,7 @@
       ],
       "title": "Local storage - Remaining free space per disk",
       "type": "timeseries",
-      "description": "Free space LEFT on local disks (xfs, ext4...). The total size of each disk is shown in the legend."
+      "description": "Espace **libre restant** sur chaque disque local. La taille totale est dans la légende.\n\nUne courbe qui descend = un disque qui se remplit. Orange sous 50 Go, rouge sous 20 Go.\nChoix des disques : liste **Local disks** en haut."
     },
     {
       "datasource": {
@@ -845,7 +848,7 @@
       ],
       "title": "Remote storage (NFS / CIFS) - Remaining free space per mount",
       "type": "timeseries",
-      "description": "Free space LEFT on network mounts (NFS, CIFS...) seen by this server. Automounted shares only appear while they are mounted."
+      "description": "Espace **libre restant** sur les partages réseau (NFS…) montés sur ce serveur.\n\nUn partage automonté n'apparaît que lorsqu'il est utilisé.\nChoix des partages : liste **Remote disks** en haut."
     },
     {
       "datasource": {
@@ -954,7 +957,8 @@
         }
       ],
       "title": "RAM - Usage / Evolution",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "% de la mémoire utilisée par les programmes (le cache libérable n'est pas compté).\n\nOrange au-dessus de 70 %, rouge au-dessus de 90 % : les calculs ralentissent fortement."
     },
     {
       "datasource": {
@@ -1235,7 +1239,8 @@
           }
         }
       ],
-      "type": "table"
+      "type": "table",
+      "description": "Situation **actuelle** de chaque disque : espace disponible, taille totale, type (Local ou Remote) et % used.\n\nVert < 80 %, orange < 90 %, rouge au-delà. À vérifier avant de lancer un calcul."
     },
     {
       "datasource": {
@@ -1373,7 +1378,8 @@
         }
       ],
       "title": "Reseau - Debit entrant / sortant",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Trafic réseau en bits/s : reçu au-dessus de l'axe, envoyé en dessous. La vitesse maximale de la carte est aussi tracée.\n\nUtile pour repérer un gros transfert de fichiers."
     },
     {
       "datasource": {
@@ -1507,7 +1513,8 @@
         }
       ],
       "title": "Reseau - Erreurs et pertes de paquets",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Erreurs et paquets perdus par seconde sur les cartes réseau.\n\nDoit rester à 0. Si des valeurs apparaissent de façon durable, prévenez l'équipe Supervision."
     },
     {
       "datasource": {
@@ -1612,7 +1619,8 @@
         }
       ],
       "title": "CPU usage by user",
-      "type": "bargauge"
+      "type": "bargauge",
+      "description": "Part du serveur utilisée par chaque utilisateur **en ce moment** (100 % = tout le serveur).\n\n**Free** = capacité encore libre. Les comptes système ne sont pas comptés."
     },
     {
       "datasource": {
@@ -1892,7 +1900,8 @@
           }
         }
       ],
-      "type": "table"
+      "type": "table",
+      "description": "Programmes en cours, regroupés par utilisateur.\n\n- **CPU %** : part du serveur utilisée.\n- **RAM** : mémoire utilisée.\n- **Nb instances** : nombre de processus identiques.\n- **Depuis** : lancement du plus ancien.\n\nFiltrez la colonne Utilisateur (entonnoir) pour retrouver vos processus."
     }
   ],
   "preload": false,

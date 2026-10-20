@@ -72,7 +72,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "count(max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range])) > 0)",
+          "expr": "count((max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range:6h])) > 0) < 100000)",
           "refId": "A",
           "legendFormat": "",
           "instant": true,
@@ -115,8 +115,8 @@
     {
       "id": 3,
       "type": "stat",
-      "title": "Average fill rate",
-      "description": "Average share of the purchased licences that was in use over the period (all features together).",
+      "title": "Avg fill rate (licences in use)",
+      "description": "Average fill rate of the licence features that were used at least once in the period (never-used features are counted separately).",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -134,7 +134,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "100 * sum(max by(app, name) (avg_over_time(flexlm_feature_used{app=~\"$vendor\"}[$__range])) and on(app, name) (max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range])) > 0)) / sum(max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range])) > 0)",
+          "expr": "avg((100 * (max by(app, name) (avg_over_time(flexlm_feature_used{app=~\"$vendor\"}[$__range:5m]))) / ((max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range:6h])) > 0) < 100000)) and on(app, name) ((max by(app, name) (max_over_time(max_over_time(flexlm_feature_used{app=~\"$vendor\"}[1d])[$__range:1d]))) > 0))",
           "refId": "A",
           "legendFormat": "",
           "instant": true,
@@ -209,7 +209,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "count((max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range])) > 0) unless on(app, name) ((max by(app, name) (max_over_time(flexlm_feature_used{app=~\"$vendor\"}[$__range]))) > 0)) or vector(0)",
+          "expr": "count(((max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range:6h])) > 0) < 100000) unless on(app, name) ((max by(app, name) (max_over_time(max_over_time(flexlm_feature_used{app=~\"$vendor\"}[1d])[$__range:1d]))) > 0)) or vector(0)",
           "refId": "A",
           "legendFormat": "",
           "instant": true,
@@ -275,7 +275,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "count((100 * max by(app, name) (avg_over_time(((flexlm_feature_used{app=~\"$vendor\"} >= bool flexlm_feature_issued{app=~\"$vendor\"}) and on(app, name) (flexlm_feature_issued{app=~\"$vendor\"} > 0))[$__range:5m]))) > 5) or vector(0)",
+          "expr": "count((100 * max by(app, name) (avg_over_time(((flexlm_feature_used{app=~\"$vendor\"} >= bool flexlm_feature_issued{app=~\"$vendor\"}) and on(app, name) (flexlm_feature_issued{app=~\"$vendor\"} > 0))[$__range:15m]))) > 5) or vector(0)",
           "refId": "A",
           "legendFormat": "",
           "instant": true,
@@ -341,7 +341,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "count(count by(user) (max_over_time(flexlm_feature_used_users{app=~\"$vendor\"}[$__range])))",
+          "expr": "count(max_over_time((count by(user) (count_over_time(flexlm_feature_used_users{app=~\"$vendor\"}[1d])))[$__range:1d]))",
           "refId": "A",
           "legendFormat": "",
           "instant": true,
@@ -383,9 +383,9 @@
     },
     {
       "id": 7,
-      "type": "bargauge",
-      "title": "Top 10 - most used licences (average fill rate)",
-      "description": "Average share of the licences of each feature that was in use over the period.",
+      "type": "table",
+      "title": "Top 10 - most used licences",
+      "description": "The 10 features with the highest average share of licences in use over the period.",
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -403,71 +403,133 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "topk(10, 100 * (max by(app, name) (avg_over_time(flexlm_feature_used{app=~\"$vendor\"}[$__range]))) / (max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range])) > 0))",
+          "expr": "topk(10, 100 * (max by(app, name) (avg_over_time(flexlm_feature_used{app=~\"$vendor\"}[$__range:5m]))) / ((max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range:6h])) > 0) < 100000))",
           "refId": "A",
-          "legendFormat": "{{name}} ({{app}})",
+          "legendFormat": "",
           "instant": true,
           "range": false,
-          "format": "time_series"
+          "format": "table"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "percent",
-          "min": 0,
-          "max": 100,
-          "decimals": 1,
-          "color": {
-            "mode": "thresholds"
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": false
           },
+          "decimals": 1,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "blue",
-                "value": null
-              },
-              {
                 "color": "green",
-                "value": 20
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Avg fill rate"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
               },
               {
-                "color": "yellow",
-                "value": 70
+                "id": "min",
+                "value": 0
               },
               {
-                "color": "red",
-                "value": 90
+                "id": "max",
+                "value": 100
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "gradient",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "blue",
+                      "value": null
+                    },
+                    {
+                      "color": "green",
+                      "value": 20
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 70
+                    },
+                    {
+                      "color": "red",
+                      "value": 90
+                    }
+                  ]
+                }
               }
             ]
           }
-        },
-        "overrides": []
+        ]
       },
       "options": {
-        "orientation": "horizontal",
-        "displayMode": "gradient",
-        "valueMode": "color",
-        "showUnfilled": true,
-        "namePlacement": "top",
-        "sizing": "auto",
-        "text": {
-          "titleSize": 13,
-          "valueSize": 16
+        "cellHeight": "sm",
+        "showHeader": true,
+        "enablePagination": false,
+        "sortBy": [
+          {
+            "displayName": "Avg fill rate",
+            "desc": true
+          }
+        ]
+      },
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
         },
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "app": 0,
+              "name": 1,
+              "Value": 2
+            },
+            "renameByName": {
+              "app": "Vendor",
+              "name": "Licence",
+              "Value": "Avg fill rate"
+            }
+          }
         }
-      }
+      ]
     },
     {
       "id": 8,
-      "type": "bargauge",
-      "title": "Top 10 - least used licences (but used at least once)",
+      "type": "table",
+      "title": "Top 10 - least used licences (used at least once)",
       "description": "Features that are used, but very little: the number of licences could probably be reduced.",
       "datasource": {
         "type": "prometheus",
@@ -486,66 +548,128 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "bottomk(10, (100 * (max by(app, name) (avg_over_time(flexlm_feature_used{app=~\"$vendor\"}[$__range]))) / (max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range])) > 0)) and on(app, name) ((max by(app, name) (max_over_time(flexlm_feature_used{app=~\"$vendor\"}[$__range]))) > 0))",
+          "expr": "bottomk(10, (100 * (max by(app, name) (avg_over_time(flexlm_feature_used{app=~\"$vendor\"}[$__range:5m]))) / ((max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range:6h])) > 0) < 100000)) and on(app, name) ((max by(app, name) (max_over_time(max_over_time(flexlm_feature_used{app=~\"$vendor\"}[1d])[$__range:1d]))) > 0))",
           "refId": "A",
-          "legendFormat": "{{name}} ({{app}})",
+          "legendFormat": "",
           "instant": true,
           "range": false,
-          "format": "time_series"
+          "format": "table"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "percent",
-          "min": 0,
-          "max": 100,
-          "decimals": 1,
-          "color": {
-            "mode": "thresholds"
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": false
           },
+          "decimals": 1,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "blue",
-                "value": null
-              },
-              {
                 "color": "green",
-                "value": 20
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Avg fill rate"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
               },
               {
-                "color": "yellow",
-                "value": 70
+                "id": "min",
+                "value": 0
               },
               {
-                "color": "red",
-                "value": 90
+                "id": "max",
+                "value": 100
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "gradient",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "blue",
+                      "value": null
+                    },
+                    {
+                      "color": "green",
+                      "value": 20
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 70
+                    },
+                    {
+                      "color": "red",
+                      "value": 90
+                    }
+                  ]
+                }
               }
             ]
           }
-        },
-        "overrides": []
+        ]
       },
       "options": {
-        "orientation": "horizontal",
-        "displayMode": "gradient",
-        "valueMode": "color",
-        "showUnfilled": true,
-        "namePlacement": "top",
-        "sizing": "auto",
-        "text": {
-          "titleSize": 13,
-          "valueSize": 16
+        "cellHeight": "sm",
+        "showHeader": true,
+        "enablePagination": false,
+        "sortBy": [
+          {
+            "displayName": "Avg fill rate",
+            "desc": false
+          }
+        ]
+      },
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
         },
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "app": 0,
+              "name": 1,
+              "Value": 2
+            },
+            "renameByName": {
+              "app": "Vendor",
+              "name": "Licence",
+              "Value": "Avg fill rate"
+            }
+          }
         }
-      }
+      ]
     },
     {
       "id": 9,
@@ -569,7 +693,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "(max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range])) > 0) unless on(app, name) ((max by(app, name) (max_over_time(flexlm_feature_used{app=~\"$vendor\"}[$__range]))) > 0)",
+          "expr": "((max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range:6h])) > 0) < 100000) unless on(app, name) ((max by(app, name) (max_over_time(max_over_time(flexlm_feature_used{app=~\"$vendor\"}[1d])[$__range:1d]))) > 0)",
           "refId": "A",
           "legendFormat": "",
           "instant": true,
@@ -669,7 +793,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "(100 * max by(app, name) (avg_over_time(((flexlm_feature_used{app=~\"$vendor\"} >= bool flexlm_feature_issued{app=~\"$vendor\"}) and on(app, name) (flexlm_feature_issued{app=~\"$vendor\"} > 0))[$__range:5m]))) > 0",
+          "expr": "(100 * max by(app, name) (avg_over_time(((flexlm_feature_used{app=~\"$vendor\"} >= bool flexlm_feature_issued{app=~\"$vendor\"}) and on(app, name) (flexlm_feature_issued{app=~\"$vendor\"} > 0))[$__range:15m]))) > 0",
           "refId": "A",
           "legendFormat": "",
           "instant": true,
@@ -682,7 +806,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range])) > 0",
+          "expr": "(max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range:6h])) > 0) < 100000",
           "refId": "B",
           "legendFormat": "",
           "instant": true,
@@ -695,7 +819,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "max by(app, name) (max_over_time(flexlm_feature_used{app=~\"$vendor\"}[$__range]))",
+          "expr": "max by(app, name) (max_over_time(max_over_time(flexlm_feature_used{app=~\"$vendor\"}[1d])[$__range:1d]))",
           "refId": "C",
           "legendFormat": "",
           "instant": true,
@@ -708,7 +832,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "count by(app, name) (count by(app, name, user) (max_over_time(flexlm_feature_used_users{app=~\"$vendor\"}[$__range])))",
+          "expr": "count by(app, name) (max_over_time((count by(app, name, user) (count_over_time(flexlm_feature_used_users{app=~\"$vendor\"}[1d])))[$__range:1d]))",
           "refId": "D",
           "legendFormat": "",
           "instant": true,
@@ -909,7 +1033,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "((100 * max by(app, name) (avg_over_time(((flexlm_feature_used{app=~\"$vendor\"} >= bool flexlm_feature_issued{app=~\"$vendor\"}) and on(app, name) (flexlm_feature_issued{app=~\"$vendor\"} > 0))[$__range:5m]))) > 5) * 0 + 3 or ((max by(app, name) (max_over_time(flexlm_feature_used{app=~\"$vendor\"}[$__range]))) == 0 and on(app, name) (max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range])) > 0)) * 0 + 0 or ((100 * (max by(app, name) (avg_over_time(flexlm_feature_used{app=~\"$vendor\"}[$__range]))) / (max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range])) > 0)) < 20) * 0 + 1 or (max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range])) > 0) * 0 + 2",
+          "expr": "((100 * max by(app, name) (avg_over_time(((flexlm_feature_used{app=~\"$vendor\"} >= bool flexlm_feature_issued{app=~\"$vendor\"}) and on(app, name) (flexlm_feature_issued{app=~\"$vendor\"} > 0))[$__range:15m]))) > 5) * 0 + 3 or ((max by(app, name) (max_over_time(max_over_time(flexlm_feature_used{app=~\"$vendor\"}[1d])[$__range:1d]))) == 0 and on(app, name) ((max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range:6h])) > 0) < 100000)) * 0 + 0 or ((100 * (max by(app, name) (avg_over_time(flexlm_feature_used{app=~\"$vendor\"}[$__range:5m]))) / ((max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range:6h])) > 0) < 100000)) < 20) * 0 + 1 or ((max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range:6h])) > 0) < 100000) * 0 + 2",
           "refId": "A",
           "legendFormat": "",
           "instant": true,
@@ -922,7 +1046,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range])) > 0",
+          "expr": "(max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range:6h])) > 0) < 100000",
           "refId": "B",
           "legendFormat": "",
           "instant": true,
@@ -935,7 +1059,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "max by(app, name) (avg_over_time(flexlm_feature_used{app=~\"$vendor\"}[$__range]))",
+          "expr": "max by(app, name) (avg_over_time(flexlm_feature_used{app=~\"$vendor\"}[$__range:5m]))",
           "refId": "C",
           "legendFormat": "",
           "instant": true,
@@ -948,7 +1072,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "max by(app, name) (max_over_time(flexlm_feature_used{app=~\"$vendor\"}[$__range]))",
+          "expr": "max by(app, name) (max_over_time(max_over_time(flexlm_feature_used{app=~\"$vendor\"}[1d])[$__range:1d]))",
           "refId": "D",
           "legendFormat": "",
           "instant": true,
@@ -961,7 +1085,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "100 * (max by(app, name) (avg_over_time(flexlm_feature_used{app=~\"$vendor\"}[$__range]))) / (max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range])) > 0)",
+          "expr": "100 * (max by(app, name) (avg_over_time(flexlm_feature_used{app=~\"$vendor\"}[$__range:5m]))) / ((max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range:6h])) > 0) < 100000)",
           "refId": "E",
           "legendFormat": "",
           "instant": true,
@@ -974,7 +1098,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "100 * (max by(app, name) (max_over_time(flexlm_feature_used{app=~\"$vendor\"}[$__range]))) / (max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range])) > 0)",
+          "expr": "100 * (max by(app, name) (max_over_time(max_over_time(flexlm_feature_used{app=~\"$vendor\"}[1d])[$__range:1d]))) / ((max by(app, name) (max_over_time(flexlm_feature_issued{app=~\"$vendor\"}[$__range:6h])) > 0) < 100000)",
           "refId": "F",
           "legendFormat": "",
           "instant": true,
@@ -987,7 +1111,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "100 * max by(app, name) (avg_over_time(((flexlm_feature_used{app=~\"$vendor\"} >= bool flexlm_feature_issued{app=~\"$vendor\"}) and on(app, name) (flexlm_feature_issued{app=~\"$vendor\"} > 0))[$__range:5m]))",
+          "expr": "100 * max by(app, name) (avg_over_time(((flexlm_feature_used{app=~\"$vendor\"} >= bool flexlm_feature_issued{app=~\"$vendor\"}) and on(app, name) (flexlm_feature_issued{app=~\"$vendor\"} > 0))[$__range:15m]))",
           "refId": "G",
           "legendFormat": "",
           "instant": true,
@@ -1000,7 +1124,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "count by(app, name) (count by(app, name, user) (max_over_time(flexlm_feature_used_users{app=~\"$vendor\"}[$__range])))",
+          "expr": "count by(app, name) (max_over_time((count by(app, name, user) (count_over_time(flexlm_feature_used_users{app=~\"$vendor\"}[1d])))[$__range:1d]))",
           "refId": "H",
           "legendFormat": "",
           "instant": true,
@@ -1373,7 +1497,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "topk(15, sum by(user) (count_over_time(flexlm_feature_used_users{app=~\"$vendor\"}[$__range])) / 60)",
+          "expr": "topk(15, sum by(user) (sum_over_time((sum by(user) (count_over_time(flexlm_feature_used_users{app=~\"$vendor\"}[1h])))[$__range:1h])) / 60)",
           "refId": "A",
           "legendFormat": "",
           "instant": true,
