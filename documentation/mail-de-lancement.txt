@@ -12,22 +12,18 @@ Il affiche en temps réel l'état des machines CAO, leur disponibilité et des s
   • vérifier qu'une licence (Vivado, QuestaSim…) est disponible.
 
 Comment y accéder ?
-  1. Ouvrez Chrome ou Edge : https://saxfrc0155.ux.main.fr.ds.corp
-  2. Connectez-vous : [mode de connexion / identifiant]
-  3. Ouvrez le dashboard « Serveurs CAO - Vue globale » : c'est la page d'accueil. Cliquez sur un serveur pour voir son détail.
+  - Ouvrez Chrome ou Edge : https://saxfrc0155.ux.main.fr.ds.corp
+  - Sur la page d'accueil cliquez sur un serveur pour voir son détail.
 
-Astuce : survolez l'icône ⓘ à côté du titre d'un panneau pour savoir ce qu'il affiche.
+Astuce : survolez l'icône ⓘ à côté du titre d'un panneau pour voir des détails sur ce qu'il veut montrer et les chiffres clés.
 
 Documentation (Confluence) :
-  • Présentation du service : [lien Confluence]
-  • Guide d'utilisation : [lien Confluence]
-  • Glossaire : [lien Confluence]
+  • [lien Confluence]
 
-Managers : une vue « Tendances et capacité » et un suivi des licences FlexLM sont également disponibles. Voir la documentation managers : [lien Confluence]
 
-L'accès est en lecture seule : vous ne pouvez rien modifier ni casser, n'hésitez pas à explorer.
+L'accès est en lecture seule, n'hésitez pas à explorer.
 
-Une question, une anomalie ou une idée d'amélioration ? Contactez [contact].
+Une question, une anomalie ou une idée d'amélioration ? Contactez Alexis Francesco: alexis.francesco@airbus.com.
 
 Bonne utilisation,
 
