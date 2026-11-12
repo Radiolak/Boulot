@@ -1,0 +1,9 @@
+
+
+Fichier	Modification
+EDB/common/param/param.pl	$G_SYD passe de $G_ROOTDIR/process/SYNCHRO à $G_ROOTDIR/SYNCHRO
+EDB/common/param/global_param.pl	Ajout de $MGCDISPLAY, $MGCENV, $ULMC_DIR, $UHL
+EDB/SYNCHRO/bin/synchro.pl	Boucle d'import padstack, cell, symbol, part et IBIS, plus le log temporaire concaténé en fin de script
+EDB/common/param/msg.txt	Codes SYN001 à SYN004. À vérifier : confirme qu'ils existent en prod
+EDB/API/bin/PartImport.pl	Traces [DEBUG] avant et après la copie. À décider : les livrer ou les retirer avant la MEP
+
