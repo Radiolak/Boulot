@@ -1,0 +1,27 @@
+Comment on récup les métriques:
+
+Installer agent Windows Exporter sur les vms
+https://github.com/prometheus-community/windows_exporter/releases  <----- vérifier si c'est sécure
+
+Puis vérifier si les métriques sont bien exposées: 
+
+http://localhost:9182/metrics
+
+
+prometheus.yml:
+
+scrape_configs:
+  - job_name: 'vms-windows'
+    scrape_interval: 15s
+    static_configs:
+      - targets:
+          - '192.168.1.10:9182'
+          - '192.168.1.11:9182'
+
+
+Reddemarer puis http://<IP_PROMETHEUS>:9090/targets
+
+Faire les dashboards
+
+
+
